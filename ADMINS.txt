@@ -1,0 +1,8 @@
+INSERT INTO admin (email, password, phone_number, first_name) VALUES ('qroblesuriel@gmail.com', 'juj', 666666666, 'QuiqueMasterAdmin');
+
+UPDATE admin SET password ='pbkdf2:sha256:600000$UhQhpmX4PdPQ4tTK$c57ddef0750fcf75c4683c72a91f9b41f23118808eec759a6a62956068bf3345' WHERE phone_number=666666666;
+
+
+
+
+INSERT INTO event (name, date, max_guest_num, member_price, member_child_price, guest_price, admin_id) VALUES ('Concerto Night', '2024-02-15 18:30:00', 200, 25.0, 10.0, 35.0, 1);

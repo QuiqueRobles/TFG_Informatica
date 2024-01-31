@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User
+from .models import User,Admin
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
@@ -13,18 +13,27 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-
+        admin= Admin.query.filter_by(email=email).first()
         user = User.query.filter_by(email=email).first()
+        if admin:
+            if check_password_hash(admin.password, password):
+                flash('Logged in successfully as ADMIN!', category='success')
+                login_user(admin, remember=False)
+                print("Contraseña de admin aceptada")
+                return redirect(url_for('views.home'))
+            elif not user and not admin:
+                flash('Incorrect password for admin, try again.', category='error')
+                return render_template("login.html", user=current_user)
         if user:
             if check_password_hash(user.password, password):
                 flash('Logged in successfully!', category='success')
                 login_user(user, remember=True)
+                print("Contraseña de user aceptada")
                 return redirect(url_for('views.home'))
             else:
                 flash('Incorrect password, try again.', category='error')
         else:
             flash('Email does not exist.', category='error')
-
     return render_template("login.html", user=current_user)
 
 
@@ -42,7 +51,7 @@ def sign_up():
         first_name = request.form.get('firstName')
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
-
+        nif=request.form.get('NIF')
         user = User.query.filter_by(email=email).first()
         if user:
             flash('Email already exists.', category='error')
@@ -56,7 +65,7 @@ def sign_up():
             flash('Password must be at least 7 characters.', category='error')
         else:
             new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-                password1, method='sha256'))
+                password1, method='pbkdf2:sha256'),nif=nif)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)

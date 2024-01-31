@@ -1,5 +1,12 @@
 {% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
 %}
+<div class="container mt-5">
+  <!-- Centra la imagen utilizando las clases de Bootstrap -->
+  <div class="text-center">
+    <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="img-fluid" alt="gremaLogo">
+  </div>
+</div>
+<br />
 <form method="POST">
   <h3 align="center">Login</h3>
   <div class="form-group">
