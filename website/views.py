@@ -63,21 +63,16 @@ def delete_event(event_id):
 
 
 @views.route('/event-attendance/<int:event_id>', methods=['GET', 'POST'])
+@login_required
 def event_attendance(event_id):
+
     if request.method == 'POST':
-        # Procesar la información del formulario aquí
-        name = request.form.get('name')
-        email = request.form.get('email')
+
         event_id = request.form.get('event_id')
-
-        # Realizar acciones con la información (guardar en la base de datos, etc.)
-
-        return redirect(url_for('event_details', event_id=event_id))  # Redirigir a la página de detalles del evento
-
-    # Obtener información del evento para mostrar en el formulario
+        return redirect(url_for('event_details', event_id=event_id))
+    
     event = Event.query.get_or_404(event_id)
-
-    return render_template('event_attendance.html', event=event)
+    return render_template('event.html', event=event, user=current_user)
 
 
 
