@@ -31,27 +31,27 @@
                 <h3 align="center">Buy tickets</h3>
                 <div class="form-group">
                     <label for="number_member_tickets">Member tickets</label>
-                    <input type="number" class="form-control" id="number_member_tickets" name="number_member_tickets" placeholder="Member tickets" />
+                    <input type="number" class="form-control" id="number_member_tickets" name="number_member_tickets"
+                        placeholder="Member tickets" min="0" />
                 </div>
                 <div class="form-group">
                     <label for="number_child_member_tickets">Member tickets (child)</label>
                     <input type="number" class="form-control" id="number_child_member_tickets" name="number_child_member_tickets"
-                        placeholder="Member tickets (child)" />
+                        placeholder="Member tickets (child)" min="0" />
                 </div>
                 <div class="form-group">
                     <label for="number_guest_tickets">Guest tickets</label>
                     <input type="number" class="form-control" id="number_guest_tickets" name="number_guest_tickets"
-                        placeholder="Guest tickets" />
+                        placeholder="Guest tickets" min="0" />
                 </div>
                 <div class="form-group">
                     <label for="number_child_member_tickets">Member tickets (child)</label>
                     <input type="number" class="form-control" id="number_child_member_tickets" name="number_child_member_tickets"
-                        placeholder="Member tickets (child)" />
+                        placeholder="Member tickets (child)" min="0" />
                 </div>
                 <div class="form-group">
                     <label for="guests_names">Guest Names</label>
-                    <input type="text" class="form-control" id="guests_names" name="guests_names"
-                        placeholder="Guest names" />
+                    <input type="text" class="form-control" id="guests_names" name="guests_names" placeholder="Guest names" />
                 </div>
                 <div class="form-group">
                     <label for="totalAmount"></label>
@@ -60,6 +60,7 @@
                 <br />
                 <button type="submit" class="btn btn-primary">Purchase tickets</button>
             </form>
+
         </div>
     </div>
 </div>
@@ -67,7 +68,7 @@
 <script>
     $(document).ready(function () {
         // Precios de los tickets obtenidos del servidor o de tu base de datos
-        var memberPrice = {{ event.member_price }};
+    var memberPrice = {{ event.member_price }};
     var childMemberPrice = {{ event.member_child_price }};
     var guestPrice = {{ event.guest_price }};
 
