@@ -64,6 +64,43 @@
         </div>
     </div>
 </div>
+<script src="https://www.paypal.com/sdk/js?client-id=paypal_business_client_id&currency=USD"></script>
+<!-- Set up a container element for the button -->
+<div id="paypal-button-container">
+    <button type="submit" class="btn btn-primary">paypal</button>
+</div>
+<script>
+    paypal.Buttons({
+        // Sets up the transaction when a payment button is clicked
+        createOrder: (data, actions) => {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: '77.44' // Can also reference a variable or function
+                    }
+                }]
+            });
+        },
+        // Finalize the transaction after payer approval
+        // Finalize the transaction on the server after payer approval
+        onApprove: (data, actions) => {
+            return fetch(`/payments/${data.orderID}/capture`, {
+                method: "post",
+            })
+                .then((response) => response.json())
+                .then((orderData) => {
+                    // Successful capture! For dev/demo purposes:
+                    console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                    const transaction = orderData.purchase_units[0].payments.captures[0];
+                    // alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
+                    // When ready to go live, remove the alert and show a success message within this page. For example:
+                    const element = document.getElementById('paypal-button-container');
+                    element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                    // Or go to another URL:  actions.redirect('thank_you.html');
+                });
+        }
+    }).render('#paypal-button-container');
+</script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     $(document).ready(function () {
