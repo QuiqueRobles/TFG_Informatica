@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from .models import User,Admin
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
-
+import os
+from werkzeug.utils import secure_filename
 
 auth = Blueprint('auth', __name__)
 
@@ -49,6 +50,7 @@ def sign_up():
     if request.method == 'POST':
         email = request.form.get('email')
         first_name = request.form.get('firstName')
+        profile_image= request.files['profile_image']
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
         nif=request.form.get('NIF')
@@ -64,8 +66,20 @@ def sign_up():
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
+            if profile_image and allowed_file(profile_image.filename):
+                # Asegurar el nombre del archivo
+                filename = secure_filename(profile_image.filename)
+                # Guardar la imagen en la carpeta "static"
+                filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                print(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+                profile_image.save(filepath)
+                print(url_for('static',filename=f'images/{filename}'))
+            # Obtener la URL relativa de la imagen
+                img_url = url_for('static',filename=f'images/{filename}')
+            else: 
+                img_url=url_for('static',filename=f'images/userLogo.png')
             new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-                password1, method='pbkdf2:sha256'),nif=nif)
+                password1, method='pbkdf2:sha256'),nif=nif,user_profile_image_url=img_url)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
@@ -73,3 +87,7 @@ def sign_up():
             return redirect(url_for('views.home'))
 
     return render_template("sign_up.html", user=current_user)
+
+
+def allowed_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']

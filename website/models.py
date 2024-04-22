@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
     birthday = db.Column(db.Date) 
     creation_date = db.Column(db.Date, default=func.current_date()) 
     first_name = db.Column(db.String(150))
+    user_profile_image_url = db.Column(db.String(300))
     
 
 class Admin(db.Model, UserMixin):
@@ -28,6 +29,7 @@ class Admin(db.Model, UserMixin):
     creation_date = db.Column(db.Date, default=func.current_date()) 
     address=db.Column(db.String(150))
     events = db.relationship('Event')
+    admin_profile_image_url = db.Column(db.String(300))
 
 
 class Event(db.Model):
@@ -38,6 +40,7 @@ class Event(db.Model):
     member_price=db.Column(db.Float)
     member_child_price=db.Column(db.Float)
     guest_price=db.Column(db.Float)
+    child_price=db.Column(db.Float)
     img_url=db.Column(db.String(300))
     description=db.Column(db.String(800))
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'))
@@ -52,7 +55,6 @@ class Event_Attendance(db.Model):
     number_child_tickets = db.Column(db.Integer)
     number_member_tickets = db.Column(db.Integer)
     number_memberchild_tickets = db.Column(db.Integer)
-    member_price=db.Column(db.Float)
     guests_names = db.Column(db.String(300))
     cash_payment_in_event=db.Column(db.Boolean)
     total_price= db.Column(db.Float)
@@ -62,6 +64,7 @@ class Fee(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     payed= db.Column(db.Boolean)
     year= db.Column(db.String(4))
+    user_fee= db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class Child(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,6 +74,7 @@ class Child(db.Model):
     creation_date = db.Column(db.Date, default=func.current_date()) 
     name = db.Column(db.String(150))
     phone_number=db.Column(db.Integer)
+    child_profile_image_url = db.Column(db.String(300))
 
 class Partner(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -80,3 +84,4 @@ class Partner(db.Model):
     creation_date = db.Column(db.Date, default=func.current_date()) 
     name = db.Column(db.String(150))
     phone_number=db.Column(db.Integer)
+    partner_profile_image_url = db.Column(db.String(300))

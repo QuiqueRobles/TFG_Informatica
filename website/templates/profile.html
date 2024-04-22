@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content%}
+<br />
+
+<h1 align="center">{{ user.first_name}}</h1>
+<br />
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            {% if user.user_profile_image_url %}
+            <div class="profile-image-container">
+                <img src="{{ user.user_profile_image_url }}" alt="Profile Image">
+            </div>
+            {% else %}
+            <div class="profile-image-container">
+            <img src="{{ url_for('static', filename='images/userLogo.png') }}" class="card-img-top"
+                alt="{{ user.first_name }}">
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <p><strong>NIF:</strong> {{ user.nif }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+            <p><strong>Address:</strong> {{ user.address }}</p>
+            <p><strong>Birthday:</strong> {{ user.birthday }}</p>
+            <p><strong>Creation Date:</strong> {{ user.creation_date }}</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-image-container img {
+        max-width: 50%;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        justify-content: center; 
+        align-items: center;
+    }
+</style>
+
+{% endblock %}
+
