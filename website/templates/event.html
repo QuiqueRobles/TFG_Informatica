@@ -66,7 +66,11 @@
                 <!-- Un div para mostrar errores de validación -->
                 <div id="card-errors" role="alert"></div>
                 <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-                <button id="submit" type="submit" class="btn btn-primary">Purchase tickets</button>
+                <button id="submit" type="submit" class="btn btn-primary">
+                    <div class="spinner hidden" id="spinner"></div>
+                    <span id="button-text">Purchase tickets</span>
+
+                </button>
                 <div id="payment-message" class="hidden"></div>
             </form>
 
