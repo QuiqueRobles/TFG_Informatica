@@ -2,7 +2,11 @@
 <br />
 <h1 align="center">{{ event.name}}</h1>
 <br />
-<div id=payment-element class="row">
+<script src="https://js.stripe.com/v3/"></script>
+<script src="/static/checkout.js" defer></script>
+<link rel="stylesheet" href="/static/checkout.css" />
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<div class="row">
     <div class="col-md-6">
         <div class="card mb-4">
             {% if event.img_url %}
@@ -58,18 +62,19 @@
                     <label for="totalAmount"></label>
                     <p id="totalAmountDisplay"></p>
                 </div>
-                <br />
+                <div id="payment-element" class="form-control"></div>
+                <!-- Un div para mostrar errores de validación -->
+                <div id="card-errors" role="alert"></div>
+                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
                 <button id="submit" type="submit" class="btn btn-primary">Purchase tickets</button>
+                <div id="payment-message" class="hidden"></div>
             </form>
 
         </div>
     </div>
 </div>
 
-<script src="https://js.stripe.com/v3/"></script>
-<script src="checkout.js" defer></script>
-<link rel="stylesheet" href="checkout.css" />
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 
 <script>
     $(document).ready(function () {
