@@ -38,24 +38,30 @@ async function initialize() {
 async function handleSubmit(e) {
   e.preventDefault();
   setLoading(true);
+  console.log("Submitting form...");
+  // Obtener los datos del formulario
+  const formData = new FormData(document.getElementById("payment-form"));
+
+  // Convertir los datos del formulario en un objeto JSON
+  const formDataJSON = {};
+  formData.forEach((value, key) => {
+    formDataJSON[key] = value;
+  });
 
   const { error } = await stripe.confirmPayment({
     elements,
     confirmParams: {
       // Make sure to change this to your payment completion page
-      return_url: "http://localhost:5000/home.html",
+      return_url: "http://localhost:5000/success"
     },
   });
 
-  // This point will only be reached if there is an immediate error when
-  // confirming the payment. Otherwise, your customer will be redirected to
-  // your `return_url`. For some payment methods like iDEAL, your customer will
-  // be redirected to an intermediate site first to authorize the payment, then
-  // redirected to the `return_url`.
+  console.log("Confirmation result:", error);
   if (error.type === "card_error" || error.type === "validation_error") {
     showMessage(error.message);
   } else {
-    showMessage("An unexpected error occurred.");
+    showMessage("Payment succeeded!");
+    
   }
 
   setLoading(false);
@@ -116,3 +122,4 @@ function setLoading(isLoading) {
     document.querySelector("#button-text").classList.remove("hidden");
   }
 }
+

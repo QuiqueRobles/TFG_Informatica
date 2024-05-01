@@ -53,14 +53,50 @@ def event_attendance(event_id):
 def profile():
     return render_template('profile.html', user=current_user)
 
+
+@views.route('/success', methods=['GET', 'POST'])
+@login_required
+def success():
+    payment_intent_id = request.args.get('payment_intent')
+    print(payment_intent_id)
+    if payment_intent_id:
+        # Payment intent ID received, proceed to create entry in the database
+        try:
+            print("SUUUU2")
+            number_member_tickets = int(request.form['number_member_tickets'])
+            number_child_member_tickets = int(request.form['number_child_member_tickets'])
+            number_guest_tickets = int(request.form['number_guest_tickets'])
+            number_child_tickets = int(request.form['number_child_tickets'])
+            guests_names = request.form['guests_names']
+            print(number_member_tickets)
+            print(number_child_member_tickets)
+            print(number_child_tickets)
+            print(number_guest_tickets)
+            print(guests_names)
+
+            
+            return render_template('success.html')
+        except Exception as e:
+            # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
+            print("SUUUU3")
+            return render_template('error.html', message='Failed to create database entry')
+    else:
+        print("SUUUU4")
+        # No se recibió el ID del intento de pago, manejar el error adecuadamente
+        return render_template('error.html', message='Payment intent ID not provided')
+
+@views.route('/error', methods=['GET', 'POST'])
+@login_required
+def error():
+    return render_template('error.html', message='An error was detected')
+
 @views.route('/create-payment-intent', methods=['POST'])
 @login_required
 def create_payment():
     try:
-        data = json.loads(request.data)
+        data = json.loads(request.data)        
         intent = stripe.PaymentIntent.create(
-            #amount=calculate_order_amount(data['items']),
-            amount=500,
+            amount=700,
             currency='eur',
             automatic_payment_methods={
                 'enabled': True,
@@ -110,8 +146,19 @@ def create_event():
     flash('Event added correctly!', category='success')
     return 
 
-def calculate_order_amount(items):
-    # Replace this constant with a calculation of the order's amount
-    # Calculate the order total on the server to prevent
-    # people from directly manipulating the amount on the client
-    return 1000
+def calculate_order_amount(data):
+    # Calcula el monto total sumando los productos multiplicados por su cantidad
+    member_tickets = data.get('number_member_tickets', 0)
+    child_member_tickets = data.get('number_child_member_tickets', 0)
+    guest_tickets = data.get('number_guest_tickets', 0)
+    child_tickets = data.get('number_child_tickets', 0)
+    
+    member_price = float(data.get('member_price', 0))
+    child_member_price = float(data.get('member_child_price', 0))
+    guest_price = float(data.get('guest_price', 0))
+    child_price = float(data.get('child_price', 0))
+
+    total_amount = (member_tickets * member_price) + (child_member_tickets * child_member_price) + (guest_tickets * guest_price) + (child_tickets * child_price)
+    
+    return int(total_amount * 100)  # Convertir a centavos para Stripe
+  
