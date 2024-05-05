@@ -52,7 +52,7 @@ async function handleSubmit(e) {
     elements,
     confirmParams: {
       // Make sure to change this to your payment completion page
-      return_url: "http://localhost:5000/success"
+      return_url: "http://localhost:5000/success?" + new URLSearchParams(formData).toString()
     },
   });
 
@@ -61,7 +61,6 @@ async function handleSubmit(e) {
     showMessage(error.message);
   } else {
     showMessage("Payment succeeded!");
-    
   }
 
   setLoading(false);

@@ -2,7 +2,7 @@ import os
 import json
 from flask import Blueprint, render_template, request, flash, jsonify, url_for,Flask, current_app, redirect
 from flask_login import login_required, current_user
-from .models import User,Admin,Event
+from .models import User,Admin,Event,Event_Attendance
 from . import db
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -63,22 +63,32 @@ def success():
         # Payment intent ID received, proceed to create entry in the database
         try:
             print("SUUUU2")
-            number_member_tickets = int(request.form['number_member_tickets'])
-            number_child_member_tickets = int(request.form['number_child_member_tickets'])
-            number_guest_tickets = int(request.form['number_guest_tickets'])
-            number_child_tickets = int(request.form['number_child_tickets'])
-            guests_names = request.form['guests_names']
-            print(number_member_tickets)
-            print(number_child_member_tickets)
-            print(number_child_tickets)
-            print(number_guest_tickets)
-            print(guests_names)
+            # Extraer los datos del formulario de la solicitud
+            number_member_tickets = request.args.get('number_member_tickets')
+            number_child_member_tickets = request.args.get('number_child_member_tickets')
+            number_guest_tickets = request.args.get('number_guest_tickets')
+            number_child_tickets = request.args.get('number_child_tickets')
+            guests_names = request.args.get('guests_names')
+            
+            # Crear una nueva instancia de Event_Attendance con los datos del formulario
+            event_attendance = Event_Attendance(
+                number_member_tickets=number_member_tickets,
+                number_memberchild_tickets=number_child_member_tickets,
+                number_guest_tickets=number_guest_tickets,
+                number_child_tickets=number_child_tickets,
+                guests_names=guests_names,
+                user_id=current_user.id  # Asegúrate de reemplazar esto con el ID del usuario actual
+            )
+            
+            # Agregar la nueva instancia a la sesión y confirmar los cambios en la base de datos
+            db.session.add(event_attendance)
+            db.session.commit()
 
             
             return render_template('success.html')
         except Exception as e:
             # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
-            print("SUUUU3")
+            print(e)
             return render_template('error.html', message='Failed to create database entry')
     else:
         print("SUUUU4")
