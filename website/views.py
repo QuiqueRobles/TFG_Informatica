@@ -104,9 +104,20 @@ def error():
 @login_required
 def create_payment():
     try:
-        data = json.loads(request.data)        
+        data = json.loads(request.data) 
+
+        # Obtener los datos del formulario
+        number_member_tickets = data.get('number_member_tickets')
+        number_child_member_tickets = data.get('number_child_member_tickets')
+        number_guest_tickets = data.get('number_guest_tickets')
+        number_child_tickets = data.get('number_child_tickets')      
+        total_amount = float(data.get('totalAmount'))
+        
+        #Calculate amount for Stripe
+        amountStripe= int(total_amount*100)
+        print(f'amountStripe:{amountStripe}')
         intent = stripe.PaymentIntent.create(
-            amount=700,
+            amount=amountStripe,
             currency='eur',
             automatic_payment_methods={
                 'enabled': True,
@@ -156,19 +167,5 @@ def create_event():
     flash('Event added correctly!', category='success')
     return 
 
-def calculate_order_amount(data):
-    # Calcula el monto total sumando los productos multiplicados por su cantidad
-    member_tickets = data.get('number_member_tickets', 0)
-    child_member_tickets = data.get('number_child_member_tickets', 0)
-    guest_tickets = data.get('number_guest_tickets', 0)
-    child_tickets = data.get('number_child_tickets', 0)
-    
-    member_price = float(data.get('member_price', 0))
-    child_member_price = float(data.get('member_child_price', 0))
-    guest_price = float(data.get('guest_price', 0))
-    child_price = float(data.get('child_price', 0))
 
-    total_amount = (member_tickets * member_price) + (child_member_tickets * child_member_price) + (guest_tickets * guest_price) + (child_tickets * child_price)
-    
-    return int(total_amount * 100)  # Convertir a centavos para Stripe
   

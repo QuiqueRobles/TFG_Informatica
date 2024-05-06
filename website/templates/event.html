@@ -62,6 +62,10 @@
                     <label for="totalAmount"></label>
                     <p id="totalAmountDisplay"></p>
                 </div>
+                <div id="error-message" class="error-message hidden">You must fill in all the fields.</div>
+                <br />  
+                <button id="continue-btn" class="btn btn-primary">Continue with Payment</button>
+                <br /><br />
                 <div id="payment-element" class="form-control"></div>
                 <div id="card-errors" role="alert"></div>
                 <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
@@ -106,6 +110,7 @@
     updateTotal();
     });
 </script>
+
 
 
 

@@ -13,6 +13,13 @@ body {
     height: 100vh;
     width: 100vw;
 }
+.error-message {
+    color: red;
+    /* Color rojo para indicar un mensaje de error */
+    font-weight: bold;
+    /* Texto en negrita para resaltar el mensaje */
+    
+}
 
 form {
     width: 30vw;

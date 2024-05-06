@@ -6,7 +6,19 @@ const items = [{ id: "xl-tshirt" }];
 
 let elements;
 
-initialize();
+document.getElementById("continue-btn").addEventListener("click", function() {
+  event.preventDefault();
+  if (isFormValid()) {
+    initialize(); // Llama a la función initialize() si el formulario está válido
+  } else {
+    document.getElementById("error-message").classList.remove("hidden");
+    showMessage("You must fill in all the fields."); // Muestra un mensaje si el formulario no está completo
+  }
+  setTimeout(function() {
+      document.getElementById("error-message").classList.add("hidden");
+    }, 3000);
+});
+
 checkStatus();
 
 document
@@ -15,10 +27,21 @@ document
 
 // Fetches a payment intent and captures the client secret
 async function initialize() {
+
+  const totalAmount = $('#totalAmountDisplay').text().replace('Total Amount: €', '').trim();
+
+  const formData = {
+    number_member_tickets: document.getElementById("number_member_tickets").value,
+    number_child_member_tickets: document.getElementById("number_child_member_tickets").value,
+    number_guest_tickets: document.getElementById("number_guest_tickets").value,
+    number_child_tickets: document.getElementById("number_child_tickets").value,
+    totalAmount: totalAmount
+  };
+  
   const response = await fetch("/create-payment-intent", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ items }),
+    body: JSON.stringify(formData),
   });
   const { clientSecret } = await response.json();
 
@@ -53,6 +76,7 @@ async function handleSubmit(e) {
     confirmParams: {
       // Make sure to change this to your payment completion page
       return_url: "http://localhost:5000/success?" + new URLSearchParams(formData).toString()
+      //receipt_email: document.getElementById("email").value,
     },
   });
 
@@ -122,3 +146,15 @@ function setLoading(isLoading) {
   }
 }
 
+function isFormValid() {
+  // Obtén todos los campos del formulario
+  const inputs = document.querySelectorAll("#payment-form input[type='number'], #payment-form input[type='text']");
+
+  // Verifica si algún campo está vacío
+  for (const input of inputs) {
+    if (!input.value) {
+      return false; // Devuelve false si algún campo está vacío
+    }
+  }
+  return true; // Devuelve true si todos los campos están llenos
+}
