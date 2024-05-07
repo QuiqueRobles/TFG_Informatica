@@ -1,9 +1,6 @@
 // This is your test publishable API key.
 const stripe = Stripe("pk_test_51OfpDEDOahdbfVYL1Vc9nQ4TnnkZgWxaUghqWXNbMeuTIT7DRJQDGZoGucdQ2ws9xs1p4MlpNFFCWrjhewchZO3L00lf2gWEz8");
 
-// The items the customer wants to buy
-const items = [{ id: "xl-tshirt" }];
-
 let elements;
 
 document.getElementById("continue-btn").addEventListener("click", function() {
@@ -29,13 +26,15 @@ document
 async function initialize() {
 
   const totalAmount = $('#totalAmountDisplay').text().replace('Total Amount: €', '').trim();
+  
 
   const formData = {
     number_member_tickets: document.getElementById("number_member_tickets").value,
     number_child_member_tickets: document.getElementById("number_child_member_tickets").value,
     number_guest_tickets: document.getElementById("number_guest_tickets").value,
     number_child_tickets: document.getElementById("number_child_tickets").value,
-    totalAmount: totalAmount
+    totalAmount: totalAmount,
+    event_id:document.getElementById('eventId').dataset.eventId
   };
   
   const response = await fetch("/create-payment-intent", {
@@ -62,20 +61,31 @@ async function handleSubmit(e) {
   e.preventDefault();
   setLoading(true);
   console.log("Submitting form...");
+  // Obtener el totalAmount del elemento #totalAmountDisplay
+  const totalAmount = parseFloat(document.getElementById("totalAmountDisplay").textContent.replace('Total Amount: €', '').trim());
+
+  // Obtener el event_id del elemento #eventId
+  const eventId = document.getElementById("eventId").dataset.eventId;
+
   // Obtener los datos del formulario
   const formData = new FormData(document.getElementById("payment-form"));
+
+// Agregar el totalAmount y el event_id al formData
+  formData.append('totalAmount', totalAmount);
+  formData.append('event_id', eventId);
+  
 
   // Convertir los datos del formulario en un objeto JSON
   const formDataJSON = {};
   formData.forEach((value, key) => {
     formDataJSON[key] = value;
   });
-
+  console.log(formDataJSON);
   const { error } = await stripe.confirmPayment({
     elements,
     confirmParams: {
       // Make sure to change this to your payment completion page
-      return_url: "http://localhost:5000/success?" + new URLSearchParams(formData).toString()
+      return_url: "http://localhost:5000/success?" + new URLSearchParams(formData).toString(),
       //receipt_email: document.getElementById("email").value,
     },
   });

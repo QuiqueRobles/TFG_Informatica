@@ -24,14 +24,24 @@ def home():
         create_event()
     todos_los_eventos = Event.query.all()
     eventos_activos = [evento for evento in todos_los_eventos if evento.date >= datetime.now()]
-    for event in eventos_activos:
-        print(event.name)
+    
     if current_user.is_admin == True:
         print("Renderizando homeAdmin")
         return render_template("homeAdmin.html", user=current_user, active_event=eventos_activos)
     return render_template("home.html", user=current_user, active_event=eventos_activos)
 
+@views.route('/my_events', methods=['GET', 'POST'])
+@login_required
+def my_events():
+    user_attendances = Event_Attendance.query.filter_by(user_id=current_user.id).all()
+    events = [Event.query.get(attendance.event_id) for attendance in user_attendances]
+    now = datetime.now()
+    return render_template('my_events.html', user_attendances=user_attendances, events=events, user=current_user,now=now)
 
+@views.route('/about_us', methods=['GET', 'POST'])
+@login_required
+def about_us():
+    return render_template('about_us.html', user=current_user)
 
 @views.route('/delete-event/<int:event_id>', methods=['POST'])
 def delete_event(event_id): 
@@ -58,17 +68,18 @@ def profile():
 @login_required
 def success():
     payment_intent_id = request.args.get('payment_intent')
-    print(payment_intent_id)
     if payment_intent_id:
         # Payment intent ID received, proceed to create entry in the database
         try:
-            print("SUUUU2")
             # Extraer los datos del formulario de la solicitud
             number_member_tickets = request.args.get('number_member_tickets')
             number_child_member_tickets = request.args.get('number_child_member_tickets')
             number_guest_tickets = request.args.get('number_guest_tickets')
             number_child_tickets = request.args.get('number_child_tickets')
             guests_names = request.args.get('guests_names')
+            event_id = request.args.get('event_id')
+            totalAmount= request.args.get('totalAmount')
+
             
             # Crear una nueva instancia de Event_Attendance con los datos del formulario
             event_attendance = Event_Attendance(
@@ -77,7 +88,9 @@ def success():
                 number_guest_tickets=number_guest_tickets,
                 number_child_tickets=number_child_tickets,
                 guests_names=guests_names,
-                user_id=current_user.id  # Asegúrate de reemplazar esto con el ID del usuario actual
+                user_id=current_user.id,
+                event_id=event_id,
+                total_price=totalAmount
             )
             
             # Agregar la nueva instancia a la sesión y confirmar los cambios en la base de datos
@@ -112,16 +125,18 @@ def create_payment():
         number_guest_tickets = data.get('number_guest_tickets')
         number_child_tickets = data.get('number_child_tickets')      
         total_amount = float(data.get('totalAmount'))
-        
+        receipt_email = current_user.email
+        print(receipt_email)
         #Calculate amount for Stripe
         amountStripe= int(total_amount*100)
-        print(f'amountStripe:{amountStripe}')
+        
         intent = stripe.PaymentIntent.create(
             amount=amountStripe,
             currency='eur',
             automatic_payment_methods={
                 'enabled': True,
             },
+            receipt_email=receipt_email
         )
         return jsonify({
             'clientSecret': intent['client_secret']

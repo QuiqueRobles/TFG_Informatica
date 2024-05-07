@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}About Us{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" alt="GREMA Logo" class="img-fluid mb-4">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h2 style="color: #333; font-weight: bold;">GREMA - Greek-Spanish Families Association of Madrid</h2>
+            <p style="color: #555;">GREMA is the Association of Greek-Spanish families in the Community of Madrid. Our
+                goal is to promote interculturality and preserve Greek cultural heritage, language, and traditions
+                within Greek-Spanish families.</p>
+            <p style="color: #555;">GREMA είναι ο Σύλλογος Ελληνο-Ισπανικών Οικογενειών της Μαδρίτης. Ο στόχος μας είναι
+                η προώθηση της διαπολιτισμικότητας και η διατήρηση της ελληνικής πολιτιστικής κληρονομιάς, της γλώσσας
+                και των παραδόσεων στις ελληνο-ισπανικές οικογένειες.</p>
+        </div>
+        <div class="col-md-6">
+            <h2 style="color: #333; font-weight: bold;">Board of Directors / Διοικητικό Συμβούλιο</h2>
+            <ul style="color: #555;">
+                <li>Sofia Tsipa (Presidenta/Πρόεδρος)</li>
+                <li>Aikaterini Koutsou (Vicepresident /Αντιπρόεδρος)</li>
+                <li>Sylvia-Anna Orfanides (Secretaria/Γραμματεία)</li>
+                <li>Νikolaos Maris (Tesorero/Ταμίας)</li>
+                <li>Parthena Papandreadou (Vocal/Μέλος)</li>
+                <li>Galani Kiourtzi(Vocal/Μέλος)</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h2 style="color: #333; font-weight: bold;">Contact Us / Επικοινωνία</h2>
+            <p style="color: #555;">Contact us to learn more about our initiative, receive information about the
+                activities we carry out, or become a <span
+                    style="color: #ffcc00; font-weight: bold; font-family: 'Arial', sans-serif;">MEMBER</span>. The
+                more, the better!</p>
+            <p style="color: #555;">Επικοινώνησε μαζί μας για να μάθεις περισσότερα για την πρωτοβουλία μας, να λάβεις
+                πληροφορίες σχετικά με τις δραστηριότητες που πραγματοποιούμε ή να γίνεις μέλος. Όσοι περισσότεροι, τόσο
+                καλύτερα!</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}My Events{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">My Events</h1>
+    {% if user_attendances|length == 0 %}
+    <p class="text-center text-muted mb-4">You haven't signed up for any events yet.</p>
+    {% else %}
+    <div class="row row-cols-1 row-cols-md-4">
+        {% for i in range(user_attendances|length) %}
+        <div class="col mb-4">
+            <div class="card h-100">
+                {% if events[i].img_url %}
+                <img src="{{ events[i].img_url }}" class="card-img-top" alt="{{ events[i].name }}">
+                {% else %}
+                <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top"
+                    alt="{{ events[i].name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ events[i].name }}</h5>
+                    <p class="card-text">Event Date: {{ events[i].date }}</p>
+                    <p class="card-text">Number of Tickets:</p>
+                    <ul class="list-unstyled">
+                        <li>Member: {{ user_attendances[i].number_member_tickets }}</li>
+                        <li>Guest: {{ user_attendances[i].number_guest_tickets }}</li>
+                        <li>Child: {{ user_attendances[i].number_child_tickets }}</li>
+                        <li>Member's Child: {{ user_attendances[i].number_memberchild_tickets }}</li>
+                    </ul>
+                    <p class="card-text">Total Cost: {{ user_attendances[i].total_price }}</p>
+                    {% if events[i].date < now %} <p class="card-text text-success mb-0">Thank you for attending the
+                        event!</p> <!-- Mensaje de agradecimiento -->
+                        {% else %}
+                        <p class="card-text text-primary mb-0">See you there!</p>
+                        <!-- Mensaje para asistir al evento -->
+                        {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
