@@ -5,26 +5,26 @@
 <br />
 <div class="row">
   {% for event in active_event %}
-  <div class="col-md-6">
-    <div class="card mb-4">
+  <div class="col-md-4">
+
+    <div class="card mb-4 div-hover">
       {% if event.img_url %}
       <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
       {% else %}
       <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top" alt="{{ event.name }}">
       {% endif %}
       <div class="card-body">
+
         <h5 class="card-title">
           <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
         </h5>
-        Event Date: {{event.date}} <br/>
+        Event Date: {{event.date}} <br />
         Maximum capacity: {{event.max_guest_num}} people <br />
         Member price: {{event.member_price}} € <br />
-        Member price (Child): {{event.member_child_price}} € <br /> 
+        Member price (Child): {{event.member_child_price}} € <br />
         Guest price: {{event.guest_price}} € <br />
         Description: {{event.description}}
       </div>
-      <a href="{{ url_for('views.event_attendance', event_id=event.id) }}" class="btn btn-primary">Assist Event</a>
-
     </div>
   </div>
   {% endfor %}

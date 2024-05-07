@@ -31,6 +31,22 @@ content %}
     <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name" />
   </div>
   <div class="form-group">
+    <label for="Surname">Surname</label>
+    <input type="text" class="form-control" id="surname" name="surname" placeholder="Enter your surname" />
+  </div>
+  <div class="form-group">
+    <label for="birthday">Birthday Date</label>
+    <input type="date" class="form-control" id="birthday" name="birthday" />
+  </div>
+  <div class="form-group">
+    <label for="Phone Number">Phone Number</label>
+    <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Enter your Phone Number" />
+  </div>
+  <div class="form-group">
+    <label for="Phone Number">Address</label>
+    <input type="text" class="form-control" id="address" name="address" placeholder="Enter your full address" />
+  </div>
+  <div class="form-group">
     <label for="profile_image">Profile Image</label>
     <input type="file" class="form-control" id="profile_image" name="profile_image" />
   </div>
@@ -54,7 +70,134 @@ content %}
       placeholder="Confirm password"
     />
   </div>
+  <div class="form-group">
+    <label>Do you have a partner or children?</label><br>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="partnerCheckbox" name="familyStatus" value="partner">
+      <label class="form-check-label" for="partnerCheckbox">Partner</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="childrenCheckbox" name="familyStatus" value="children">
+      <label class="form-check-label" for="childrenCheckbox">Children</label>
+    </div>
+  </div>
+  <div id="childrenCountContainer" style="display: none;">
+    <div class="form-group">
+      <label for="childrenCount">Number of Children</label>
+      <select class="form-control" id="childrenCount" name="childrenCount">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <!-- Puedes agregar más opciones si es necesario -->
+      </select>
+    </div>
+  </div>
+  <div class="form-group" id="partnerForm" style="display: none;">
+    <label for="partnerName">Partner's Name</label>
+    <input type="text" class="form-control" id="partnerName" name="partnerName" placeholder="Enter partner's name" />
+  
+    <label for="partnerNIF">Partner's NIF</label>
+    <input type="text" class="form-control" id="partnerNIF" name="partnerNIF" placeholder="Enter partner's NIF" />
+  
+    <label for="partnerBirthday">Partner's Birthday</label>
+    <input type="date" class="form-control" id="partnerBirthday" name="partnerBirthday"
+      placeholder="Enter partner's birthday" />
+  
+    <label for="partnerPhoneNumber">Partner's Phone Number</label>
+    <input type="text" class="form-control" id="partnerPhoneNumber" name="partnerPhoneNumber"
+      placeholder="Enter partner's phone number" />
+  
+    <!-- Otros campos relacionados con la pareja... -->
+  </div>
+  
+  <div class="form-group" id="childrenForm" style="display: none;">
+    <label for="childName">Child's Name</label>
+    <input type="text" class="form-control" id="childName" name="childName" placeholder="Enter child's name" />
+  
+    <label for="childNIF">Child's NIF</label>
+    <input type="text" class="form-control" id="childNIF" name="childNIF" placeholder="Enter child's NIF" />
+  
+    <label for="childBirthday">Child's Birthday</label>
+    <input type="date" class="form-control" id="childBirthday" name="childBirthday"
+      placeholder="Enter child's birthday" />
+  
+    <label for="childPhoneNumber">Child's Phone Number</label>
+    <input type="text" class="form-control" id="childPhoneNumber" name="childPhoneNumber"
+      placeholder="Enter child's phone number" />
+  
+    <!-- Otros campos relacionados con los hijos... -->
+  </div>
+
+  <div id="childrenFormsContainer">
+    <!-- Aquí se agregarán dinámicamente los formularios de hijos -->
+  </div>
+
   <br />
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+<script>
+  // Función para mostrar u ocultar los formularios adicionales según las opciones seleccionadas
+  document.addEventListener('DOMContentLoaded', function () {
+    var partnerForm = document.getElementById('partnerForm');
+    var childrenForm = document.getElementById('childrenForm');
+    var partnerCheckbox = document.getElementById('partnerCheckbox');
+    var childrenCheckbox = document.getElementById('childrenCheckbox');
+
+    // Función para mostrar u ocultar el formulario de pareja
+    partnerCheckbox.addEventListener('change', function () {
+      if (this.checked) {
+        partnerForm.style.display = 'block';
+      } else {
+        partnerForm.style.display = 'none';
+      }
+    });
+
+    var childrenCountContainer = document.getElementById('childrenCountContainer');
+    var childrenFormsContainer = document.getElementById('childrenFormsContainer');
+    var childrenCheckbox = document.getElementById('childrenCheckbox');
+    var childrenCountSelect = document.getElementById('childrenCount');
+
+    // Función para mostrar u ocultar el campo de número de hijos según la casilla de children
+    childrenCheckbox.addEventListener('change', function () {
+      childrenCountContainer.style.display = this.checked ? 'block' : 'none';
+      if (!this.checked) {
+        childrenFormsContainer.innerHTML = ''; // Limpiamos el contenedor si desmarcan la casilla
+      }
+    });
+
+    // Función para agregar o quitar formularios de hijos según el número seleccionado
+    childrenCountSelect.addEventListener('change', function () {
+      var childrenCount = parseInt(this.value);
+      childrenFormsContainer.innerHTML = ''; // Limpiamos el contenedor
+
+      // Creamos y agregamos los formularios de hijos según el número seleccionado
+      for (var i = 1; i <= childrenCount; i++) {
+        var childForm = document.createElement('div');
+        childForm.className = 'form-group';
+        childForm.innerHTML = `
+          <label for="childName_${i}">Child's ${i} Name</label>
+<input type="text" class="form-control" id="childName_${i}" name="childName_${i}" placeholder="Enter child's name" />
+
+<label for="childNIF_${i}">Child's ${i} NIF</label>
+<input type="text" class="form-control" id="childNIF_${i}" name="childNIF_${i}" placeholder="Enter child's NIF" />
+
+<label for="childBirthday_${i}">Child's ${i} Birthday</label>
+<input type="date" class="form-control" id="childBirthday_${i}" name="childBirthday_${i}"
+  placeholder="Enter child's birthday" />
+
+<label for="childPhoneNumber_${i}">Child's ${i} Phone Number</label>
+<input type="text" class="form-control" id="childPhoneNumber_${i}" name="childPhoneNumber_${i}"
+  placeholder="Enter child's phone number" />
+
+        `;
+        childrenFormsContainer.appendChild(childForm);
+      }
+    });
+  });
+  
+</script>
+
 {% endblock %}

@@ -39,7 +39,6 @@ def my_events():
     return render_template('my_events.html', user_attendances=user_attendances, events=events, user=current_user,now=now)
 
 @views.route('/about_us', methods=['GET', 'POST'])
-@login_required
 def about_us():
     return render_template('about_us.html', user=current_user)
 

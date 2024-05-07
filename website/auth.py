@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
-from .models import User,Admin
+from .models import User,Admin,Partner,Child
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
 import os
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 auth = Blueprint('auth', __name__)
 
@@ -48,12 +49,21 @@ def logout():
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
+
+        ## USER ##  
         email = request.form.get('email')
         first_name = request.form.get('firstName')
+        surname = request.form.get('surname')
+        bd = request.form.get('birthday')
+        address = request.form.get('address')
+        phone_number = request.form.get('phone_number')
+        birthday= datetime.strptime(bd, '%Y-%m-%d').date()
         profile_image= request.files['profile_image']
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
         nif=request.form.get('NIF')
+
+                
         user = User.query.filter_by(email=email).first()
         if user:
             flash('Email already exists.', category='error')
@@ -78,11 +88,53 @@ def sign_up():
                 img_url = url_for('static',filename=f'images/{filename}')
             else: 
                 img_url=url_for('static',filename=f'images/userLogo.png')
-            new_user = User(email=email, first_name=first_name, password=generate_password_hash(
+            new_user = User(email=email, first_name=first_name, surname=surname, address=address, phone_number=phone_number, birthday=birthday, password=generate_password_hash(
                 password1, method='pbkdf2:sha256'),nif=nif,user_profile_image_url=img_url)
+            
             db.session.add(new_user)
+            
             db.session.commit()
             login_user(new_user, remember=True)
+
+            ## PARTNER ##
+
+            if any(request.form.getlist('partnerName')):
+                partner_name = request.form.get('partnerName')
+                partner_birthday= datetime.strptime(bd, '%Y-%m-%d').date()
+                partner_nif=request.form.get('partnerNIF')
+                partner_phone_number = request.form.get('partnerPhoneNumber')
+                new_partner = Partner(user_id= current_user.id, name=partner_name,nif=partner_nif,birthday=partner_birthday,phone_number=partner_phone_number)
+                db.session.add(new_partner)
+                db.session.commit()
+
+            ## CHILDREN ##
+
+            if any(request.form.getlist('childName')):
+                children = []
+                for key in request.form:
+                    if key.startswith('childName'):
+                        index = key.split('_')[1]
+                        child_name = request.form.get('childName_' + index)
+                        child_nif = request.form.get('childNIF_' + index)
+                        child_birthday = datetime.strptime(request.form.get('childBirthday_' + index), '%Y-%m-%d').date()
+                        child_phone_number = request.form.get('childPhoneNumber_' + index)
+                        children.append({
+                            'name': child_name,
+                            'nif': child_nif,
+                            'birthday': child_birthday,
+                            'phone_number': child_phone_number
+                        })
+                for child_data in children:
+                    new_child = Child(
+                        user_id=current_user.id, 
+                        name=child_data['name'],
+                        nif=child_data['nif'],
+                        birthday=child_data['birthday'],
+                        phone_number=child_data['phone_number']                    
+                    )
+                    db.session.add(new_child)
+                    db.session.commit()
+
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))
 
