@@ -9,7 +9,7 @@
     <div class="row row-cols-1 row-cols-md-4">
         {% for i in range(user_attendances|length) %}
         <div class="col mb-4">
-            <div class="card h-100">
+            <div class="card h-100 div-hover" >
                 {% if events[i].img_url %}
                 <img src="{{ events[i].img_url }}" class="card-img-top" alt="{{ events[i].name }}">
                 {% else %}

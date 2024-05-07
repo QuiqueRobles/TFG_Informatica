@@ -1,3 +1,5 @@
+.payment-form {
+
 /* Variables */
 * {
     box-sizing: border-box;
@@ -155,4 +157,6 @@ button:disabled {
         width: 80vw;
         min-width: initial;
     }
+}
+
 }

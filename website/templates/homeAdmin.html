@@ -6,16 +6,17 @@
 <br/>
 <div class="row">
     {% for event in active_event %}
-    <div class="col-md-6">
-        
-        <div class="card mb-4">
+    <div class="col-md-4">
+
+        <div class="card mb-4 div-hover">
             {% if event.img_url %}
             <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
             {% else %}
-            <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top" alt="{{ event.name }}">
+            <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top"
+                alt="{{ event.name }}">
             {% endif %}
             <div class="card-body">
-                
+
                 <h5 class="card-title">
                     <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
                 </h5>
@@ -33,6 +34,7 @@
     </div>
     {% endfor %}
 </div>
+
 <br/>  
 <form method="POST" enctype="multipart/form-data">
     <h3 align="center">Create Event</h3>

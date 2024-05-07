@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
     birthday = db.Column(db.Date) 
     creation_date = db.Column(db.Date, default=func.current_date()) 
     first_name = db.Column(db.String(150))
+    surname= db.Column(db.String(150))
     user_profile_image_url = db.Column(db.String(300))
     
 

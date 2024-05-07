@@ -1,0 +1,26 @@
+.gold-background {
+    background-color: rgb(255, 183, 0);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.gold-button {
+    background-color: rgb(255, 183, 0);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    transition: background-color 0.3s;
+}
+
+.gold-button:hover {
+    background-color: darkgoldenrod;
+}
+
+.animated-list-item {
+    transition: transform 0.3s ease;
+}
+
+.animated-list-item:hover {
+    transform: scale(1.05);
+}

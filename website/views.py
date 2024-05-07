@@ -43,6 +43,11 @@ def my_events():
 def about_us():
     return render_template('about_us.html', user=current_user)
 
+@views.route('/become_member', methods=['GET', 'POST'])
+@login_required
+def become_member():
+    return render_template('become_member.html', user=current_user)
+
 @views.route('/delete-event/<int:event_id>', methods=['POST'])
 def delete_event(event_id): 
     print("Deleting event")

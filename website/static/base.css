@@ -1,0 +1,18 @@
+.div-hover:hover {
+    /* Propiedades que deseas aplicar cuando el mouse está encima del div */
+    /*background-color: rgb(242, 241, 241); /* Por ejemplo, cambiar el color de fondo */
+    transform: scale(1.1);
+    /* Por ejemplo, aumentar el tamaño */
+    transition: background-color 0.3s, transform 0.3s;
+    /* Animación suave */
+}
+
+.span-hover:hover {
+    /* Propiedades que deseas aplicar cuando el mouse está encima del span */
+    /*color: red; /* Por ejemplo, cambiar el color del texto */
+    font-weight: bold;
+    /* Por ejemplo, hacer que el texto sea negrita */
+    transition: color 0.3s, font-weight 0.3s;
+    /* Animación suave */
+}
+

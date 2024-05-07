@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Become a Member{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/become_member.css">
+<br /><br /><br /><br />
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-primary shadow">
+                <div class="card-header gold-background text-white text-center" style="text-shadow: 4px 4px 8px #000000;">
+                    <h4 class="mb-0">Become a Member</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Welcome to <span style="color: rgb(27, 27, 146); font-weight: bold;">GREMA</span>, the <span style="color: rgb(27, 27, 146); font-weight: bold;">Greek-Spanish Association of Madrid!</span></p>
+                    <p class="mb-4">By becoming a member, you join our family and gain access to exclusive benefits:</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item animated-list-item">Access to privileged events</li>
+                        <li class="list-group-item animated-list-item">Reduced prices for events</li>
+                        <li class="list-group-item animated-list-item">Membership covers the member, their spouse, and
+                            children (no additional fees for children)</li>
+                        <li class="list-group-item animated-list-item">Promotion of Greek values in Spain</li>
+                    </ul>
+                    <hr class="my-4">
+                    <p class="mb-4">Fill out the form below to become a member:</p>
+                    <form id="membership-form" action="/membership" method="POST">
+                        <div class="form-group">
+                            <label for="card-element">Credit or Debit Card</label>
+                            <div id="card-element" class="form-control"></div>
+                            <div id="card-errors" role="alert"></div>
+                        </div>
+                        <button id="submit-button" class="btn btn-primary btn-block gold-button">Submit Payment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="/static/membership.js" defer></script>
+
+{% endblock %}
