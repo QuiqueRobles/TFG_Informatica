@@ -23,4 +23,32 @@
 
 .animated-list-item:hover {
     transform: scale(1.05);
+
+}
+.custom-list {
+    list-style: none;
+    padding: 0;
+}
+
+.custom-list li {
+    position: relative;
+    padding-left: 20px;
+    /* Adjust as needed */
+    margin-bottom: 10px;
+    /* Adjust as needed */
+}
+
+.custom-list li:before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    /* Adjust as needed */
+    left: 0;
+    width: 18px;
+    /* Width of your custom bullet image */
+    height: 18px;
+    /* Height of your custom bullet image */
+    background-image: url('/static/images/star.png');
+    /* Replace 'path/to/your/image.png' with the path to your custom image */
+    background-size: cover;
 }
