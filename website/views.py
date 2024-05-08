@@ -2,7 +2,7 @@ import os
 import json
 from flask import Blueprint, render_template, request, flash, jsonify, url_for,Flask, current_app, redirect
 from flask_login import login_required, current_user
-from .models import User,Admin,Event,Event_Attendance
+from .models import User,Admin,Event,Event_Attendance,Fee
 from . import db
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -108,7 +108,29 @@ def success():
             print(e)
             return render_template('error.html', message='Failed to create database entry')
     else:
-        print("SUUUU4")
+        # No se recibió el ID del intento de pago, manejar el error adecuadamente
+        return render_template('error.html', message='Payment intent ID not provided')
+    
+@views.route('/success_membership', methods=['GET', 'POST'])
+@login_required
+def success_membership():
+    payment_intent_id = request.args.get('payment_intent')
+    if payment_intent_id:
+        try:
+            fee = Fee(
+                payed= True,
+                year= datetime.now().year,
+                user_fee= current_user.id
+            )
+            # Agregar la nueva instancia a la sesión y confirmar los cambios en la base de datos
+            db.session.add(fee)
+            db.session.commit()
+            return render_template('success_membership.html')
+        except Exception as e:
+            # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
+            print(e)
+            return render_template('error.html', message='Failed to create database entry')
+    else:
         # No se recibió el ID del intento de pago, manejar el error adecuadamente
         return render_template('error.html', message='Payment intent ID not provided')
 
@@ -187,4 +209,10 @@ def create_event():
     return 
 
 
-  
+@views.context_processor
+def inject_membership():
+    if current_user.is_authenticated:
+        is_member = Fee.query.filter_by(user_fee=current_user.id, payed=True).first() is not None
+    else:
+        is_member = False
+    return dict(is_member=is_member)

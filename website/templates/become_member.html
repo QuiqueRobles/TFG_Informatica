@@ -5,13 +5,44 @@
 <br /><br /><br /><br />
 <div class="container">
     <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card mb-4 border-primary">
+                <div class="profile-image-container mx-auto mt-4">
+                    {% if user.user_profile_image_url %}
+                    <img src="{{ user.user_profile_image_url }}" class="card-img-top rounded-circle"
+                        alt="Profile Image">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/userLogo.png') }}"
+                        class="card-img-top rounded-circle" alt="{{ user.first_name }}">
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title text-center">{{ user.first_name }} {{ user.surname }}</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong class="text-secondary">NIF:</strong> {{ user.nif }}</li>
+                        <li class="list-group-item"><strong class="text-secondary">Email:</strong> {{ user.email }}</li>
+                        <li class="list-group-item"><strong class="text-secondary">Phone Number:</strong> {{
+                            user.phone_number }}</li>
+                        <li class="list-group-item"><strong class="text-secondary">Address:</strong> {{ user.address }}
+                        </li>
+                        <li class="list-group-item"><strong class="text-secondary">Birthday:</strong> {{ user.birthday
+                            }}</li>
+                        <li class="list-group-item"><strong class="text-secondary">Creation Date:</strong> {{
+                            user.creation_date }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
         <div class="col-md-8">
-            <div class="card border-primary shadow">
-                <div class="card-header gold-background text-white text-center" style="text-shadow: 4px 4px 8px #000000;">
+            <div class="card shadow">
+                <div class="card-header gold-background text-white text-center"
+                    style="text-shadow: 4px 4px 8px #000000;">
                     <h4 class="mb-0">Become a Member</h4>
                 </div>
                 <div class="card-body">
-                    <p class="lead">Welcome to <span style="color: rgb(27, 27, 146); font-weight: bold;">GREMA</span>, the <span style="color: rgb(27, 27, 146); font-weight: bold;">Greek-Spanish Association of Madrid!</span></p>
+                    <p class="lead">Welcome to <span style="color: rgb(27, 27, 146); font-weight: bold;">GREMA</span>,
+                        the <span style="color: rgb(27, 27, 146); font-weight: bold;">Greek-Spanish Association of
+                            Madrid!</span></p>
                     <p class="mb-4">By becoming a member, you join our family and gain access to exclusive benefits:</p>
                     <ul class="list-group list-group-flush custom-list">
                         <li class="list-group-item animated-list-item">Access to privileged events</li>
@@ -22,14 +53,23 @@
                     </ul>
                     <hr class="my-4">
                     <p class="mb-4">Fill out the form below to become a member:</p>
-                    <form id="membership-form" action="/membership" method="POST">
-                        <div class="form-group">
-                            <label for="card-element">Credit or Debit Card</label>
-                            <div id="card-element" class="form-control"></div>
+                    <p class="mb-4">Membership fee: 30€ (Valid for the current calendar year)</p>
+                    <form id=membership-form method="POST" class="border-0">
+                        <button id="continue-btn" class="btn btn-primary btn-block gold-button">BECOME GREMA MEMBER</button>
+                        <br /><br />
+                        <div id="hidden-payment-form" class="hidden">
+                            <div id="payment-element" class="form-control"></div>
                             <div id="card-errors" role="alert"></div>
+                            <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                            <button id="submit" type="submit" class="btn btn-primary">
+                                <div class="spinner hidden" id="spinner"></div>
+                                <span id="button-text">Purchase tickets</span>
+                        
+                            </button>
+                            <div id="payment-message" class="hidden"></div>
                         </div>
-                        <button id="submit-button" class="btn btn-primary btn-block gold-button">Submit Payment</button>
                     </form>
+                        
                 </div>
             </div>
         </div>

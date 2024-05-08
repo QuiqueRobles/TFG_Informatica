@@ -15,7 +15,13 @@
                     <img src="{{ url_for('static', filename='images/userLogo.png') }}"
                         class="card-img-top rounded-circle" alt="{{ user.first_name }}">
                     {% endif %}
+                    {% if is_member %}
+                    <div class="alert alert-success text-center rounded-pill" role="alert" style="background-color: gold; color: black;">
+                        <strong>Member</strong>
+                    </div>
+                    {% endif %}
                 </div>
+                
             </div>
         </div>
         <div class="col-md-6">

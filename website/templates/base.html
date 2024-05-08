@@ -44,11 +44,19 @@
             {% endif %}
           </ul>
           {% if user.is_authenticated %}
+                  
           <ul class="navbar-nav ml-auto">
+            {% if not is_member %}
             <li class="nav-item">
               <a class="nav-item nav-link btn btn-warning rounded-pill font-weight-bold" id="becomeMember" href="/become_member"
                 style="color: #333;"><span class="span-hover">Become member!</span></a>
             </li>
+            {% else %}
+            <div class="alert alert-success text-center rounded-pill" role="alert"
+              style="background-color: gold; color: black; font-size: 14px; padding: 5px 10px;">
+              <strong>Member</strong>
+            </div>
+            {% endif %}
             <li class="nav-item">
               <a class="nav-link" href="/about_us">About Us</a>
             </li>
@@ -124,7 +132,6 @@
           }
         }
 </script>
-
 {% endblock %}
   </body>
 </html>
