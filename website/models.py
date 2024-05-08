@@ -1,6 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 
 
 
@@ -18,6 +19,8 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(150))
     surname= db.Column(db.String(150))
     user_profile_image_url = db.Column(db.String(300))
+    children = relationship("Child", back_populates="parent")
+    partner = relationship("Partner", back_populates="user")
     
 
 class Admin(db.Model, UserMixin):
@@ -76,6 +79,8 @@ class Child(db.Model):
     name = db.Column(db.String(150))
     phone_number=db.Column(db.Integer)
     child_profile_image_url = db.Column(db.String(300))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    parent = relationship("User", back_populates="children")
 
 class Partner(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -86,3 +91,5 @@ class Partner(db.Model):
     name = db.Column(db.String(150))
     phone_number=db.Column(db.Integer)
     partner_profile_image_url = db.Column(db.String(300))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = relationship("User", back_populates="partner")

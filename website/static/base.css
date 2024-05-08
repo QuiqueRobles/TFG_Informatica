@@ -16,3 +16,6 @@
     /* Animación suave */
 }
 
+.hidden {
+    display: none;
+}

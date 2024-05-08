@@ -141,34 +141,6 @@ def sign_up():
                     db.session.add(new_child)
                 
                 db.session.commit()
-            # if any(request.form.getlist('childName')):
-            #     print("TAMOS DONDE NIÑÑOSOSSSS")
-            #     children = []
-            #     for key in request.form:
-            #         if key.startswith('childName'):
-            #             parts = key.split('_')
-            #             if len(parts) >= 2:
-            #                 index = parts[1]
-            #                 child_name = request.form.get('childName_' + index)
-            #                 child_nif = request.form.get('childNIF_' + index)
-            #                 child_birthday = datetime.strptime(request.form.get('childBirthday_' + index), '%Y-%m-%d').date()
-            #                 child_phone_number = request.form.get('childPhoneNumber_' + index)
-            #                 children.append({
-            #                     'name': child_name,
-            #                     'nif': child_nif,
-            #                     'birthday': child_birthday,
-            #                     'phone_number': child_phone_number
-            #                 })
-            #     for child_data in children:
-            #         new_child = Child(
-            #             user_id=current_user.id, 
-            #             name=child_data['name'],
-            #             nif=child_data['nif'],
-            #             birthday=child_data['birthday'],
-            #             phone_number=child_data['phone_number']                    
-            #         )
-            #         db.session.add(new_child)
-            #         db.session.commit()
 
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))

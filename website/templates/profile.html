@@ -1,48 +1,161 @@
 {% extends "base.html" %}
 {% block title %}Profile{% endblock %}
 {% block content%}
-<br />
-
-<h1 align="center">{{ user.first_name}} {{user.surname}}</h1>
-<br />
-<div class="row">
-    <div class="col-md-6">
-        <div class="card mb-4">
-            {% if user.user_profile_image_url %}
-            <div class="profile-image-container">
-                <img src="{{ user.user_profile_image_url }}" alt="Profile Image">
+<br><br />
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="text-center ">{{ user.first_name}} {{ user.surname }}</h1>
+            <div class="card mb-4">
+                <div class="profile-image-container mx-auto mt-4">
+                    {% if user.user_profile_image_url %}
+                    <img src="{{ user.user_profile_image_url }}" class="card-img-top rounded-circle"
+                        alt="Profile Image">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/userLogo.png') }}"
+                        class="card-img-top rounded-circle" alt="{{ user.first_name }}">
+                    {% endif %}
+                </div>
             </div>
-            {% else %}
-            <div class="profile-image-container">
-            <img src="{{ url_for('static', filename='images/userLogo.png') }}" class="card-img-top"
-                alt="{{ user.first_name }}">
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong class="text-secondary">NIF:</strong> {{ user.nif }}</li>
+                        <li class="list-group-item"><strong class="text-secondary">Email:</strong> {{ user.email }}</li>
+                        <li class="list-group-item"><strong class="text-secondary">Phone Number:</strong> {{
+                            user.phone_number }}</li>
+                        <li class="list-group-item"><strong class="text-secondary">Address:</strong> {{ user.address }}
+                        </li>
+                        <li class="list-group-item"><strong class="text-secondary">Birthday:</strong> {{ user.birthday
+                            }}</li>
+                        <li class="list-group-item"><strong class="text-secondary">Creation Date:</strong> {{
+                            user.creation_date }}</li>
+                    </ul>
+                </div>
             </div>
-            {% endif %}
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card mb-4">
-            <p><strong>NIF:</strong> {{ user.nif }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
-            <p><strong>Address:</strong> {{ user.address }}</p>
-            <p><strong>Birthday:</strong> {{ user.birthday }}</p>
-            <p><strong>Creation Date:</strong> {{ user.creation_date }}</p>
+    {% if user.partner or user.children %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4 custom-color">Family</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if user.partner %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted text-center text-warning">Partner</h6>
+                                    {% for partner in user.partner %}
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-md-9">
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item"><strong class="custom-color">Name:</strong> {{
+                                                    partner.name }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">NIF:</strong> {{
+                                                    partner.nif }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">Phone
+                                                        Number:</strong> {{ partner.phone_number }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">Birthday:</strong>
+                                                    {{ partner.birthday }}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="partner-image-container">
+                                                {% if partner.partner_profile_image_url %}
+                                                <img src="{{ partner.partner_profile_image_url }}" class="rounded-circle"
+                                                    alt="Partner Image">
+                                                {% else %}
+                                                <img src="{{ url_for('static', filename='images/userLogo.png') }}"
+                                                    class="rounded-circle" alt="Default Partner Image">
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {% if user.children %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted text-center text-warning">Children</h6>
+                                    {% for child in user.children %}
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-md-9">
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item"><strong class="custom-color">Name:</strong> {{
+                                                    child.name }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">NIF:</strong> {{
+                                                    child.nif }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">Phone
+                                                        Number:</strong> {{ child.phone_number }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">Birthday:</strong>
+                                                    {{ child.birthday }}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="child-image-container">
+                                                {% if child.child_profile_image_url %}
+                                                <img src="{{ child.child_profile_image_url }}" class="rounded-circle"
+                                                    alt="Child Image">
+                                                {% else %}
+                                                <img src="{{ url_for('static', filename='images/userLogo.png') }}"
+                                                    class="rounded-circle" alt="Default Child Image">
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
 <style>
-    .profile-image-container img {
-        max-width: 50%;
-        height: auto;
-        margin-left: auto;
-        margin-right: auto;
-        display: flex;
-        justify-content: center; 
-        align-items: center;
+    .profile-image-container {
+        max-width: 150px;
     }
+
+    .card {
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 0.75rem 0;
+    }
+
+    .card-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .custom-color {
+        color: rgb(20, 73, 172);
+    }
+    .partner-image-container img,
+    .child-image-container img {
+        max-width: 80px; /* Ajusta el tamaño según sea necesario */
+        height: auto;
+    }
+    
 </style>
 
 {% endblock %}
-

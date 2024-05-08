@@ -3,18 +3,7 @@ const stripe = Stripe("pk_test_51OfpDEDOahdbfVYL1Vc9nQ4TnnkZgWxaUghqWXNbMeuTIT7D
 
 let elements;
 
-document.getElementById("continue-btn").addEventListener("click", function() {
-  event.preventDefault();
-  if (isFormValid()) {
-    initialize(); // Llama a la función initialize() si el formulario está válido
-  } else {
-    document.getElementById("error-message").classList.remove("hidden");
-    showMessage("You must fill in all the fields."); // Muestra un mensaje si el formulario no está completo
-  }
-  setTimeout(function() {
-      document.getElementById("error-message").classList.add("hidden");
-    }, 3000);
-});
+
 
 checkStatus();
 
@@ -168,3 +157,18 @@ function isFormValid() {
   }
   return true; // Devuelve true si todos los campos están llenos
 }
+
+document.getElementById("continue-btn").addEventListener("click", function() {
+  event.preventDefault();
+  if (isFormValid()) {
+    initialize();
+    document.getElementById("hidden-payment-form").classList.remove("hidden");
+    document.getElementById("formulario_a_ocultar").classList.add("hidden");
+  } else {
+    document.getElementById("error-message").classList.remove("hidden");
+    showMessage("You must fill in all the fields."); // Muestra un mensaje si el formulario no está completo
+  }
+  setTimeout(function() {
+      document.getElementById("error-message").classList.add("hidden");
+    }, 3000);
+});
