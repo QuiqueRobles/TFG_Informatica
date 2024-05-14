@@ -48,24 +48,29 @@
                         <li class="list-group-item animated-list-item">Access to privileged events</li>
                         <li class="list-group-item animated-list-item">Reduced prices for events</li>
                         <li class="list-group-item animated-list-item">Membership covers the member, their spouse, and
-                            children (no additional fees for children)</li>
+                            children</li>
                         <li class="list-group-item animated-list-item">Promotion of Greek values in Spain</li>
                     </ul>
                     <hr class="my-4">
                     <p class="mb-4">Fill out the form below to become a member:</p>
                     <p class="mb-4">Membership fee: 30€ (Valid for the current calendar year)</p>
                     <form id=membership-form method="POST" class="border-0">
-                        <button id="continue-btn" class="btn btn-primary btn-block gold-button">BECOME GREMA MEMBER</button>
+                        <div id="boton_a_ocultar">
+                        <button id="continue-btn" class="btn btn-primary btn-block gold-button  my-button">
+                            <span class="shimmer"></span>
+                            BECOME GREMA MEMBER 
+                        </button>
                         <br /><br />
+                        </div>
                         <div id="hidden-payment-form" class="hidden">
                             <div id="payment-element" class="form-control"></div>
                             <div id="card-errors" role="alert"></div>
                             <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-                            <button id="submit" type="submit" class="btn btn-primary">
-                                <div class="spinner hidden" id="spinner"></div>
-                                <span id="button-text">Purchase tickets</span>
-                        
+                            <button id="submit" type="submit" class=" my-button">
+                                <span class="text">PAY AND BECOME MEMBER</span>
+                                <span class="shimmer"></span>
                             </button>
+
                             <div id="payment-message" class="hidden"></div>
                         </div>
                     </form>

@@ -48,7 +48,7 @@
           <ul class="navbar-nav ml-auto">
             {% if not is_member %}
             <li class="nav-item">
-              <a class="nav-item nav-link btn btn-warning rounded-pill font-weight-bold" id="becomeMember" href="/become_member"
+              <a class="nav-item nav-link btn my-button btn-warning rounded-pill font-weight-bold" id="becomeMember" href="/become_member"
                 style="color: #333;"><span class="span-hover">Become member!</span></a>
             </li>
             {% else %}
@@ -73,7 +73,7 @@
       </div>
     </nav>
 
-
+    
 
     {% with messages = get_flashed_messages(with_categories=true) %} {% if
     messages %} {% for category, message in messages %} {% if category ==
@@ -133,5 +133,20 @@
         }
 </script>
 {% endblock %}
+<br><br><br><br><br><br>
+<footer class="footer">
+  <div>
+    <img src="/static/images/greek_laurel.png" alt="Laurel" />
+    <span class="text-white">&copy; 2024 GREMA. All rights reserved.</span>
+  </div>
+  <div>
+    
+  </div>
+  
+  <div>
+    <a href="/">Home</a> | <a href="/about_us">About Us</a>
+  </div>
+</footer>
+
   </body>
 </html>

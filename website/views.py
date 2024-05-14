@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Blueprint, render_template, request, flash, jsonify, url_for,Flask, current_app, redirect
+from flask import Blueprint, render_template, request, flash, jsonify, url_for,Flask, current_app, redirect, send_file
 from flask_login import login_required, current_user
 from .models import User,Admin,Event,Event_Attendance,Fee
 from . import db
@@ -54,6 +54,16 @@ def delete_event(event_id):
     db.session.delete(event)
     db.session.commit()
     return jsonify({'message': 'Event deleted successfully'})
+
+
+@views.route('/download_pdf/<int:attendance_id>')
+@login_required
+def download_pdf(attendance_id):
+    # Lógica para generar el PDF de la factura
+    pdf = generate_pdf(attendance_id)
+    # Devuelve el PDF al usuario
+    return send_file(pdf, as_attachment=True)
+
 
 
 @views.route('/event-attendance/<int:event_id>', methods=['GET', 'POST'])
@@ -171,10 +181,13 @@ def create_payment():
         return jsonify(error=str(e)), 403
     
 
+#################################################
+#################################################
+
+#FUNCTIONS#
+
 def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
-
-
 
 
 def create_event():
@@ -216,3 +229,20 @@ def inject_membership():
     else:
         is_member = False
     return dict(is_member=is_member)
+
+def generate_pdf(attendance_id):
+    # Lógica para obtener los datos de asistencia del evento
+    attendance = Event_Attendance.query.get_or_404(attendance_id)
+
+    # Lógica para generar el PDF de la factura utilizando ReportLab o PyFPDF
+    # (Ejemplo con ReportLab)
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+
+    pdf = f"attendance_{attendance_id}.pdf"
+    c = canvas.Canvas(pdf, pagesize=letter)
+    c.drawString(100, 750, "Event Attendance")
+    # Aquí agregar el resto de la información de la factura utilizando los datos de asistencia
+    c.save()
+
+    return pdf

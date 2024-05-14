@@ -42,7 +42,10 @@ def test_register_user(client):
                                      'profile_image': (f, 'userLogo.png'), 
                                      'password1': 'password', 
                                      'password2': 'password', 
-                                     'NIF': '12345678A'}, 
+                                     'NIF': '12345678A',
+                                     'birthday': '2024-12-12'                                      
+                                     },
+                                     
                                follow_redirects=True)
     
     # Verificar que se muestre un mensaje de éxito después del registro

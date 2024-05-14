@@ -39,7 +39,7 @@ async function initialize() {
 
 async function handleSubmit(e) {
   e.preventDefault();
-  setLoading(true);
+  //setLoading(true);
   
   const { error } = await stripe.confirmPayment({
     elements,
@@ -120,6 +120,6 @@ document.getElementById("continue-btn").addEventListener("click", function() {
   event.preventDefault();   
     initialize();
     document.getElementById("hidden-payment-form").classList.remove("hidden");
-    document.getElementById("formulario_a_ocultar").classList.add("hidden");
+    document.getElementById("boton_a_ocultar").classList.add("hidden");
  
 });
