@@ -9,13 +9,17 @@
             <br>
             <div class="card mb-4">
                 <div class="profile-image-container mx-auto mt-4">
-                    {% if user.user_profile_image_url %}
+                    {% if user.user_profile_image_url%}
                     <img src="{{ user.user_profile_image_url }}" class="card-img-top rounded-circle"
                         alt="Profile Image">
+                    {% elif user.admin_profile_image_url%}
+                    <img src="{{ user.admin_profile_image_url }}" class="card-img-top rounded-circle" alt="Profile Image">
                     {% else %}
+
                     <img src="{{ url_for('static', filename='images/userLogo.png') }}"
                         class="card-img-top rounded-circle" alt="{{ user.first_name }}">
                     {% endif %}
+                    
                     {% if is_member %}
                     <div class="alert alert-success text-center rounded-pill" role="alert"
                         style="background-color: gold; color: black; padding: 4px;">

@@ -23,7 +23,7 @@ def login():
                 login_user(admin, remember=False)
                 print("Contraseña de admin aceptada")
                 return redirect(url_for('views.home'))
-            elif not user and not admin:
+            else:
                 flash('Incorrect password for admin, try again.', category='error')
                 return render_template("login.html", user=current_user)
         if user:

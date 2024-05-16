@@ -9,7 +9,7 @@
     
     <div class="row">
         <div class="col-md-6">
-            <div class="card mb-4">
+            <div class="card shadow mb-4">
                 {% if event.img_url %}
                 <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
                 {% else %}
@@ -36,6 +36,7 @@
                 <form id=payment-form method="POST" class="border-0">
                     <div id="formulario_a_ocultar">
                     <h3 align="center">Buy tickets</h3>
+                    {% if user_fee %}
                     <div class="form-group">
                         <label for="number_member_tickets">Member tickets</label>
                         <input type="number" class="form-control" id="number_member_tickets" name="number_member_tickets"
@@ -46,6 +47,7 @@
                         <input type="number" class="form-control" id="number_child_member_tickets" name="number_child_member_tickets"
                             placeholder="Member tickets (child)" min="0" />
                     </div>
+                    {% endif %}
                     <div class="form-group">
                         <label for="number_guest_tickets">Guest tickets</label>
                         <input type="number" class="form-control" id="number_guest_tickets" name="number_guest_tickets"
@@ -64,6 +66,15 @@
                         <label for="totalAmount"></label>
                         <p id="totalAmountDisplay"></p>
                     </div>
+                    <div class="form-group">
+                        <label class="checkbox">
+                            <input type="checkbox" id="pay_cash" name="pay_cash">
+                            Pay with cash
+                        </label>
+                        <br>
+                        <small>You will pay at the event location if this button is marked</small>
+                    </div>
+
                     <div id="error-message" class="error-message hidden">You must fill in   all the fields.</div>
                     <br>
                     <button id="continue-btn" class="btn btn-primary">Continue with Payment</button>
@@ -76,7 +87,6 @@
                     <button id="submit" type="submit" class="btn btn-primary">
                         <div class="spinner hidden" id="spinner"></div>
                         <span id="button-text">Purchase tickets</span>
-
                     </button>
                     <div id="payment-message" class="hidden"></div>
                     </div>

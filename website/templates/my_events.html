@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}My Events{% endblock %}
 {% block content %}
+<br>
 <div class="container">
     <h1 class="text-center mb-4">My Events</h1>
     {% if user_attendances|length == 0 %}
@@ -9,7 +10,7 @@
     <div class="row row-cols-1 row-cols-md-4">
         {% for i in range(user_attendances|length) %}
         <div class="col mb-4">
-            <div class="card h-100 div-hover" >
+            <div class="card h-100 div-hover">
                 {% if events[i].img_url %}
                 <img src="{{ events[i].img_url }}" class="card-img-top" alt="{{ events[i].name }}">
                 {% else %}
@@ -25,6 +26,11 @@
                         <li>Guest: {{ user_attendances[i].number_guest_tickets }}</li>
                         <li>Child: {{ user_attendances[i].number_child_tickets }}</li>
                         <li>Member's Child: {{ user_attendances[i].number_memberchild_tickets }}</li>
+                        {%if user_attendances[i].cash_payment_in_event %}
+                        <li><span class="text-danger">Must pay at event</span></li>
+                        {%else%}
+                        <li><span class="text-success">Already paid correctly</span></li>
+                        {% endif%}
                     </ul>
                     <p class="card-text">Total Cost: {{ user_attendances[i].total_price }}</p>
                     {% if events[i].date < now %} <p class="card-text text-success mb-0">Thank you for attending the
@@ -33,6 +39,12 @@
                         <p class="card-text text-primary mb-0">See you there!</p>
                         <!-- Mensaje para asistir al evento -->
                         {% endif %}
+                </div>
+                <!-- Botón para descargar PDF -->
+                <div class="card-footer text-center">
+                    <form action="{{ url_for('views.download_event_pdf', event_id=events[i].id) }}" method="post">
+                        <button type="submit" class="btn btn-primary">Download PDF</button>
+                    </form>
                 </div>
             </div>
         </div>

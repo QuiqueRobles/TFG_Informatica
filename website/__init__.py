@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
+import os
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -11,7 +12,9 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
-    app.config['UPLOAD_FOLDER'] = 'C://Users//qrobl//OneDrive - Fundación Universitaria San Pablo CEU//Escritorio//QUIQUE//CEU//Quinto//TFG Informática//TFG_Informatica_Repo//website//static//images'
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    upload_folder = os.path.join(base_dir, "static", "images")
+    app.config['UPLOAD_FOLDER'] = upload_folder
     app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
     db.init_app(app)

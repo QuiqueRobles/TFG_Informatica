@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Manage Fees{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Manage Memberships</h1>
+    <p class="mb-4 justify-content-center">
+        <span style="color: #4CAF50;"><strong>Welcome to the Manage Fees page.</strong></span>
+        Here, you have the ability to both <span style="color: #4CAF50;"><strong>add</strong></span> and <span
+            style="color: #F44336;"><strong>remove</strong></span>
+        <span style="color:gold"><strong>memberships</strong></span>. However, it's important to exercise caution when using these functions. 
+        <span style="color: #4CAF50;"><strong>Adding</strong></span> or <span
+            style="color: #F44336;"><strong>removing</strong></span> a membership
+        should only be done under specific circumstances, such as when it has been requested via email or if there's an
+        error in the database. Please ensure that any action taken here aligns with the appropriate authorization and
+        verification processes to maintain the integrity of the membership system.
+    </p>
+
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <form method="post" action="{{ url_for('views.check_fee') }}" class="d-flex">
+                <input type="text" class="form-control me-2" name="user_email" placeholder="Search memberships by email...">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+    {% if user_fee_info %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="alert alert-{{ 'success' if user_fee_info.has_fee else 'danger' }} mt-3">
+                {% if user_fee_info.has_fee %}
+                <strong>User {{user_fee_info.user_email}} has a fee for {{ user_fee_info.year }}</strong>
+                {% else %}
+                <strong>User {{user_fee_info.user_email}} does not have a fee</strong>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <div class="card border-success" style="background-color: #f8f9fa;">
+                <div class="card-header bg-success text-white text-center">
+                    <h2 class="card-title mb-0">Add Membership</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('views.manage_memberships') }}">
+                        <div class="mb-3">
+                            <label for="user_email_add" class="form-label">User Email:</label>
+                            <input type="email" class="form-control" id="user_email_add" name="user_email_add" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="year_add" class="form-label">Year:</label>
+                            <input type="text" class="form-control" id="year_add" name="year_add" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Add Membership</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mt-4 mt-md-0">
+            <div class="card border-danger" style="background-color: #f8f9fa;;">
+                <div class="card-header bg-danger text-white text-center">
+                    <h2 class="card-title mb-0">Remove Membership</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('views.manage_memberships') }}">
+                        <div class="mb-3">
+                            <label for="user_email_delete" class="form-label">User Email:</label>
+                            <input type="text" class="form-control" id="user_email_delete" name="user_email_delete"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="year_delete" class="form-label">Year:</label>
+                            <input type="text" class="form-control" id="year_delete" name="year_delete" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">Remove Membership</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}C

@@ -26,11 +26,23 @@
           <ul class="navbar-nav mr-auto">
             {% if user.is_authenticated %}
             <li class="nav-item">
+              {% if user.is_admin %}
+              <a class="nav-link" href="/">Manage Events</a>
+              {%else%}
               <a class="nav-link" href="/">Incoming Events</a>
+              {%endif%}
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/my_events">My Events</a>
             </li>
+            {% if user.is_admin %}
+            <li class="nav-item">
+              <a class="nav-link" href="/manage_memberships">Manage Memberships</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/manage_event_attendances">Manage Event Attendances</a>
+            </li>
+            {%endif%}
             {% else %}
             <li class="nav-item">
               <a class="nav-link" href="/login">Login</a>
@@ -46,6 +58,14 @@
           {% if user.is_authenticated %}
                   
           <ul class="navbar-nav ml-auto">
+            {%if user.is_admin%}
+            <li class="nav-item">
+              <div class="alert alert-success text-center rounded-pill" role="alert"
+                style="background-color: rgb(52, 204, 231); color: black; font-size: 14px; padding: 5px 10px;">
+                <strong>Admin</strong>
+              </div>
+            </li>
+            {%endif%}
             {% if not is_member %}
             <li class="nav-item">
               <a class="nav-item nav-link btn my-button btn-warning rounded-pill font-weight-bold" id="becomeMember" href="/become_member"
