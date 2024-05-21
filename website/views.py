@@ -35,11 +35,42 @@ def home():
         create_event()
     todos_los_eventos = Event.query.all()
     eventos_activos = [evento for evento in todos_los_eventos if evento.date >= datetime.now()]
-    
+    event_details = []
+
+    for event in eventos_activos:
+        attendances = Event_Attendance.query.filter_by(event_id=event.id).all()
+        
+        total_tickets_sold = sum(
+            (attendance.number_guest_tickets or 0) + 
+            (attendance.number_child_tickets or 0) + 
+            (attendance.number_member_tickets or 0) + 
+            (attendance.number_memberchild_tickets or 0) 
+            for attendance in attendances
+        )
+        
+        tickets_remaining = event.max_guest_num - total_tickets_sold
+        
+        if (total_tickets_sold/event.max_guest_num > 0.6):
+            warning_few_tickets= True
+        else:
+            warning_few_tickets=False
+            
+        if (total_tickets_sold/event.max_guest_num==1):
+            sold_out=True
+        else:
+            sold_out=False
+            
+        event_details.append({
+            'event': event.id,
+            'tickets_remaining': tickets_remaining,
+            'warning_few_tickets': warning_few_tickets,
+            'sold_out':sold_out
+        })
+
     if current_user.is_admin == True:
         print("Renderizando homeAdmin")
-        return render_template("homeAdmin.html", user=current_user, active_event=eventos_activos)
-    return render_template("home.html", user=current_user, active_event=eventos_activos)
+        return render_template("homeAdmin.html", user=current_user, active_event=eventos_activos, event_details=event_details)
+    return render_template("home.html", user=current_user, active_event=eventos_activos, event_details=event_details)
 
 @views.route('/my_events', methods=['GET', 'POST'])
 @login_required
@@ -79,6 +110,57 @@ def event_attendance(event_id):
 def profile():
     return render_template('profile.html', user=current_user)
 
+@views.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    if request.method == 'POST':
+        # Obtener los datos del formulario de edición
+        first_name = request.form['first_name']
+        surname = request.form['surname']
+        nif = request.form['nif']
+        phone_number = request.form['phone_number']
+        address = request.form['address']
+        if not current_user.is_admin:
+            birthday = request.form['birthday']
+            try:
+                birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+            except:
+                birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
+        
+
+    current_user.first_name = first_name
+    current_user.surname = surname
+    current_user.nif = nif
+    current_user.phone_number = phone_number
+    current_user.address = address
+    if not current_user.is_admin:
+        current_user.birthday = birthday
+    if not current_user.is_admin:
+        if current_user.partner:
+                for partner in current_user.partner:
+                    partner.name = request.form['partner_name']
+                    partner.nif = request.form['partner_nif']
+                    partner.phone_number = request.form['partner_phone_number']
+                    birthday = request.form['partner_birthday']
+                    try:
+                        birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+                    except:
+                        birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
+                    partner.birthday=birthday
+
+        if current_user.children:
+                for child in current_user.children:
+                    child.name = request.form['child_name']
+                    child.nif = request.form['child_nif']
+                    child.phone_number = request.form['child_phone_number']
+                    birthday = request.form['child_birthday']
+                    try:
+                        birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+                    except:
+                        birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
+                    child.birthday=birthday
+    flash("Profile data updated correctly")
+    return render_template('profile.html', user=current_user)
 
 @views.route('/success', methods=['GET', 'POST'])
 @login_required

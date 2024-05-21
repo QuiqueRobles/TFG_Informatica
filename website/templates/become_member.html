@@ -25,10 +25,13 @@
                             user.phone_number }}</li>
                         <li class="list-group-item"><strong class="text-secondary">Address:</strong> {{ user.address }}
                         </li>
-                        <li class="list-group-item"><strong class="text-secondary">Birthday:</strong> {{ user.birthday
+                        {%if not user.is_admin%}
+                        <li class="list-group-item"><strong class="text-secondary">Birthday:</strong> {{ user.birthday.strftime('%d-%m-%Y')
                             }}</li>
+                        
                         <li class="list-group-item"><strong class="text-secondary">Creation Date:</strong> {{
-                            user.creation_date }}</li>
+                            user.creation_date.strftime('%d-%m-%Y') }}</li>
+                            {%endif%}
                     </ul>
                 </div>
             </div>

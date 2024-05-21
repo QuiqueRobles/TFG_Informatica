@@ -9,7 +9,7 @@
     
     <div class="row">
         <div class="col-md-6">
-            <div class="card shadow mb-4">
+            <div class="card  mb-4">
                 {% if event.img_url %}
                 <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
                 {% else %}
@@ -20,7 +20,7 @@
                     <h5 class="card-title">
                         <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
                     </h5>
-                    Event Date: {{event.date}} <br />
+                    Event Date: {{event.date.strftime('%d-%m-%Y')}} <br />
                     Maximum capacity: {{event.max_guest_num}} people <br />
                     Member price: {{event.member_price}} € <br />
                     Member price (Child): {{event.member_child_price}} € <br />
@@ -32,7 +32,7 @@
         </div>
 
         <div class="col-md-6">
-            <div class="card mb-4">
+            <div class="card mb-4 ">
                 <form id=payment-form method="POST" class="border-0">
                     <div id="formulario_a_ocultar">
                     <h3 align="center">Buy tickets</h3>
@@ -40,23 +40,23 @@
                     <div class="form-group">
                         <label for="number_member_tickets">Member tickets</label>
                         <input type="number" class="form-control" id="number_member_tickets" name="number_member_tickets"
-                            placeholder="Member tickets" min="0" />
+                            placeholder="Member tickets" min="0" value="0" />
                     </div>
                     <div class="form-group">
                         <label for="number_child_member_tickets">Member tickets (child)</label>
                         <input type="number" class="form-control" id="number_child_member_tickets" name="number_child_member_tickets"
-                            placeholder="Member tickets (child)" min="0" />
+                            placeholder="Member tickets (child)" min="0" value="0" />
                     </div>
                     {% endif %}
                     <div class="form-group">
                         <label for="number_guest_tickets">Guest tickets</label>
                         <input type="number" class="form-control" id="number_guest_tickets" name="number_guest_tickets"
-                            placeholder="Guest tickets" min="0" />
+                            placeholder="Guest tickets" min="0" value="0" />
                     </div>
                     <div class="form-group">
                         <label for="number_child_tickets">Child tickets</label>
                         <input type="number" class="form-control" id="number_child_tickets" name="number_child_tickets"
-                            placeholder="Child tickets" min="0" />
+                            placeholder="Child tickets" min="0" value="0"/>
                     </div>
                     <div class="form-group">
                         <label for="guests_names">Guest Names</label>

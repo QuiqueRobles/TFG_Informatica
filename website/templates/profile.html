@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Profile{% endblock %}
-{% block content%}
+{% block content %}
 <br><br />
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <h1 class="text-center ">{{ user.first_name}} {{ user.surname }}</h1>
+            <h1 class="text-center">{{ user.first_name }} {{ user.surname }}</h1>
             <br>
             <div class="card mb-4">
                 <div class="profile-image-container mx-auto mt-4">
-                    {% if user.user_profile_image_url%}
+                    {% if user.user_profile_image_url %}
                     <img src="{{ user.user_profile_image_url }}" class="card-img-top rounded-circle"
                         alt="Profile Image">
-                    {% elif user.admin_profile_image_url%}
-                    <img src="{{ user.admin_profile_image_url }}" class="card-img-top rounded-circle" alt="Profile Image">
+                    {% elif user.admin_profile_image_url %}
+                    <img src="{{ user.admin_profile_image_url }}" class="card-img-top rounded-circle"
+                        alt="Profile Image">
                     {% else %}
-
                     <img src="{{ url_for('static', filename='images/userLogo.png') }}"
                         class="card-img-top rounded-circle" alt="{{ user.first_name }}">
                     {% endif %}
-                    
+
                     {% if is_member %}
                     <div class="alert alert-success text-center rounded-pill" role="alert"
                         style="background-color: gold; color: black; padding: 4px;">
@@ -27,7 +27,6 @@
                     </div>
                     {% endif %}
                 </div>
-                
             </div>
         </div>
         <div class="col-md-6">
@@ -40,15 +39,18 @@
                             user.phone_number }}</li>
                         <li class="list-group-item"><strong class="text-secondary">Address:</strong> {{ user.address }}
                         </li>
-                        <li class="list-group-item"><strong class="text-secondary">Birthday:</strong> {{ user.birthday
-                            }}</li>
+                        {% if not user.is_admin %}
+                        <li class="list-group-item"><strong class="text-secondary">Birthday:</strong> {{
+                            user.birthday.strftime('%d-%m-%Y') }}</li>
                         <li class="list-group-item"><strong class="text-secondary">Creation Date:</strong> {{
-                            user.creation_date }}</li>
+                            user.creation_date.strftime('%d-%m-%Y') }}</li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
         </div>
     </div>
+
     {% if user.partner or user.children %}
     <div class="row">
         <div class="col-md-12">
@@ -65,21 +67,22 @@
                                     <div class="row align-items-center mb-3">
                                         <div class="col-md-9">
                                             <ul class="list-group list-group-flush">
-                                                <li class="list-group-item"><strong class="custom-color">Name:</strong> {{
-                                                    partner.name }}</li>
-                                                <li class="list-group-item"><strong class="custom-color">NIF:</strong> {{
-                                                    partner.nif }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">Name:</strong>
+                                                    {{ partner.name }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">NIF:</strong>
+                                                    {{ partner.nif }}</li>
                                                 <li class="list-group-item"><strong class="custom-color">Phone
                                                         Number:</strong> {{ partner.phone_number }}</li>
-                                                <li class="list-group-item"><strong class="custom-color">Birthday:</strong>
-                                                    {{ partner.birthday }}</li>
+                                                <li class="list-group-item"><strong
+                                                        class="custom-color">Birthday:</strong> {{ partner.birthday }}
+                                                </li>
                                             </ul>
                                         </div>
                                         <div class="col-md-3">
                                             <div class="partner-image-container">
                                                 {% if partner.partner_profile_image_url %}
-                                                <img src="{{ partner.partner_profile_image_url }}" class="rounded-circle"
-                                                    alt="Partner Image">
+                                                <img src="{{ partner.partner_profile_image_url }}"
+                                                    class="rounded-circle" alt="Partner Image">
                                                 {% else %}
                                                 <img src="{{ url_for('static', filename='images/userLogo.png') }}"
                                                     class="rounded-circle" alt="Default Partner Image">
@@ -101,14 +104,15 @@
                                     <div class="row align-items-center mb-3">
                                         <div class="col-md-9">
                                             <ul class="list-group list-group-flush">
-                                                <li class="list-group-item"><strong class="custom-color">Name:</strong> {{
-                                                    child.name }}</li>
-                                                <li class="list-group-item"><strong class="custom-color">NIF:</strong> {{
-                                                    child.nif }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">Name:</strong>
+                                                    {{ child.name }}</li>
+                                                <li class="list-group-item"><strong class="custom-color">NIF:</strong>
+                                                    {{ child.nif }}</li>
                                                 <li class="list-group-item"><strong class="custom-color">Phone
                                                         Number:</strong> {{ child.phone_number }}</li>
-                                                <li class="list-group-item"><strong class="custom-color">Birthday:</strong>
-                                                    {{ child.birthday }}</li>
+                                                <li class="list-group-item"><strong
+                                                        class="custom-color">Birthday:</strong> {{ child.birthday }}
+                                                </li>
                                             </ul>
                                         </div>
                                         <div class="col-md-3">
@@ -134,11 +138,126 @@
         </div>
     </div>
     {% endif %}
+
+    <!-- Botón de edición y formulario -->
+    <div class="text-center mb-4">
+        <button id="edit-profile-btn" class="btn btn-primary">Change Profile Data</button>
+    </div>
+    <div id="edit-profile-form" style="display: none;">
+        <form id="profile-edit-form" method="POST" action="/update_profile">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Edit Profile</h5>
+                    <!-- Campos de edición del perfil del usuario -->
+                    <div class="form-group">
+                        <label for="first_name">Nombre:</label>
+                        <input type="text" id="first_name" name="first_name" class="form-control"
+                            value="{{ user.first_name }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="surname">Apellido:</label>
+                        <input type="text" id="surname" name="surname" class="form-control" value="{{ user.surname }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="nif">NIF:</label>
+                        <input type="text" id="nif" name="nif" class="form-control" value="{{ user.nif }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone_number">Número de Teléfono:</label>
+                        <input type="tel" id="phone_number" name="phone_number" class="form-control"
+                            value="{{ user.phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Dirección:</label>
+                        <input type="text" id="address" name="address" class="form-control" value="{{ user.address }}">
+                    </div>
+                    {% if not user.is_admin %}
+                    <div class="form-group">
+                        <label for="birthday">Fecha de Nacimiento:</label>
+                        <input type="date" id="birthday" name="birthday" class="form-control"
+                            value="{{ user.birthday }}">
+                    </div>
+                    {% endif %}
+
+                    {% if user.partner %}
+                    {% for partner in user.partner %}
+                    <h5 class="mt-4">Partner</h5>
+                    <div class="form-group">
+                        <label for="partner_name">Partner Name:</label>
+                        <input type="text" id="partner_name" name="partner_name" class="form-control"
+                            value="{{ partner.name }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="partner_nif">Partner NIF:</label>
+                        <input type="text" id="partner_nif" name="partner_nif" class="form-control"
+                            value="{{ partner.nif }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="partner_phone_number">Partner Phone Number:</label>
+                        <input type="text" id="partner_phone_number" name="partner_phone_number" class="form-control"
+                            value="{{ partner.phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="partner_birthday">Partner Birthday:</label>
+                        <input type="date" id="partner_birthday" name="partner_birthday" class="form-control"
+                            value="{{ partner.birthday }}">
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if user.children %}
+                    <h5 class="mt-4">Children</h5>
+                    {% for child in user.children %}
+                    <div class="form-group">
+                        <label for="child_name">Child Name:</label>
+                        <input type="text" id="child_name" name="child_name" class="form-control"
+                            value="{{ child.name }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="child_nif">Child NIF:</label>
+                        <input type="text" id="child_nif" name="child_nif" class="form-control" value="{{ child.nif }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="child_phone_number">Child Phone Number:</label>
+                        <input type="text" id="child_phone_number" name="child_phone_number" class="form-control"
+                            value="{{ child.phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="child_birthday">Child Birthday:</label>
+                        <input type="date" id="child_birthday" name="child_birthday" class="form-control"
+                            value="{{ child.birthday }}">
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <!-- Botón de guardar cambios -->
+                    <button type="submit" class="btn btn-primary btn-block">Guardar Cambios</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Obtenemos el botón de edición y el formulario de edición
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const editProfileForm = document.getElementById('edit-profile-form');
+
+        // Agregamos un event listener para el clic en el botón de edición
+        editProfileBtn.addEventListener('click', function () {
+            // Alternamos la visibilidad del formulario de edición
+            if (editProfileForm.style.display === 'none') {
+                editProfileForm.style.display = 'block';
+            } else {
+                editProfileForm.style.display = 'none';
+            }
+        });
+    </script>
 </div>
 
 <style>
     .profile-image-container {
         max-width: 150px;
+        margin-bottom: 15px;
     }
 
     .card {
@@ -162,12 +281,21 @@
     .custom-color {
         color: rgb(20, 73, 172);
     }
+
     .partner-image-container img,
     .child-image-container img {
-        max-width: 80px; /* Ajusta el tamaño según sea necesario */
+        max-width: 80px;
+        /* Ajusta el tamaño según sea necesario */
         height: auto;
     }
-    
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-block {
+        width: 100%;
+    }
 </style>
 
 {% endblock %}

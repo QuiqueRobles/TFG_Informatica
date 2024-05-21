@@ -19,7 +19,7 @@
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ events[i].name }}</h5>
-                    <p class="card-text">Event Date: {{ events[i].date }}</p>
+                    <p class="card-text">Event Date: {{ events[i].date.strftime('%d-%m-%Y') }}</p>
                     <p class="card-text">Number of Tickets:</p>
                     <ul class="list-unstyled">
                         <li>Member: {{ user_attendances[i].number_member_tickets }}</li>

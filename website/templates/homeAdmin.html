@@ -20,7 +20,7 @@
                 <h5 class="card-title">
                     <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
                 </h5>
-                Event Date: {{event.date}} <br />
+                Event Date: {{event.date.strftime('%d-%m-%Y')}} <br />
                 Maximum capacity: {{event.max_guest_num}} people <br />
                 Member price: {{event.member_price}} € <br />
                 Member price (Child): {{event.member_child_price}} € <br />

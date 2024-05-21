@@ -18,8 +18,8 @@ async function initialize() {
   
 
   const formData = {
-    number_member_tickets: document.getElementById("number_member_tickets").value,
-    number_child_member_tickets: document.getElementById("number_child_member_tickets").value,
+    number_member_tickets: document.getElementById("number_member_tickets")?.value,
+    number_child_member_tickets: document.getElementById("number_child_member_tickets")?.value,
     number_guest_tickets: document.getElementById("number_guest_tickets").value,
     number_child_tickets: document.getElementById("number_child_tickets").value,
     guests_names: document.getElementById("guests_names").value,

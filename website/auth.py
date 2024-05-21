@@ -55,20 +55,25 @@ def sign_up():
         first_name = request.form.get('firstName')
         surname = request.form.get('surname')
         bd = request.form.get('birthday')
+        try:
+            birthday = datetime.strptime(bd, '%Y-%m-%d').date()
+        except ValueError:
+            birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
+
         address = request.form.get('address')
         phone_number = request.form.get('phone_number')
-        birthday= datetime.strptime(bd, '%Y-%m-%d').date()
+        
         profile_image= request.files['profile_image']
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
         nif=request.form.get('NIF')
-
-                
         user = User.query.filter_by(email=email).first()
         if user:
             flash('Email already exists.', category='error')
         elif len(email) < 4:
             flash('Email must be greater than 3 characters.', category='error')
+        elif not email or not first_name or not surname or not address or not phone_number or not password1 or not password2:
+            flash("Please complete all the mandatory fields", category='error')
         elif len(first_name) < 2:
             flash('First name must be greater than 1 character.', category='error')
         elif password1 != password2:
@@ -100,9 +105,15 @@ def sign_up():
 
             if any(request.form.getlist('partnerName')):
                 partner_name = request.form.get('partnerName')
-                partner_birthday= datetime.strptime(bd, '%Y-%m-%d').date()
+                bd = request.form.get('partnerBirthday')
+                try:
+                    partner_birthday= datetime.strptime(bd, '%Y-%m-%d').date()
+                except: 
+                    partner_birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
                 partner_nif=request.form.get('partnerNIF')
                 partner_phone_number = request.form.get('partnerPhoneNumber')
+                if not partner_name or not partner_birthday or not partner_nif or not partner_phone_number:
+                    flash("Missing fields of the partner, please complete them on profile page", category='error')
                 new_partner = Partner(user_id= current_user.id, name=partner_name,nif=partner_nif,birthday=partner_birthday,phone_number=partner_phone_number)
                 db.session.add(new_partner)
                 db.session.commit()
@@ -116,9 +127,14 @@ def sign_up():
                     if f'childName_{index}' in request.form:
                         child_name = request.form.get(f'childName_{index}')
                         child_nif = request.form.get(f'childNIF_{index}')
-                        child_birthday = datetime.strptime(request.form.get(f'childBirthday_{index}'), '%Y-%m-%d').date()
+                        cb=request.form.get(f'childBirthday_{index}')
+                        try:
+                            child_birthday = datetime.strptime(cb, '%Y-%m-%d').date()
+                        except:
+                            child_birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
                         child_phone_number = request.form.get(f'childPhoneNumber_{index}')
-                        
+                        if not child_name or not child_nif or not child_birthday or not child_phone_number:
+                            flash(f"Missing fields on children_{index}, please complete them on profile page",category='error')
                         children.append({
                             'name': child_name,
                             'nif': child_nif,
