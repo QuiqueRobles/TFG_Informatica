@@ -18,6 +18,8 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph
 from reportlab.lib.enums import TA_CENTER
+import base64
+#from pyzbar.pyzbar import decode
 
 
 
@@ -411,6 +413,19 @@ def create_payment():
         return jsonify(error=str(e)), 403
     
 
+@views.route('/process_qr', methods=['POST'])
+def process_qr():
+    data = request.json.get('qr_data')
+    print("SUUUUU")
+    # Aquí puedes procesar los datos del QR como necesites
+    # Por ahora, simplemente los retornamos
+    return jsonify({"status": "success", "data": data})
+    
+
+@views.route('/qr_reader', methods=['GET','POST'])
+def reader_qr():
+    return render_template('qr_reader.html', user=current_user)
+
 #################################################
 #################################################
 
@@ -461,17 +476,7 @@ def inject_membership():
     return dict(is_member=is_member)
 
 
-def generate_qr(event):
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(f"Event: {event.name}\nDate: {event.date.strftime('%B %d, %Y')}\nDescription: {event.description}")
-    qr.make(fit=True)
-    qr_img = qr.make_image(fill_color="black", back_color="white")
-    return qr_img
+
 
 def generate_event_pdf(event, user_attendance, current_user):
     # Crear un documento PDF
@@ -531,7 +536,19 @@ def generate_event_pdf(event, user_attendance, current_user):
     logo = Image(logo_path, width=100, height=100)
 
     # Crear el código QR
-    qr_data = f"Event: {event.name}\nDate: {event.date.strftime('%B %d, %Y')}\nDescription: {event.description}"
+    qr_data = f"""
+    Event: {event.name}
+    Date: {event.date.strftime('%B %d, %Y')}
+    Description: {event.description}
+    User: {user_name}
+    Email: {user_email}
+    Member Tickets: {user_attendance.number_member_tickets}
+    Guest Tickets: {user_attendance.number_guest_tickets}
+    Child Tickets: {user_attendance.number_child_tickets}
+    Member's Child Tickets: {user_attendance.number_memberchild_tickets}
+    Total Price: ${user_attendance.total_price}
+    Paid: {"Yes" if not user_attendance.cash_payment_in_event else "No"}
+    """
     qr = pyqrcode.create(qr_data)
 
     # Guardar el código QR en un archivo temporal
