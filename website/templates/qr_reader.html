@@ -15,6 +15,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/qr-scanner/qr-scanner.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/instascan@2/dist/instascan.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', async function () {
         const video = document.getElementById('video');
@@ -25,19 +26,24 @@
         const qrScanner = new QrScanner(video, result => handleQrCode(result));
 
         // Función para manejar los resultados del escaneo
-        function handleQrCode(result) {
-            qrScanner.stop();
-            resultDiv.innerText = `QR Code: ${result}`;
+         function handleQrCode(content) {
+            resultDiv.innerText = `QR Code: ${content}`;
             fetch('/process_qr', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ qr_data: result }),
+                body: JSON.stringify({ qr_data: content }),
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Success:', data);
+                    console.log('Success:', data);  
+                    // Mostrar la información en una tabla HTML
+                    if (data.status === "success") {
+                        displayQRInfo(data.data);
+                    } else {
+                        resultDiv.innerText = "QR data is incorrect.";
+                    }
                 })
                 .catch((error) => {
                     console.error('Error:', error);
@@ -83,7 +89,23 @@
                 console.error('Error listing cameras:', error);
             }
         }
+        function displayQRInfo(qrData) {
+            const table = document.createElement('table');
+            table.classList.add('table', 'table-bordered');
 
+            // Crear filas para cada campo del QR
+            for (const [key, value] of Object.entries(qrData)) {
+                const row = table.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                cell1.textContent = key;
+                cell2.textContent = value;
+            }
+
+            // Limpiar el contenido anterior y agregar la tabla al div de resultados
+            resultDiv.innerHTML = '';
+            resultDiv.appendChild(table);
+        }
         // Cambiar la cámara cuando se seleccione una opción diferente
         cameraSelect.addEventListener('change', () => {
             setupCamera(cameraSelect.value);
@@ -92,8 +114,8 @@
         // Listar las cámaras disponibles al cargar la página
         await listCameras();
 
-        // Iniciar el escáner QR
-        qrScanner.start();
+            // Iniciar el escáner QR
+            qrScanner.start();
     });
 </script>
 {% endblock %}

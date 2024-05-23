@@ -1,65 +1,45 @@
-document.addEventListener('DOMContentLoaded', async function() {
-    const video = document.getElementById('video');
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('preview');
     const resultDiv = document.getElementById('result');
 
-    // Función para configurar la cámara
-    async function setupCamera() {
-    try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
-        
-        // Encuentra el ID de la cámara trasera o utiliza la primera disponible
-        let deviceId;
-        for (const device of videoDevices) {
-            if (device.label.includes('back')) {
-                deviceId = device.deviceId;
-                break;
-            }
-        }
+    // Crear un nuevo escáner
+    let scanner = new Instascan.Scanner({ video: video });
 
-        // Si no se encontró una cámara trasera, utiliza la primera disponible
-        if (!deviceId && videoDevices.length > 0) {
-            deviceId = videoDevices[0].deviceId;
-        }
-
-        const constraints = {
-            video: {
-                deviceId: { exact: deviceId }
-            }
-        };
-
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
-    } catch (error) {
-        console.error('Error accessing the camera:', error);
-    }
-}
-
-
-    // Llama a la función setupCamera para configurar la cámara cuando se carga el DOM
-    setupCamera();
-
-    // Este código maneja el escaneo del código QR y el envío de datos al servidor
-    const qrScanner = new QrScanner(video, result => handleQrCode(result));
-    qrScanner.start();
-
-    function handleQrCode(result) {
-        qrScanner.stop();
-        resultDiv.innerText = `QR Code: ${result}`;
-
+    // Función para manejar los resultados del escaneo
+    scanner.addListener('scan', function(content) {
+        resultDiv.innerText = `QR Code: ${content}`;
+        // Realizar aquí las operaciones que deseas con el contenido del código QR
+        // Por ejemplo, enviar los datos al servidor mediante una solicitud POST
         fetch('/process_qr', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ qr_data: result }),
+            body: JSON.stringify({ qr_data: content }),
         })
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
+            if (data.status === "success") {
+            displayQRInfo(data.data);
+        } else {
+            resultDiv.innerText = "QR data is incorrect.";
+        }
         })
         .catch((error) => {
             console.error('Error:', error);
         });
-    }
+    });
+
+    // Iniciar la cámara y el escáner
+    Instascan.Camera.getCameras().then(function(cameras) {
+        if (cameras.length > 0) {
+            scanner.start(cameras[0]); // Comienza con la primera cámara disponible
+        } else {
+            console.error('No cameras found.');
+        }
+    }).catch(function(error) {
+        console.error('Error accessing cameras:', error);
+    });
+    
 });

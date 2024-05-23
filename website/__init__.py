@@ -27,10 +27,11 @@ def create_app():
     app.config['MAIL_USERNAME'] = 'brawnyhamster@gmail.com'
     app.config['MAIL_PASSWORD'] = 'leckyroque01'
     app.config['MAIL_DEFAULT_SENDER'] = 'brawnyhamster@gmail.com'
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
     db.init_app(app)
     mail.init_app(app)
-    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    
     
     from .views import views
     from .auth import auth

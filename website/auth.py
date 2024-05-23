@@ -180,7 +180,7 @@ def forgot_password():
             mail.send(msg)
             flash('Password reset link sent', 'info')
         else:
-            flash('Email not found', 'danger')
+            flash('Email not found', category='error')
     return render_template('forgot_password.html', user=current_user)
 
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
