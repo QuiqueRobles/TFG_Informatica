@@ -1,3 +1,5 @@
+# __init__.py
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
@@ -9,7 +11,7 @@ from itsdangerous import URLSafeTimedSerializer
 db = SQLAlchemy()
 mail = Mail()
 DB_NAME = "database.db"
-
+s = None  # Inicializamos s fuera de create_app
 
 def create_app():
     app = Flask(__name__)
@@ -20,18 +22,19 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = upload_folder
     app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
     
-    # Configuración de Flask-Mail para usar Outlook
+    # Configuración de Flask-Mail para usar Gmail
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = 'brawnyhamster@gmail.com'
-    app.config['MAIL_PASSWORD'] = 'leckyroque01'
-    app.config['MAIL_DEFAULT_SENDER'] = 'brawnyhamster@gmail.com'
+    app.config['MAIL_USERNAME'] = 'grematfginformatica@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'cqjubziosxffbssb'
+    app.config['MAIL_DEFAULT_SENDER'] = 'grematfginformatica@gmail.com'
+    
+    global s  # Hacemos que s sea global para que sea accesible desde auth.py
     s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
     db.init_app(app)
     mail.init_app(app)
-    
     
     from .views import views
     from .auth import auth
@@ -39,7 +42,7 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .models import User, Admin, Event, Event_Attendance, Child, Partner,Fee
+    from .models import User, Admin, Event, Event_Attendance, Child, Partner, Fee
     
     with app.app_context():
         db.create_all()
@@ -50,15 +53,14 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(id):
-        user=User.query.get(int(id))
-        admin=Admin.query.get(int(id))
+        user = User.query.get(int(id))
+        admin = Admin.query.get(int(id))
         if admin:
             return admin
         else:
             return user
 
     return app
-
 
 
 def create_database(app):

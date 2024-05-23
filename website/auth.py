@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from .models import User,Admin,Partner,Child
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db, mail   ##means from __init__.py import db
+from . import db, mail, s   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
 import os
 from werkzeug.utils import secure_filename
@@ -11,6 +11,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 
 auth = Blueprint('auth', __name__)
+
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -173,10 +174,10 @@ def forgot_password():
         email = request.form['email']
         user = User.query.filter_by(email=email).first()
         if user:
-            token = s.dumps(email, salt='email-confirm')
-            msg = Message('Password Reset Request', sender='noreply@demo.com', recipients=[email])
-            link = url_for('auth.reset_password', token=token, _external=True)
-            msg.body = f'Your link is {link}'
+            token = s.dumps(email, salt='password-reset-salt')
+            reset_url = url_for('auth.reset_password', token=token, _external=True)
+            msg = Message('Password Reset Request', recipients=[email])
+            msg.body = f'Please click the link to reset your password: {reset_url}'
             mail.send(msg)
             flash('Password reset link sent', 'info')
         else:
@@ -186,17 +187,21 @@ def forgot_password():
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     try:
-        email = s.loads(token, salt='email-confirm', max_age=3600)
+        email = s.loads(token, salt='password-reset-salt', max_age=3600)
     except SignatureExpired:
-        return '<h1>The token is expired!</h1>'
+        flash('The password reset link is invalid or has expired.', 'danger')
+        return redirect(url_for('auth.forgot_password'))
     
     if request.method == 'POST':
         new_password = request.form['password']
-        users[email] = new_password
-        flash('Your password has been updated!', 'success')
-        return redirect(url_for('login'))
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
+            db.session.commit()
+            flash('Your password has been updated!', 'success')
+            return redirect(url_for('auth.login'))
     
-    return render_template('reset_password.html', token=token)
+    return render_template('reset_password.html', token=token, user=current_user)
 
 
 @auth.route('/render_forgot_password', methods=['GET','POST'])

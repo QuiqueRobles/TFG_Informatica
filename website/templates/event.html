@@ -1,15 +1,18 @@
-    {% extends "base.html" %} {% block title %}Event{% endblock %} {% block content%}
-    <br />
-    <h1 align="center">{{ event.name}}</h1>
-    <br />
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="/static/checkout.js" defer></script>
-    <link rel="stylesheet" href="/static/checkout.css" />
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    
+{% extends "base.html" %}
+{% block title %}Event{% endblock %}
+{% block content %}
+<br />
+<h1 class="text-center mt-5">{{ event.name }}</h1>
+<br />
+<script src="https://js.stripe.com/v3/"></script>
+<script src="/static/checkout.js" defer></script>
+<link rel="stylesheet" href="/static/checkout.css" />
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<div class="container py-5">
     <div class="row">
         <div class="col-md-6">
-            <div class="card  mb-4">
+            <div class="card shadow-lg mb-4">
                 {% if event.img_url %}
                 <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
                 {% else %}
@@ -20,114 +23,194 @@
                     <h5 class="card-title">
                         <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
                     </h5>
-                    Event Date: {{event.date.strftime('%d-%m-%Y')}} <br />
-                    Maximum capacity: {{event.max_guest_num}} people <br />
-                    Member price: {{event.member_price}} € <br />
-                    Member price (Child): {{event.member_child_price}} € <br />
-                    Guest price: {{event.guest_price}} € <br />
-                    Child price: {{event.child_price}} € <br />
-                    Description: {{event.description}}
+                    <ul class="list-unstyled">
+                        <li><strong>Event Date:</strong> {{ event.date.strftime('%d-%m-%Y') }}</li>
+                        <li><strong>Maximum Capacity:</strong> {{ event.max_guest_num }} people</li>
+                        <li><strong>Member Price:</strong> {{ event.member_price }} €</li>
+                        <li><strong>Member Price (Child):</strong> {{ event.member_child_price }} €</li>
+                        <li><strong>Guest Price:</strong> {{ event.guest_price }} €</li>
+                        <li><strong>Child Price:</strong> {{ event.child_price }} €</li>
+                    </ul>
+                    <p class="card-text">{{ event.description }}</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card mb-4 ">
-                <form id=payment-form method="POST" class="border-0">
-                    <div id="formulario_a_ocultar">
-                    <h3 align="center">Buy tickets</h3>
-                    {% if user_fee %}
-                    <div class="form-group">
-                        <label for="number_member_tickets">Member tickets</label>
-                        <input type="number" class="form-control" id="number_member_tickets" name="number_member_tickets"
-                            placeholder="Member tickets" min="0" value="0" />
-                    </div>
-                    <div class="form-group">
-                        <label for="number_child_member_tickets">Member tickets (child)</label>
-                        <input type="number" class="form-control" id="number_child_member_tickets" name="number_child_member_tickets"
-                            placeholder="Member tickets (child)" min="0" value="0" />
-                    </div>
-                    {% endif %}
-                    <div class="form-group">
-                        <label for="number_guest_tickets">Guest tickets</label>
-                        <input type="number" class="form-control" id="number_guest_tickets" name="number_guest_tickets"
-                            placeholder="Guest tickets" min="0" value="0" />
-                    </div>
-                    <div class="form-group">
-                        <label for="number_child_tickets">Child tickets</label>
-                        <input type="number" class="form-control" id="number_child_tickets" name="number_child_tickets"
-                            placeholder="Child tickets" min="0" value="0"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="guests_names">Guest Names</label>
-                        <input type="text" class="form-control" id="guests_names" name="guests_names" placeholder="Guest names" />
-                    </div>
-                    <div class="form-group">
-                        <label for="totalAmount"></label>
-                        <p id="totalAmountDisplay"></p>
-                    </div>
-                    <div class="form-group">
-                        <label class="checkbox">
-                            <input type="checkbox" id="pay_cash" name="pay_cash">
-                            Pay with cash
-                        </label>
-                        <br>
-                        <small>You will pay at the event location if this button is marked</small>
-                    </div>
+            <div class="card shadow-lg mb-4">
+                <div class="card-body">
+                    <form id="payment-form" method="POST" class="border-0">
+                        <div id="formulario_a_ocultar">
+                            <h3 class="text-center">Buy tickets</h3>
+                            {% if user_fee %}
+                            <div class="form-group">
+                                <label for="number_member_tickets">Member tickets</label>
+                                <input type="number" class="form-control" id="number_member_tickets"
+                                    name="number_member_tickets" placeholder="Member tickets" min="0" value="0" />
+                            </div>
+                            <div class="form-group">
+                                <label for="number_child_member_tickets">Member tickets (child)</label>
+                                <input type="number" class="form-control" id="number_child_member_tickets"
+                                    name="number_child_member_tickets" placeholder="Member tickets (child)" min="0"
+                                    value="0" />
+                            </div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label for="number_guest_tickets">Guest tickets</label>
+                                <input type="number" class="form-control" id="number_guest_tickets"
+                                    name="number_guest_tickets" placeholder="Guest tickets" min="0" value="0" />
+                            </div>
+                            <div class="form-group">
+                                <label for="number_child_tickets">Child tickets</label>
+                                <input type="number" class="form-control" id="number_child_tickets"
+                                    name="number_child_tickets" placeholder="Child tickets" min="0" value="0" />
+                            </div>
+                            <div class="form-group">
+                                <label for="guests_names">Guest Names</label>
+                                <input type="text" class="form-control" id="guests_names" name="guests_names"
+                                    placeholder="Guest names" />
+                            </div>
+                            <div class="form-group">
+                                <label for="totalAmount"></label>
+                                <p id="totalAmountDisplay" class="font-weight-bold text-center"></p>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="pay_cash" name="pay_cash">
+                                <label class="form-check-label" for="pay_cash">Pay with cash</label>
+                                <small class="form-text text-muted">You will pay at the event location if this button is
+                                    marked</small>
+                            </div>
 
-                    <div id="error-message" class="error-message hidden">You must fill in   all the fields.</div>
-                    <br>
-                    <button id="continue-btn" class="btn btn-primary">Continue with Payment</button>
-                    </div>
-                    <br /><br />
-                    <div id="hidden-payment-form"class="hidden">
-                    <div id="payment-element" class="form-control"></div>
-                    <div id="card-errors" role="alert"></div>
-                    <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-                    <button id="submit" type="submit" class="btn btn-primary">
-                        <div class="spinner hidden" id="spinner"></div>
-                        <span id="button-text">Purchase tickets</span>
-                    </button>
-                    <div id="payment-message" class="hidden"></div>
-                    </div>
-                    <div id="eventId" data-event-id="{{ event.id }}" style="display: none;"></div>
-                </form>
-
+                            <div id="error-message" class="alert alert-danger hidden">You must fill in all the fields.
+                            </div>
+                            <br>
+                            <button id="continue-btn" class="btn btn-primary btn-block">Continue with Payment</button>
+                        </div>
+                        <br /><br />
+                        <div id="hidden-payment-form" class="hidden">
+                            <div id="payment-element" class="form-control"></div>
+                            <div id="card-errors" role="alert"></div>
+                            <br /><br /><br><br /><br><br /><br><br /><br><br /><br><br><br><br><br><br>
+                            <button id="submit" type="submit" class="btn btn-primary btn-block">
+                                <div class="spinner hidden" id="spinner"></div>
+                                <span id="button-text">Purchase tickets</span>
+                            </button>
+                            <div id="payment-message" class="hidden"></div>
+                        </div>
+                        <div id="eventId" data-event-id="{{ event.id }}" style="display: none;"></div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
+<script>
+    $(document).ready(function () {
+    var memberPrice = {{ event.member_price }};
+    var childMemberPrice = {{ event.member_child_price }};
+    var guestPrice = {{ event.guest_price }};
+    var childPrice = {{ event.child_price }};
 
+    function updateTotal() {
+        var total = 0;
+        total += (parseFloat($('input[name="number_member_tickets"]').val()) || 0) * memberPrice;
+        total += (parseFloat($('input[name="number_child_member_tickets"]').val()) || 0) * childMemberPrice;
+        total += (parseFloat($('input[name="number_guest_tickets"]').val()) || 0) * guestPrice;
+        total += (parseFloat($('input[name="number_child_tickets"]').val()) || 0) * childPrice;
+        $('#totalAmountDisplay').text('Total Amount: €' + total.toFixed(2));
+    }
 
-    <script>
-        $(document).ready(function () {
-            // Precios de los tickets obtenidos del servidor o de tu base de datos
-        var memberPrice = {{ event.member_price }}; 
-        var childMemberPrice = {{ event.member_child_price }}; 
-        var guestPrice = {{ event.guest_price }}; 
-        var childPrice ={{event.child_price}} 
+    $('input[name^="number_"]').on('input', updateTotal);
 
-        // Función para actualizar el total
-        function updateTotal() {
-            // Calcula el total sumando los valores de todos los campos de número
-            var total = 0;
-            total += (parseFloat($('input[name="number_member_tickets"]').val()) || 0) * memberPrice;
-            total += (parseFloat($('input[name="number_child_member_tickets"]').val()) || 0) * childMemberPrice;
-            total += (parseFloat($('input[name="number_guest_tickets"]').val()) || 0) * guestPrice;
-            total += (parseFloat($('input[name="number_child_tickets"]').val()) || 0) * childPrice;
-            // Actualiza el contenido del párrafo con el total
-            $('#totalAmountDisplay').text('Total Amount: €' + total.toFixed(2)); // Ajusta el total a dos decimales
+    updateTotal();
+    });
+</script>
+
+{% endblock %}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-img-top {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .card-title a {
+        text-decoration: none;
+        color: #007bff;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .card-title a:hover {
+        color: #0056b3;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .form-check-input {
+        margin-top: 0.3rem;
+    }
+
+    .alert {
+        display: none;
+    }
+
+    .alert.hidden {
+        display: block;
+    }
+
+    #spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid transparent;
+        border-radius: 50%;
+        border-top-color: #ffffff;
+        animation: spinner 0.6s linear infinite;
+    }
+
+    @keyframes spinner {
+        0% {
+            transform: rotate(0deg);
         }
 
-        // Escucha los eventos de cambio en los campos de entrada
-        $('input[name^="number_"]').on('input', updateTotal);
+        100% {
+            transform: rotate(360deg);
+        }
+    }
 
-        // Llama a la función de actualización al cargar la página
-        updateTotal();
-        });
-    </script>
+    #hidden-payment-form {
+        display: none;
+    }
 
+    #hidden-payment-form.hidden {
+        display: block;
+    }
 
-
-
-    {% endblock %}
+    #error-message.hidden {
+        display: block;
+    }
+</style>

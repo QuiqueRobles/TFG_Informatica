@@ -1,58 +1,84 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-<div class="container py-5">
-<br />
-<h1 align="center">GREMA Events</h1>
-<br />
-<div class="row">
-  {% for event in active_event %}
-  <div class="col-md-4 position-relative">
+<!-- Hero Banner -->
+<section class="hero-banner bg-dark text-white text-center py-5">
+  <div class="container">
+    <h1 class="display-4">Welcome to GREMA Events</h1>
+    <p class="lead">Join us for exciting events and experiences</p>
+    <a href="#events" class="btn btn-primary btn-lg mt-3">Explore Events</a>
+  </div>
+</section>
 
-    <div class="card mb-4 div-hover">
-      {% if event.img_url %}
-      <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
-      {% else %}
-      <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top" alt="{{ event.name }}">
-      {% endif %}
-      <div class="card-body">
-
-        <h5 class="card-title">
-          <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
-        </h5>
-        Event Date: {{event.date.strftime('%d-%m-%Y')}} <br />
-        Maximum capacity: {{event.max_guest_num}} people <br />
-        Member price: {{event.member_price}} € <br />
-        Member price (Child): {{event.member_child_price}} € <br />
-        Guest price: {{event.guest_price}} € <br />
-        Description: {{event.description}}<br />
-        Available tickets:
-        {% for detail in event_details %}
-        {% if detail.event == event.id %}
-        {% if detail.event == event.id and detail.sold_out %}
-        <span style="color:rgb(253, 41, 4)">{{detail.tickets_remaining}}<br /></span>
+<div class="container py-5" id="events">
+  <br />
+  <h1 class="text-center mb-4">Upcoming Events</h1>
+  <br />
+  <div class="row">
+    {% for event in active_event %}
+    <div class="col-md-4 position-relative">
+      <div class="card mb-4 div-hover shadow-sm">
+        {% if event.img_url %}
+        <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
         {% else %}
-          {% if detail.warning_few_tickets %}
-          <span style="color:rgb(253, 199, 4)">{{detail.tickets_remaining}}<br /></span>
-          {% else %}
-          <span style="color:rgb(1, 97, 25)">{{detail.tickets_remaining}}/{{event.max_guest_num}}<br /></span><br />
-          {% endif %}
-          {% endif %}
-          {% endif %}
+        <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top" alt="{{ event.name }}">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">
+            <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
+          </h5>
+          <p><strong>Event Date:</strong> {{ event.date.strftime('%d-%m-%Y') }}</p>
+          <p><strong>Maximum capacity:</strong> {{ event.max_guest_num }} people</p>
+          <p><strong>Member price:</strong> {{ event.member_price }} €</p>
+          <p><strong>Member price (Child):</strong> {{ event.member_child_price }} €</p>
+          <p><strong>Guest price:</strong> {{ event.guest_price }} €</p>
+          <p><strong>Description:</strong> {{ event.description }}</p>
+          <p><strong>Available tickets:</strong>
+            {% for detail in event_details %}
+            {% if detail.event == event.id %}
+            {% if detail.sold_out %}
+            <span class="text-danger">{{ detail.tickets_remaining }}</span>
+            {% else %}
+            {% if detail.warning_few_tickets %}
+            <span class="text-warning">{{ detail.tickets_remaining }}</span>
+            {% else %}
+            <span class="text-success">{{ detail.tickets_remaining }}/{{ event.max_guest_num }}</span>
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+          </p>
+        </div>
+        {% for detail in event_details %}
+        {% if detail.event == event.id and detail.sold_out %}
+        <div
+          class="sold-out-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+          <img src="{{ url_for('static', filename='images/sold_out.png') }}" alt="Sold Out"
+            style="max-width: 80%; max-height: 80%;">
+        </div>
+        {% endif %}
         {% endfor %}
       </div>
-      {% for detail in event_details %}
-      {% if detail.event == event.id and detail.sold_out %}
-      <div
-        class="sold-out-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
-        <img src="{{ url_for('static', filename='images/sold_out.png') }}" alt="Sold Out"
-          style="max-width: 80%; max-height: 80%;">
-      </div>
-      {% endif %}
-      {% endfor %}
     </div>
+    {% endfor %}
   </div>
-  {% endfor %}
 </div>
-</div>
+
+<!-- Styles for the hero banner and additional custom styles -->
+<style>
+  .hero-banner {
+    background: url('/static/images/hero-banner.jpg') no-repeat center center/cover;
+    height: 60vh;
+  }
+
+  .div-hover:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+  }
+
+  .sold-out-overlay {
+    background: rgba(255, 255, 255, 0.8);
+  }
+</style>
+
 {% endblock %}
