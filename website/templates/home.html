@@ -2,13 +2,20 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 <!-- Hero Banner -->
-<section class="hero-banner bg-dark text-white text-center py-5">
-  <div class="container">
-    <h1 class="display-4">Welcome to GREMA Events</h1>
-    <p class="lead">Join us for exciting events and experiences</p>
+<section class="hero-banner bg-dark text-white text-center py-5 position-relative">
+  <video autoplay muted loop playsinline class="hero-video">
+    <source src="/static/images/banner_video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div class="hero-content position-absolute w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+    <h1 class="display-4" style="color: #fff; font-size: 3.5rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">Welcome
+      to GREMA Events</h1>
+    <p class="lead" style="color: #fff; font-size: 1.25rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">Join us for
+      exciting events and experiences</p>
     <a href="#events" class="btn btn-primary btn-lg mt-3">Explore Events</a>
   </div>
 </section>
+
 
 <div class="container py-5" id="events">
   <br />
@@ -67,8 +74,25 @@
 <!-- Styles for the hero banner and additional custom styles -->
 <style>
   .hero-banner {
-    background: url('/static/images/hero-banner.jpg') no-repeat center center/cover;
+    position: relative;
     height: 60vh;
+    overflow: hidden;
+  }
+
+  .hero-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+
+  .hero-content {
+    z-index: 2;
+    color: #ffffff;
   }
 
   .div-hover:hover {
@@ -81,4 +105,12 @@
   }
 </style>
 
+<script>
+  document.querySelector('.btn-primary').addEventListener('click', function (event) {
+    event.preventDefault();
+    document.querySelector(this.getAttribute('href')).scrollIntoView({
+      behavior: 'smooth'
+    });
+  });
+</script>
 {% endblock %}

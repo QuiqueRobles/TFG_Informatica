@@ -11,84 +11,6 @@
     crossorigin="anonymous" />
   <link rel="icon" href="/static/images/greek_laurel.png" type="image/x-icon">
   <title>{% block title %}Home{% endblock %}</title>
-  <style>
-    .navbar-custom {
-      background-color: #101213;
-      padding: 10px 0;
-    }
-
-    .navbar-brand {
-      display: flex;
-      align-items: center;
-    }
-
-    .navbar-brand img {
-      max-height: 30px;
-      margin-right: 10px;
-    }
-
-    .navbar-nav .nav-item {
-      margin-left: 10px;
-    }
-
-    .navbar-nav .nav-link {
-      color: #ffffff !important;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      padding: 5px 10px;
-    }
-
-    .navbar-nav .nav-link .fa {
-      margin-right: 5px;
-    }
-
-    .navbar-nav .nav-link:hover {
-      text-decoration: underline;
-    }
-
-    .navbar-collapse {
-      justify-content: space-between;
-    }
-
-    .navbar-nav.ml-auto {
-      margin-left: auto !important;
-    }
-
-    .container-wide {
-      max-width: 1340px;
-      width: 100%;
-      padding-left: 15px;
-      padding-right: 15px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .badge {
-      margin-left: 5px;
-      padding: 5px 10px;
-      font-size: 90%;
-    }
-
-    .nav-link.btn {
-      padding: 5px 10px;
-    }
-
-    .footer {
-      background-color: #101213;
-      color: white;
-      padding: 20px 0;
-    }
-
-    .footer a {
-      color: #ffffff;
-      margin: 0 10px;
-    }
-
-    .footer img {
-      max-height: 30px;
-    }
-  </style>
 </head>
 
 <body>
@@ -192,7 +114,7 @@
   {% endif %}
   {% endwith %}
 
-  <div class="container-fluid">{% block content %}{% endblock %}</div>
+  <div class="w-100">{% block content %}{% endblock %}</div>
 
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
     integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -226,7 +148,7 @@
   </script>
   {% endblock %}
   <br><br><br><br><br>
-  <footer class="footer mt-auto py-3 bg-dark text-white">
+  <footer class="footer mt-auto py-3">
     <div class="container text-center">
       <img src="/static/images/greek_laurel.png" alt="Laurel" style="max-height: 30px;" />
       <span>&copy; 2024 GREMA. All rights reserved

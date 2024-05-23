@@ -26,6 +26,8 @@ html {
 
 body {
     margin-bottom: 100px;
+    margin: 0;
+    padding: 0;
 }
 
 .footer {
@@ -34,7 +36,7 @@ body {
     width: 100%;
     height: 70px;
     /* Altura del footer */
-    background-color: #343a40;
+    background-color: #141618;
     /* Color de fondo del footer */
     display: flex;
     align-items: center;
@@ -56,6 +58,82 @@ body {
     margin-bottom: 0;
 }
 
+.navbar-custom {
+    background-color: #101213;
+    padding: 10px 0;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand img {
+    max-height: 30px;
+    margin-right: 10px;
+}
+
+.navbar-nav .nav-item {
+    margin-left: 10px;
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+}
+
+.navbar-nav .nav-link .fa {
+    margin-right: 5px;
+}
+
+.navbar-nav .nav-link:hover {
+    text-decoration: underline;
+}
+
+.navbar-collapse {
+    justify-content: space-between;
+}
+
+.navbar-nav.ml-auto {
+    margin-left: auto !important;
+}
+
+.container-wide {
+    max-width: 1340px;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.badge {
+    margin-left: 5px;
+    padding: 5px 10px;
+    font-size: 90%;
+}
+
+.nav-link.btn {
+    padding: 5px 10px;
+}
+
+.footer {
+    background-color: #101213;
+    color: white;
+    padding: 20px 0;
+}
+
+.footer a {
+    color: #ffffff;
+    margin: 0 10px;
+}
+
+.footer img {
+    max-height: 30px;
+}
 
 
 
