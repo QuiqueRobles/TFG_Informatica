@@ -2,65 +2,210 @@
 {% block title %}About Us{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="/static/about_us.css">
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" alt="GREMA Logo" class="img-fluid mb-4">
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6 ">
-            <div class="shadow-lg">
-            <div class="card-header  bg-info text-white">
-            <h2 class="font-weight-bold mb-4">GREMA - Greek-Spanish Families Association of Madrid</h2>
-            </div>
-            <div class="card-body">
-            <p class="lead">GREMA is the Association of Greek-Spanish families in the Community of Madrid. Our goal is
-                to promote interculturality and preserve Greek cultural heritage, language, and traditions within
-                Greek-Spanish families.</p>
-            <p>GREMA είναι ο Σύλλογος Ελληνο-Ισπανικών Οικογενειών της Μαδρίτης. Ο στόχος μας είναι η προώθηση της
-                διαπολιτισμικότητας και η διατήρηση της ελληνικής πολιτιστικής κληρονομιάς, της γλώσσας και των
-                παραδόσεων στις ελληνο-ισπανικές οικογένειες.</p>
-                </div>
-                </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card border-0 shadow-lg mb-4">
-                <div class="card-header bg-info text-white">
-                    <h2 class="font-weight-bold mb-0">Board of Directors</h2>
-                </div>
-                <div class="card-body">
-                    <ul class="list-unstyled">
-                        <li>Sofia Tsipa (Presidenta/Πρόεδρος)</li>
-                        <li>Aikaterini Koutsou (Vicepresident /Αντιπρόεδρος)</li>
-                        <li>Sylvia-Anna Orfanides (Secretaria/Γραμματεία)</li>
-                        <li>Νikolaos Maris (Tesorero/Ταμίας)</li>
-                        <li>Parthena Papandreadou (Vocal/Μέλος)</li>
-                        <li>Galani Kiourtzi (Vocal/Μέλος)</li>
-                    </ul>
-                </div>
+<br><br><br>
+<div class="container-fluid p-0">
+    <!-- Hero Banner -->
+    <section class="hero-banner text-blakc text-center d-flex align-items-center justify-content-center"
+        style="background: url('{{ url_for('static', filename='images/greekbanner.png') }}') no-repeat center center; background-size: cover;">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="display-4 font-weight-bold">Welcome to GREMA</h1>
+                <p class="lead">Greek-Spanish Families Association of Madrid</p>
+                <a href="#about-section" class="btn btn-lg btn-light mt-4">Learn More</a>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div class="jumbotron bg-transparent text-center" id="contact-jumbotron">
-                <h2 class="display-4 font-weight-bold mb-4">Contact Us / Επικοινωνία</h2>
-                <p class="lead">Contact us to learn more about our initiative, receive information about the activities
-                    we carry out, or become a <span class="font-weight-bold text-warning">MEMBER</span>. The more, the
-                    better!</p>
-                <p>Επικοινώνησε μαζί μας για να μάθεις περισσότερα για την πρωτοβουλία μας, να λάβεις πληροφορίες
-                    σχετικά με τις δραστηριότητες που πραγματοποιούμε ή να γίνεις μέλος. Όσοι περισσότεροι, τόσο
-                    καλύτερα!</p>
+    </section>
+
+    <!-- About Section -->
+    <section id="about-section" class="py-5">
+        <div class="container">
+            <div class="row fade-in">
+                <div class="col-md-12 text-center">
+                    <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" alt="GREMA Logo"
+                        class="img-fluid mb-4" style="max-height: 150px;">
+                </div>
+            </div>
+            <div class="row fade-in">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-lg mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h2 class="font-weight-bold mb-0">About GREMA</h2>
+                        </div>
+                        <div class="card-body">
+                            <p class="lead">GREMA is the Association of Greek-Spanish families in the Community of
+                                Madrid. Our goal is to promote interculturality and preserve Greek cultural heritage,
+                                language, and traditions within Greek-Spanish families.</p>
+                            <p>GREMA είναι ο Σύλλογος Ελληνο-Ισπανικών Οικογενειών της Μαδρίτης. Ο στόχος μας είναι η
+                                προώθηση της διαπολιτισμικότητας και η διατήρηση της ελληνικής πολιτιστικής κληρονομιάς,
+                                της γλώσσας και των παραδόσεων στις ελληνο-ισπανικές οικογένειες.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-lg mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h2 class="font-weight-bold mb-0">Board of Directors</h2>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li><i class="fa fa-user"></i> Sofia Tsipa (Presidenta/Πρόεδρος)</li>
+                                <li><i class="fa fa-user"></i> Aikaterini Koutsou (Vicepresident /Αντιπρόεδρος)</li>
+                                <li><i class="fa fa-user"></i> Sylvia-Anna Orfanides (Secretaria/Γραμματεία)</li>
+                                <li><i class="fa fa-user"></i> Νikolaos Maris (Tesorero/Ταμίας)</li>
+                                <li><i class="fa fa-user"></i> Parthena Papandreadou (Vocal/Μέλος)</li>
+                                <li><i class="fa fa-user"></i> Galani Kiourtzi (Vocal/Μέλος)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row justify-content-center">
-        <div class="col-md-12 text-center">
-            <img src="{{ url_for('static', filename='images/grema_people.jpg') }}" alt="GREMA People" class="img-fluid"
-                style="width: 100%;">
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row fade-in">
+                <div class="col text-center">
+                    <h2 class="display-4 font-weight-bold mb-5">Testimonials</h2>
+                    <div id="testimonialCarousel" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <blockquote class="blockquote">
+                                    <p class="mb-4">"GREMA has been a wonderful community for our family. We've made
+                                        lifelong friends and learned so much about Greek culture."</p>
+                                    <footer class="blockquote-footer">Maria Papadopoulos</footer>
+                                </blockquote>
+                            </div>
+                            <div class="carousel-item">
+                                <blockquote class="blockquote">
+                                    <p class="mb-4">"The events organized by GREMA are always fun and educational. It's
+                                        great to be part of such a vibrant community."</p>
+                                    <footer class="blockquote-footer">Carlos Martínez</footer>
+                                </blockquote>
+                            </div>
+                            <div class="carousel-item">
+                                <blockquote class="blockquote">
+                                    <p class="mb-4">"Being a member of GREMA has enriched our family's life in so many
+                                        ways. We feel more connected to our heritage."</p>
+                                    <footer class="blockquote-footer">Elena Kotsou</footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                        <a class="carousel-control-prev" href="#testimonialCarousel" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#testimonialCarousel" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-5 bg-light" id="contact-section">
+        <div class="container">
+            <div class="row fade-in">
+                <div class="col">
+                    <div class="jumbotron bg-transparent text-center shadow-lg p-4">
+                        <h2 class="display-4 font-weight-bold mb-4">Contact Us / Επικοινωνία</h2>
+                        <p class="lead">Contact us to learn more about our initiative, receive information about the
+                            activities we carry out, or become a <span
+                                class="font-weight-bold text-warning">MEMBER</span>. The more, the better!</p>
+                        <p>Επικοινώνησε μαζί μας για να μάθεις περισσότερα για την πρωτοβουλία μας, να λάβεις
+                            πληροφορίες σχετικά με τις δραστηριότητες που πραγματοποιούμε ή να γίνεις μέλος. Όσοι
+                            περισσότεροι, τόσο καλύτερα!</p>
+                        <a href="/contact" class="btn btn-info btn-lg mt-3">Get in Touch</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Image Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center fade-in">
+                <div class="col-md-12 text-center">
+                    <img src="{{ url_for('static', filename='images/grema_people.jpg') }}" alt="GREMA People"
+                        class="img-fluid shadow-lg rounded" style="width: 100%; max-height: 500px; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 {% endblock %}
+
+<style>
+    /* Additional CSS for custom styling */
+    .hero-banner {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        color: white;
+        text-shadow: 1px 1px 2px black;
+    }
+
+    .hero-banner .container {
+        text-align: center;
+    }
+
+    .hero-content {
+        animation: fadeIn 2s;
+    }
+
+    .fade-in {
+        opacity: 0;
+        animation: fadeIn 2s forwards;
+    }
+
+    .jumbotron {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+    }
+
+    .card {
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0;
+    }
+
+    .shadow-lg {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes fadeIn {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    document.querySelector('.btn-light').addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector('#about-section').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var fadeIns = document.querySelectorAll('.fade-in');
+        fadeIns.forEach(function (fadeIn) {
+            fadeIn.style.opacity = '1';
+        });
+    });
+</script>

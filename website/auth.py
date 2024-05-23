@@ -1,11 +1,14 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from .models import User,Admin,Partner,Child
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db   ##means from __init__.py import db
+from . import db, mail   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+
 
 auth = Blueprint('auth', __name__)
 
@@ -163,6 +166,42 @@ def sign_up():
 
     return render_template("sign_up.html", user=current_user)
 
+
+@auth.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            token = s.dumps(email, salt='email-confirm')
+            msg = Message('Password Reset Request', sender='noreply@demo.com', recipients=[email])
+            link = url_for('auth.reset_password', token=token, _external=True)
+            msg.body = f'Your link is {link}'
+            mail.send(msg)
+            flash('Password reset link sent', 'info')
+        else:
+            flash('Email not found', 'danger')
+    return render_template('forgot_password.html', user=current_user)
+
+@auth.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    try:
+        email = s.loads(token, salt='email-confirm', max_age=3600)
+    except SignatureExpired:
+        return '<h1>The token is expired!</h1>'
+    
+    if request.method == 'POST':
+        new_password = request.form['password']
+        users[email] = new_password
+        flash('Your password has been updated!', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('reset_password.html', token=token)
+
+
+@auth.route('/render_forgot_password', methods=['GET','POST'])
+def render_forgot_password():
+    return render_template('forgot_password.html',user=current_user)
 
 def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']

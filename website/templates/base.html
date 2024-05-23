@@ -13,26 +13,34 @@
   <title>{% block title %}Home{% endblock %}</title>
   <style>
     .navbar-custom {
-      background-color: #343a40;
+      background-color: #101213;
       padding: 10px 0;
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
     }
 
     .navbar-brand img {
       max-height: 30px;
+      margin-right: 10px;
     }
 
     .navbar-nav .nav-item {
-      margin-left: 10px;
-      /* Reducido de 20px a 10px */
-    }
-
-    .navbar-nav .badge {
       margin-left: 10px;
     }
 
     .navbar-nav .nav-link {
       color: #ffffff !important;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      padding: 5px 10px;
+    }
+
+    .navbar-nav .nav-link .fa {
+      margin-right: 5px;
     }
 
     .navbar-nav .nav-link:hover {
@@ -55,12 +63,37 @@
       margin-left: auto;
       margin-right: auto;
     }
+
+    .badge {
+      margin-left: 5px;
+      padding: 5px 10px;
+      font-size: 90%;
+    }
+
+    .nav-link.btn {
+      padding: 5px 10px;
+    }
+
+    .footer {
+      background-color: #343a40;
+      color: white;
+      padding: 20px 0;
+    }
+
+    .footer a {
+      color: #ffffff;
+      margin: 0 10px;
+    }
+
+    .footer img {
+      max-height: 30px;
+    }
   </style>
 </head>
 
 <body>
   <nav class="navbar navbar-expand-md navbar-dark navbar-custom">
-    <div class="container {% if user.is_admin %}container-wide{% else %}container{% endif %}">
+    <div class="container-wide">
       <a class="navbar-brand" href="/"><img src="{{ url_for('static', filename='images/greek_laurel.png') }}"
           alt="GREMA"> GREMA</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar"
@@ -72,34 +105,36 @@
           {% if user.is_authenticated %}
           {% if user.is_admin %}
           <li class="nav-item">
-            <a class="nav-link" href="/">Manage Events</a>
+            <a class="nav-link" href="/"><i class="fa fa-calendar" aria-hidden="true"></i> Manage Events</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/manage_memberships">Manage Memberships</a>
+            <a class="nav-link" href="/manage_memberships"><i class="fa fa-users" aria-hidden="true"></i> Manage
+              Memberships</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/manage_event_attendances">Manage Event Attendances</a>
+            <a class="nav-link" href="/manage_event_attendances"><i class="fa fa-check-square" aria-hidden="true"></i>
+              Manage Attendances</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/qr_reader">QR Reader</a>
+            <a class="nav-link" href="/qr_reader"><i class="fa fa-qrcode" aria-hidden="true"></i> QR Reader</a>
           </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="/">Incoming Events</a>
+            <a class="nav-link" href="/"><i class="fa fa-calendar" aria-hidden="true"></i> Incoming Events</a>
           </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="/my_events">My Events</a>
+            <a class="nav-link" href="/my_events"><i class="fa fa-list" aria-hidden="true"></i> My Events</a>
           </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="/login">Login</a>
+            <a class="nav-link" href="/login"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/sign-up">Sign Up</a>
+            <a class="nav-link" href="/sign-up"><i class="fa fa-user-plus" aria-hidden="true"></i> Sign Up</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/about_us">About Us</a>
+            <a class="nav-link" href="/about_us"><i class="fa fa-info-circle" aria-hidden="true"></i> About Us</a>
           </li>
           {% endif %}
         </ul>
@@ -112,8 +147,8 @@
           {% endif %}
           {% if not is_member %}
           <li class="nav-item">
-            <a class="btn btn-warning nav-link rounded-pill font-weight-bold" id="becomeMember"
-              href="/become_member">Become Member!</a>
+            <a class="btn btn-warning nav-link rounded-pill font-weight-bold" id="becomeMember" href="/become_member"><i
+                class="fa fa-star" aria-hidden="true"></i> Become Member!</a>
           </li>
           {% else %}
           <li class="nav-item">
@@ -121,13 +156,13 @@
           </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="/about_us">About Us</a>
+            <a class="nav-link" href="/about_us"><i class="fa fa-info-circle" aria-hidden="true"></i> About Us</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/profile">Profile</a>
+            <a class="nav-link" href="/profile"><i class="fa fa-user" aria-hidden="true"></i> Profile</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/logout">Logout</a>
+            <a class="nav-link" href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
           </li>
         </ul>
         {% endif %}
@@ -180,7 +215,6 @@
           .then(response => response.json())
           .then(data => {
             console.log(data.message);
-            // Puedes realizar acciones adicionales después de la eliminación si es necesario
           }).then(() => {
             window.location.href = "/";
           })
@@ -191,15 +225,11 @@
     }
   </script>
   {% endblock %}
-
+  <br><br><br><br><br>
   <footer class="footer mt-auto py-3 bg-dark text-white">
     <div class="container text-center">
       <img src="/static/images/greek_laurel.png" alt="Laurel" style="max-height: 30px;" />
-      <span>&copy; 2024 GREMA. All rights reserved.</span>
-      <div class="mt-2">
-        <a href="/" class="text-white mx-2">Home</a> |
-        <a href="/about_us" class="text-white mx-2">About Us</a>
-      </div>
+      <span>&copy; 2024 GREMA. All rights reserved
     </div>
   </footer>
 </body>

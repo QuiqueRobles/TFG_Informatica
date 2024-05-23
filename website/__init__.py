@@ -3,8 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
 import os
+from flask_mail import Mail
+from itsdangerous import URLSafeTimedSerializer
 
 db = SQLAlchemy()
+mail = Mail()
 DB_NAME = "database.db"
 
 
@@ -16,9 +19,19 @@ def create_app():
     upload_folder = os.path.join(base_dir, "static", "images")
     app.config['UPLOAD_FOLDER'] = upload_folder
     app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+    
+    # Configuración de Flask-Mail para usar Outlook
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USERNAME'] = 'brawnyhamster@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'leckyroque01'
+    app.config['MAIL_DEFAULT_SENDER'] = 'brawnyhamster@gmail.com'
 
     db.init_app(app)
-
+    mail.init_app(app)
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    
     from .views import views
     from .auth import auth
 
@@ -42,9 +55,6 @@ def create_app():
             return admin
         else:
             return user
-        
-    
-        
 
     return app
 

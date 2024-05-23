@@ -1,35 +1,82 @@
-{% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
-%}
-<div class="container mt-5">
-  <!-- Centra la imagen utilizando las clases de Bootstrap -->
-  <div class="text-center">
-    <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="img-fluid" alt="gremaLogo">
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/login.css">
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+  <div class="card shadow-lg p-4 login-card">
+    <div class="text-center mb-4">
+      <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="img-fluid logo" alt="GREMA Logo">
+    </div>
+    <h3 class="text-center mb-4">Login</h3>
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+          </div>
+          <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fa fa-lock"></i></span>
+          </div>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Enter password"
+            required />
+        </div>
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+        <label class="form-check-label" for="rememberMe">Remember Me</label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Login</button>
+      <div class="text-center mt-3">
+        <a href="{{ url_for('auth.render_forgot_password') }}">Forgot Password?</a>
+      </div>
+    </form>
   </div>
 </div>
-<br />
-<form method="POST">
-  <h3 align="center">Login</h3>
-  <div class="form-group">
-    <label for="email">Email Address</label>
-    <input
-      type="email"
-      class="form-control"
-      id="email"
-      name="email"
-      placeholder="Enter email"
-    />
-  </div>
-  <div class="form-group">
-    <label for="password">Password</label>
-    <input
-      type="password"
-      class="form-control"
-      id="password"
-      name="password"
-      placeholder="Enter password"
-    />
-  </div>
-  <br />
-  <button type="submit" class="btn btn-primary">Login</button>
-</form>
+
 {% endblock %}
+
+<style>
+  /* Additional CSS for custom styling */
+  body {
+    background: linear-gradient(to right, #0066cc, #0099cc);
+    color: #333;
+  }
+
+  .logo {
+    max-height: 100px;
+  }
+
+  .login-card {
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .input-group-text {
+    background-color: #007bff;
+    color: #fff;
+    border: 1px solid #007bff;
+  }
+
+  .input-group .form-control:focus {
+    box-shadow: none;
+    border-color: #007bff;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+</style>

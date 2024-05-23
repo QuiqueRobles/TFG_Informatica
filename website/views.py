@@ -422,6 +422,7 @@ def process_qr():
     return jsonify({"status": "success", "data": data})
     
 
+
 @views.route('/qr_reader', methods=['GET','POST'])
 def reader_qr():
     return render_template('qr_reader.html', user=current_user)

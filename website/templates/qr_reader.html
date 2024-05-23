@@ -7,13 +7,93 @@
         <div class="col-md-6 offset-md-3">
             <h1 class="text-center">QR Code Reader</h1>
             <p class="text-center mb-4">Scan all entries.</p>
+            <select id="camera-select" class="form-control mb-3"></select>
             <video id="video" width="100%" height="auto" class="mb-3"></video>
             <div id="result" class="text-center"></div>
         </div>
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qr-scanner/1.2.0/qr-scanner.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qr-scanner/build/qr-scanner.min.js"></script>
-<script src="{{ url_for('static', filename='js/qr-reader.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/qr-scanner/qr-scanner.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+        const video = document.getElementById('video');
+        const resultDiv = document.getElementById('result');
+        const cameraSelect = document.getElementById('camera-select');
+
+        // Inicializa el scanner
+        const qrScanner = new QrScanner(video, result => handleQrCode(result));
+
+        // Función para manejar los resultados del escaneo
+        function handleQrCode(result) {
+            qrScanner.stop();
+            resultDiv.innerText = `QR Code: ${result}`;
+            fetch('/process_qr', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ qr_data: result }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Función para configurar la cámara
+        async function setupCamera(deviceId) {
+            try {
+                const constraints = {
+                    video: {
+                        deviceId: deviceId ? { exact: deviceId } : undefined
+                    }
+                };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+            } catch (error) {
+                console.error('Error accessing the camera:', error);
+            }
+        }
+
+        // Función para obtener y listar las cámaras disponibles
+        async function listCameras() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                cameraSelect.innerHTML = '';
+                videoDevices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.text = device.label || `Camera ${index + 1}`;
+                    cameraSelect.appendChild(option);
+                });
+                if (videoDevices.length > 0) {
+                    // Intenta seleccionar la cámara trasera por defecto
+                    const backCamera = videoDevices.find(device => device.label.toLowerCase().includes('back'));
+                    if (backCamera) {
+                        cameraSelect.value = backCamera.deviceId;
+                    }
+                    setupCamera(cameraSelect.value);
+                }
+            } catch (error) {
+                console.error('Error listing cameras:', error);
+            }
+        }
+
+        // Cambiar la cámara cuando se seleccione una opción diferente
+        cameraSelect.addEventListener('change', () => {
+            setupCamera(cameraSelect.value);
+        });
+
+        // Listar las cámaras disponibles al cargar la página
+        await listCameras();
+
+        // Iniciar el escáner QR
+        qrScanner.start();
+    });
+</script>
 {% endblock %}
