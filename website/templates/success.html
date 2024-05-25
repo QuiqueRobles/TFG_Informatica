@@ -52,5 +52,19 @@
         <a href="http://localhost:5000/" class="btn btn-primary return-button">Return to Homepage</a>
     </div>
 </body>
+<script>
+    // Verificar el protocolo actual
+    var protocol = window.location.protocol;
+
+    // Obtener el enlace
+    var returnButton = document.querySelector('.return-button');
+
+    // Cambiar dinámicamente la URL del enlace
+    if (protocol === 'https:') {
+        returnButton.href = 'https://localhost:5000/';
+    } else {
+        returnButton.href = 'http://localhost:5000/';
+    }
+</script>
 
 </html>

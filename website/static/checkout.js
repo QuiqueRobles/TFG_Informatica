@@ -13,69 +13,81 @@ document
 
 // Fetches a payment intent and captures the client secret
 async function initialize() {
+    const totalAmount = $('#totalAmountDisplay').text().replace('Total Amount: €', '').trim();
 
-  const totalAmount = $('#totalAmountDisplay').text().replace('Total Amount: €', '').trim();
-  
+    const formData = {
+        number_member_tickets: document.getElementById("number_member_tickets")?.value,
+        number_child_member_tickets: document.getElementById("number_child_member_tickets")?.value,
+        number_guest_tickets: document.getElementById("number_guest_tickets").value,
+        number_child_tickets: document.getElementById("number_child_tickets").value,
+        guests_names: document.getElementById("guests_names").value,
+        totalAmount: totalAmount,
+        event_id: document.getElementById('eventId').dataset.eventId
+    };
 
-  const formData = {
-    number_member_tickets: document.getElementById("number_member_tickets")?.value,
-    number_child_member_tickets: document.getElementById("number_child_member_tickets")?.value,
-    number_guest_tickets: document.getElementById("number_guest_tickets").value,
-    number_child_tickets: document.getElementById("number_child_tickets").value,
-    guests_names: document.getElementById("guests_names").value,
-    totalAmount: totalAmount,
-    event_id:document.getElementById('eventId').dataset.eventId
-  };
-  
-  var payCashCheckbox = document.getElementById('pay_cash');
+    var payCashCheckbox = document.getElementById('pay_cash');
 
-  if (payCashCheckbox.checked) {
-    console.log("La casilla 'Pay with cash' está marcada.");
-
-    // Envía los datos del formulario a la vista Flask utilizando fetch
-    fetch('/success_cash', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log('Datos enviados correctamente a /success-cash.'); 
-            window.location.href = '/success_cash_template';
-            // Aquí puedes realizar otras acciones después de enviar los datos correctamente
-        } else {
-            console.error('Error al enviar los datos a /success-cash.');
-            // Aquí puedes manejar el error de envío de datos
-        }
-    })
-    .catch(error => {
-        console.error('Error al enviar los datos a /success-cash:', error);
-        // Aquí puedes manejar cualquier otro error
+    // Comprobar disponibilidad de entradas
+    const availabilityResponse = await fetch("/check-ticket-availability", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
     });
-}else {
 
-  const response = await fetch("/create-payment-intent", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formData),
-  });
-  const { clientSecret } = await response.json();
+    if (availabilityResponse.ok) {
+        if (payCashCheckbox.checked) {
+            console.log("La casilla 'Pay with cash' está marcada.");
 
-  const appearance = {
-    theme: 'stripe',
-  };
-  elements = stripe.elements({ appearance, clientSecret });
+            // Envía los datos del formulario a la vista Flask utilizando fetch
+            fetch('/success_cash', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Datos enviados correctamente a /success-cash.'); 
+                    window.location.href = '/success_cash_template';
+                    // Aquí puedes realizar otras acciones después de enviar los datos correctamente
+                } else {
+                    console.error('Error al enviar los datos a /success-cash.');
+                    // Aquí puedes manejar el error de envío de datos
+                }
+            })
+            .catch(error => {
+                console.error('Error al enviar los datos a /success-cash:', error);
+                // Aquí puedes manejar cualquier otro error
+            });
+        } else {
+            const response = await fetch("/create-payment-intent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+            const { clientSecret } = await response.json();
 
-  const paymentElementOptions = {
-    layout: "tabs",
-  };
+            const appearance = {
+                theme: 'stripe',
+            };
+            elements = stripe.elements({ appearance, clientSecret });
 
-  const paymentElement = elements.create("payment", paymentElementOptions);
-  paymentElement.mount("#payment-element");
+            const paymentElementOptions = {
+                layout: "tabs",
+            };
+
+            const paymentElement = elements.create("payment", paymentElementOptions);
+            paymentElement.mount("#payment-element");
+        }
+    } else {
+        const errorData = await availabilityResponse.json();
+        console.error('Error: ', errorData.message);
+        alert(errorData.message);
+        window.location.href = `/event-attendance/${formData.event_id}?error=${encodeURIComponent(errorData.message)}`;
+    }
 }
-}
+
 
 async function handleSubmit(e) {
   e.preventDefault();

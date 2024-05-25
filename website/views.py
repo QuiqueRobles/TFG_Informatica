@@ -381,6 +381,54 @@ def download_event_pdf(event_id):
     response.headers['Content-Disposition'] = f'attachment; filename=event_{event_id}.pdf'
     return response
 
+@views.route('/check-ticket-availability', methods=['POST'])
+@login_required
+def check_ticket_availability():
+    try:
+        data = request.get_json()
+        
+        # Verificación de los datos recibidos
+        print("Datos recibidos:", data)
+        
+        # Obtener los datos del formulario
+        number_member_tickets = int(data.get('number_member_tickets', 0))
+        number_child_member_tickets = int(data.get('number_child_member_tickets', 0))
+        number_guest_tickets = int(data.get('number_guest_tickets', 0))
+        number_child_tickets = int(data.get('number_child_tickets', 0))
+        event_id = int(data.get('event_id'))
+        
+        total_tickets = number_member_tickets + number_child_member_tickets + number_guest_tickets + number_child_tickets
+        
+        # Verificar que no se superen las entradas disponibles
+        event = Event.query.filter_by(id=event_id).first()
+        
+        if not event:
+            return jsonify({"error": "Event not found"}), 404
+        
+        print("Evento encontrado:", event)
+        
+        attendances = Event_Attendance.query.filter_by(event_id=event_id).all()
+        
+        total_tickets_sold = sum(
+            (attendance.number_guest_tickets or 0) + 
+            (attendance.number_child_tickets or 0) + 
+            (attendance.number_member_tickets or 0) + 
+            (attendance.number_memberchild_tickets or 0)
+            for attendance in attendances
+        )
+        
+        print("Total de entradas vendidas:", total_tickets_sold)
+        print("Total de entradas solicitadas:", total_tickets)
+        
+        if total_tickets_sold + total_tickets > event.max_guest_num:
+            return jsonify({"available": False, "message": "Not enough tickets available"}), 403
+        
+        return jsonify({"available": True})
+    except Exception as e:
+        print("Error:", str(e))
+        return jsonify(error=str(e)), 403
+
+
 @views.route('/create-payment-intent', methods=['POST'])
 @login_required
 def create_payment():
@@ -391,10 +439,13 @@ def create_payment():
         number_member_tickets = data.get('number_member_tickets')
         number_child_member_tickets = data.get('number_child_member_tickets')
         number_guest_tickets = data.get('number_guest_tickets')
-        number_child_tickets = data.get('number_child_tickets')      
+        number_child_tickets = data.get('number_child_tickets')  
+        event_id = data.get('event_id')
+        
+
         total_amount = float(data.get('totalAmount'))
         receipt_email = current_user.email
-        print(receipt_email)
+        
         #Calculate amount for Stripe
         amountStripe= int(total_amount*100)
         
