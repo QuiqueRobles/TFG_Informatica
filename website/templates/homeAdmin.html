@@ -10,10 +10,10 @@
     <div
         class="hero-content position-absolute w-100 h-100 d-flex flex-column justify-content-center align-items-center">
         <h1 class="display-4" style="color: #fff; font-size: 3.5rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">
-            Welcome
-            to GREMA Events Admin</h1>
-        <p class="lead" style="color: #fff; font-size: 1.25rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">Manage and
-            create events with ease</p>
+            Welcome to GREMA Events Admin</h1>
+        <p class="lead" style="color: #fff; font-size: 1.25rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">
+            Manage and create events with ease
+        </p>
     </div>
 </section>
 
@@ -79,43 +79,52 @@
     </div>
 
     <div class="create-event-form mt-5" id="create-event-form" style="display: none;">
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" action="/">
             <h3 align="center">Create Event</h3>
             <div class="form-group">
                 <label for="name">Name of the event</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Enter name of the event" />
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter name of the event"
+                    required />
             </div>
             <div class="form-group">
                 <label for="date">Date</label>
-                <input type="date" class="form-control" id="date" name="date" placeholder="Enter date of the event" />
+                <input type="date" class="form-control" id="date" name="date" placeholder="Enter date of the event"
+                    required />
             </div>
             <div class="form-group">
                 <label for="max_guest_num">Maximum number of guests</label>
                 <input type="number" class="form-control" id="max_guest_num" name="max_guest_num"
-                    placeholder="Enter the maximum guests number" />
+                    placeholder="Enter the maximum guests number" required />
             </div>
             <div class="form-group">
                 <label for="member_price">Member price</label>
                 <input type="number" class="form-control" id="member_price" name="member_price"
-                    placeholder="Enter member price" />
+                    placeholder="Enter member price" required />
             </div>
             <div class="form-group">
                 <label for="member_child_price">Child member price</label>
                 <input type="number" class="form-control" id="member_child_price" name="member_child_price"
-                    placeholder="Enter child member price" />
+                    placeholder="Enter child member price" required />
             </div>
             <div class="form-group">
                 <label for="guest_price">Guest price</label>
                 <input type="number" class="form-control" id="guest_price" name="guest_price"
-                    placeholder="Enter guest price" />
+                    placeholder="Enter guest price" required />
+            </div>
+            <div class="form-group">
+                <label for="child_price">Child price</label>
+                <input type="number" class="form-control" id="child_price" name="child_price" placeholder="Enter guest price"
+                    required />
             </div>
             <div class="form-group">
                 <label for="img_url">Event Image</label>
                 <input type="file" class="form-control" id="img_url" name="img_url" />
             </div>
             <br />
-            <label for="description">Insert a brief description of the event:</label>
-            <textarea name="description" id="description" class="form-control"></textarea>
+            <div class="form-group">
+                <label for="description">Insert a brief description of the event:</label>
+                <textarea name="description" id="description" class="form-control" required></textarea>
+            </div>
             <br />
             <button type="submit" class="btn btn-primary">Create Event</button>
         </form>
@@ -156,13 +165,6 @@
 </style>
 
 <script>
-    document.querySelector('.btn-primary').addEventListener('click', function (event) {
-        event.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
-
     document.getElementById('create-event-btn').addEventListener('click', function () {
         document.getElementById('create-event-form').style.display = 'block';
         this.style.display = 'none';

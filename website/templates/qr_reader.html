@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Qr Reader{% endblock %}
+{% block title %}QR Reader{% endblock %}
 {% block content %}
 <br><br>
 <div class="container">
@@ -8,114 +8,126 @@
             <h1 class="text-center">QR Code Reader</h1>
             <p class="text-center mb-4">Scan all entries.</p>
             <select id="camera-select" class="form-control mb-3"></select>
-            <video id="video" width="100%" height="auto" class="mb-3"></video>
+            <video id="video" width="100%" height="auto" class="mb-3" autoplay></video>
             <div id="result" class="text-center"></div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/qr-scanner/qr-scanner.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ericblade/instascan@2/dist/instascan.min.js"></script>
+<script src="{{ url_for('static', filename='js/qr-scanner.umd.min.js') }}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', async function () {
-        const video = document.getElementById('video');
-        const resultDiv = document.getElementById('result');
-        const cameraSelect = document.getElementById('camera-select');
+document.addEventListener('DOMContentLoaded', async function () {
+    const video = document.getElementById('video');
+    const resultDiv = document.getElementById('result');
+    const cameraSelect = document.getElementById('camera-select');
+    let isProcessing = false; // Variable to track if QR code is being processed
 
-        // Inicializa el scanner
-        const qrScanner = new QrScanner(video, result => handleQrCode(result));
-
-        // Función para manejar los resultados del escaneo
-         function handleQrCode(content) {
-            resultDiv.innerText = `QR Code: ${content}`;
-            fetch('/process_qr', {
+    // Initialize the scanner
+    const qrScanner = new QrScanner(video, result => handleQrCode(result));
+    
+    // Function to handle the QR scan result
+    async function handleQrCode(content) {
+        if (isProcessing) return; // Prevent multiple simultaneous processing
+        isProcessing = true;
+        
+        resultDiv.innerHTML = `Processing QR Code...`;
+        try {
+            const response = await fetch('/process_qr', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ qr_data: content }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);  
-                    // Mostrar la información en una tabla HTML
-                    if (data.status === "success") {
-                        displayQRInfo(data.data);
-                    } else {
-                        resultDiv.innerText = "QR data is incorrect.";
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                });
-        }
+            });
 
-        // Función para configurar la cámara
-        async function setupCamera(deviceId) {
-            try {
-                const constraints = {
-                    video: {
-                        deviceId: deviceId ? { exact: deviceId } : undefined
-                    }
-                };
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = stream;
-            } catch (error) {
-                console.error('Error accessing the camera:', error);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+
+            const data = await response.json();
+
+            if (data.status === "success") {
+                displayQRInfo(data.data);
+            } else {
+                resultDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            resultDiv.innerHTML = '<div class="alert alert-danger">An error occurred while processing the QR code.</div>';
+        } finally {
+            isProcessing = false; // Reset processing flag
+        }
+    }
+
+    // Function to display the QR info in an HTML table
+    function displayQRInfo(qrData) {
+        const table = document.createElement('table');
+        table.classList.add('table', 'table-bordered');
+
+        // Create rows for each QR field
+        for (const [key, value] of Object.entries(qrData)) {
+            const row = table.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            cell1.textContent = key;
+            cell2.textContent = value;
         }
 
-        // Función para obtener y listar las cámaras disponibles
-        async function listCameras() {
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                cameraSelect.innerHTML = '';
-                videoDevices.forEach((device, index) => {
-                    const option = document.createElement('option');
-                    option.value = device.deviceId;
-                    option.text = device.label || `Camera ${index + 1}`;
-                    cameraSelect.appendChild(option);
-                });
-                if (videoDevices.length > 0) {
-                    // Intenta seleccionar la cámara trasera por defecto
-                    const backCamera = videoDevices.find(device => device.label.toLowerCase().includes('back'));
-                    if (backCamera) {
-                        cameraSelect.value = backCamera.deviceId;
-                    }
-                    setupCamera(cameraSelect.value);
+        // Clear previous content and append the table to the result div
+        resultDiv.innerHTML = '';
+        resultDiv.appendChild(table);
+    }
+
+    // Function to setup the camera
+    async function setupCamera(deviceId) {
+        try {
+            const constraints = {
+                video: {
+                    deviceId: deviceId ? { exact: deviceId } : undefined
                 }
-            } catch (error) {
-                console.error('Error listing cameras:', error);
-            }
+            };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = stream;
+        } catch (error) {
+            console.error('Error accessing the camera:', error);
         }
-        function displayQRInfo(qrData) {
-            const table = document.createElement('table');
-            table.classList.add('table', 'table-bordered');
+    }
 
-            // Crear filas para cada campo del QR
-            for (const [key, value] of Object.entries(qrData)) {
-                const row = table.insertRow();
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
-                cell1.textContent = key;
-                cell2.textContent = value;
+    // Function to list available cameras
+    async function listCameras() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            cameraSelect.innerHTML = '';
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.text = device.label || `Camera ${index + 1}`;
+                cameraSelect.appendChild(option);
+            });
+            if (videoDevices.length > 0) {
+                // Try to select the back camera by default
+                const backCamera = videoDevices.find(device => device.label.toLowerCase().includes('back'));
+                if (backCamera) {
+                    cameraSelect.value = backCamera.deviceId;
+                }
+                setupCamera(cameraSelect.value);
             }
-
-            // Limpiar el contenido anterior y agregar la tabla al div de resultados
-            resultDiv.innerHTML = '';
-            resultDiv.appendChild(table);
+        } catch (error) {
+            console.error('Error listing cameras:', error);
         }
-        // Cambiar la cámara cuando se seleccione una opción diferente
-        cameraSelect.addEventListener('change', () => {
-            setupCamera(cameraSelect.value);
-        });
+    }
 
-        // Listar las cámaras disponibles al cargar la página
-        await listCameras();
-
-            // Iniciar el escáner QR
-            qrScanner.start();
+    // Change camera when a different option is selected
+    cameraSelect.addEventListener('change', () => {
+        setupCamera(cameraSelect.value);
     });
+
+    // List available cameras when the page loads
+    await listCameras();
+
+    // Start the QR scanner
+    qrScanner.start();
+});
 </script>
 {% endblock %}

@@ -192,7 +192,6 @@ def update_profile():
     flash("Profile data updated correctly")
     return render_template('profile.html', user=current_user)
 
-    return render_template('profile.html', user=current_user)
 
 @views.route('/success', methods=['GET', 'POST'])
 @login_required
@@ -276,7 +275,7 @@ def success_cash():
             # Agregar la nueva instancia a la sesión y confirmar los cambios en la base de datos
             db.session.add(event_attendance)
             db.session.commit()
-            return render_template('success.html')
+            return render_template('success.html', user=current_user)
         except Exception as e:
             # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
             print(e)
@@ -512,65 +511,77 @@ def create_payment():
 
 @views.route('/process_qr', methods=['POST'])
 def process_qr():
-    data = request.json.get('qr_data')
-    print(data)
-    # Extraer los datos del QR
-    qr_info = {}
-    for line in data.split('\n'):
-        if ':' in line:
-            key, value = line.split(': ', 1)
-            qr_info[key.strip()] = value.strip()
+    try:
+        # Asegurarse de que se recibe el JSON correctamente
+        data = request.json.get('data', '')
+        print(f"Raw data received: {data}")
 
-    print(qr_info)
-    # Verificar si la información del QR coincide con los registros en la base de datos
-    event_name = qr_info.get('Event')
-    date_str = qr_info.get('Date')
-    description = qr_info.get('Description')
-    user_name = qr_info.get('User')
-    user_email = qr_info.get('Email')
-    member_tickets = int(qr_info.get('Member Tickets', 0))
-    guest_tickets = int(qr_info.get('Guest Tickets', 0))
-    child_tickets = int(qr_info.get('Child Tickets', 0))
-    member_child_tickets = int(qr_info.get("Member's Child Tickets", 0))
-    total_price = float(qr_info.get('Total Price', '').replace('$', '').replace(',', ''))
-    paid = qr_info.get('Paid', '').lower() == "yes"
+        # Si data es un string JSON, cargarlo como diccionario
+        if isinstance(data, str):
+            data = json.loads(data)
 
-    # Buscar en la base de datos los registros que coincidan con la información del QR
-    event = Event.query.filter_by(name=event_name).first()
-    if event:
-        if event.date.strftime('%B %d, %Y') == date_str:
-            user = User.query.filter_by(email=user_email).first()
-            if user:
-                user_attendance = Event_Attendance.query.filter_by(user_id=user.id, event_id=event.id).first()
-                if user_attendance:
-                    # Comprobar si los detalles de la asistencia coinciden
-                    if (user_attendance.number_member_tickets == member_tickets and
-                            user_attendance.number_guest_tickets == guest_tickets and
-                            user_attendance.number_child_tickets == child_tickets and
-                            user_attendance.number_memberchild_tickets == member_child_tickets and
-                            user_attendance.total_price == total_price and
-                            paid):
-                        flash("Correct ticket!! Enjoy the event!!")
-                        return jsonify({"status": "success", "message": "QR data is correct."})
-                    elif (user_attendance.number_member_tickets == member_tickets and
-                            user_attendance.number_guest_tickets == guest_tickets and
-                            user_attendance.number_child_tickets == child_tickets and
-                            user_attendance.number_memberchild_tickets == member_child_tickets and
-                            user_attendance.total_price == total_price and not paid):
-                        flash("Correct ticket!! Enjoy the event!!")
-                        flash("El usuario debe pagar en efectivo","orange")
-                        return jsonify({"status": "success", "message": "QR data is correct."})
+        # Extraer los datos del QR
+        qr_info = {}
+        for line in data.split('\n'):
+            if ':' in line:
+                key, value = line.split(': ', 1)
+                qr_info[key.strip()] = value.strip()
+
+        print(f"Extracted QR Info: {qr_info}")
+
+        # Verificar si la información del QR coincide con los registros en la base de datos
+        event_name = qr_info.get('Event')
+        date_str = qr_info.get('Date')
+        description = qr_info.get('Description')
+        user_name = qr_info.get('User')
+        user_email = qr_info.get('Email')
+        member_tickets = int(qr_info.get('Member Tickets', 0))
+        guest_tickets = int(qr_info.get('Guest Tickets', 0))
+        child_tickets = int(qr_info.get('Child Tickets', 0))
+        member_child_tickets = int(qr_info.get("Member's Child Tickets", 0))
+        total_price = float(qr_info.get('Total Price', '').replace('$', '').replace(',', ''))
+        paid = qr_info.get('Paid', '').lower() == "yes"
+
+        # Buscar en la base de datos los registros que coincidan con la información del QR
+        event = Event.query.filter_by(name=event_name).first()
+        if event:
+            if event.date.strftime('%B %d, %Y') == date_str:
+                user = User.query.filter_by(email=user_email).first()
+                if user:
+                    user_attendance = Event_Attendance.query.filter_by(user_id=user.id, event_id=event.id).first()
+                    if user_attendance:
+                        # Comprobar si los detalles de la asistencia coinciden
+                        if (user_attendance.number_member_tickets == member_tickets and
+                                user_attendance.number_guest_tickets == guest_tickets and
+                                user_attendance.number_child_tickets == child_tickets and
+                                user_attendance.number_memberchild_tickets == member_child_tickets and
+                                user_attendance.total_price == total_price and
+                                paid):
+                            flash("Correct ticket!! Enjoy the event!!")
+                            return jsonify({"status": "success", "message": "QR data is correct.", "data": qr_info})
+                        elif (user_attendance.number_member_tickets == member_tickets and
+                                user_attendance.number_guest_tickets == guest_tickets and
+                                user_attendance.number_child_tickets == child_tickets and
+                                user_attendance.number_memberchild_tickets == member_child_tickets and
+                                user_attendance.total_price == total_price and not paid):
+                            flash("Correct ticket!! Enjoy the event!!")
+                            flash("El usuario debe pagar en efectivo", "orange")
+                            return jsonify({"status": "success", "message": "QR data is correct.", "data": qr_info})
+                        else:
+                            return jsonify({"status": "error", "message": "QR data does not match the records."})
                     else:
-                        return jsonify({"status": "error", "message": "QR data does not match the records."})
+                        return jsonify({"status": "error", "message": "User attendance not found."})
                 else:
-                    return jsonify({"status": "error", "message": "User attendance not found."})
+                    return jsonify({"status": "error", "message": "User not found."})
             else:
-                return jsonify({"status": "error", "message": "User not found."})
+                return jsonify({"status": "error", "message": "Event details do not match the records."})
         else:
-            return jsonify({"status": "error", "message": "Event details do not match the records."})
-    else:
-        return jsonify({"status": "error", "message": "Event not found."})
-    
+            return jsonify({"status": "error", "message": "Event not found."})
+    except Exception as e:
+        print(f"Error processing QR: {e}")
+        return jsonify({"status": "error", "message": "An error occurred while processing the QR code."})
+
+
 
 
 @views.route('/qr_reader', methods=['GET','POST'])
@@ -616,6 +627,7 @@ def download_event_attendees():
 
     for attendance in attendances:
         user = User.query.get(attendance.user_id)
+        print(user)
         guest_names = attendance.guests_names.split(', ')
 
         table_data.append([

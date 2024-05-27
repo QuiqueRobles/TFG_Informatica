@@ -190,10 +190,11 @@ function setLoading(isLoading) {
 
 function isFormValid() {
   // Obtén todos los campos del formulario
-  const inputs = document.querySelectorAll("#payment-form input[type='number'], #payment-form input[type='text']");
+  const inputs = document.querySelectorAll("#payment-form input[type='number'], #payment-form input[type='text']:not(#guests_names)");
 
   // Verifica si algún campo está vacío
   for (const input of inputs) {
+    
     if (!input.value) {
       return false; // Devuelve false si algún campo está vacío
     }
