@@ -1,5 +1,6 @@
-{% extends "base.html" %} {% block title %}Sign Up{% endblock %} {% block
-content %}
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-md-8">
@@ -116,6 +117,10 @@ content %}
                   <input type="text" class="form-control" id="partnerPhoneNumber" name="partnerPhoneNumber"
                     placeholder="Enter partner's phone number">
                 </div>
+                <div class="form-group">
+                  <label for="partner_image">Partner's Profile Image</label>
+                  <input type="file" class="form-control" id="partner_image" name="partner_image">
+                </div>
               </div>
             </div>
 
@@ -197,6 +202,10 @@ content %}
         <div class="form-group">
           <label for="childPhoneNumber_${i}">Child ${i} Phone Number</label>
           <input type="text" class="form-control" id="childPhoneNumber_${i}" name="childPhoneNumber_${i}" placeholder="Enter child's phone number">
+        </div>
+        <div class="form-group">
+          <label for="child_image_${i}">Child ${i} Profile Image</label>
+          <input type="file" class="form-control" id="child_image_${i}" name="child_image_${i}">
         </div>
       `;
       container.append(childForm);

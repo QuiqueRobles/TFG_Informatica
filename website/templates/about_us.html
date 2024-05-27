@@ -2,21 +2,29 @@
 {% block title %}About Us{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="/static/about_us.css">
-<br><br><br>
+
 <div class="container-fluid p-0">
     <!-- First Hero Banner -->
-    <section class="hero-banner text-black text-center d-flex align-items-center justify-content-center"
-        style="background: url('{{ url_for('static', filename='images/greekbanner.png') }}') no-repeat center center; background-size: cover; height: 45vh;">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="display-3 font-weight-bold mb-4"><br>Welcome to GREMA</h1>
-                <p class="lead mb-4">Greek-Spanish Families Association of Madrid</p>
+    <section
+        class="hero-banner text-white text-center d-flex align-items-center justify-content-center position-relative"
+        style="height: 70vh;">
+        <video autoplay muted loop class="position-absolute w-100 h-100" style="object-fit: cover;">
+            <source src="{{ url_for('static', filename='images/herobanner2.mp4') }}" type="video/mp4">
+        </video>
+        <div class="container position-relative" style="z-index: 1;">
+            <div class="hero-content fade-in">
+                <h1 class="display-3 font-weight-bold mb-4" style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">
+                    Discover the World of GREMA</h1>
+                <p class="lead mb-4" style="text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">Greek-Spanish Families
+                    Association of Madrid</p>
                 <a href="#about-section" class="btn btn-lg btn-light mt-4 smooth-scroll">Learn More</a>
+
+
             </div>
         </div>
+        <div class="overlay"></div>
     </section>
 
-    
     <!-- Carousel Section -->
     <section class="py-5 bg-light">
         <div class="container">
@@ -56,14 +64,14 @@
     <section id="about-section" class="py-5 bg-light">
         <div class="container">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 mb-4">
                     <h2 class="font-weight-bold mb-4">About GREMA</h2>
                     <p class="lead">GREMA (Greek-Spanish Families Association of Madrid) is dedicated to promoting
                         cultural exchange and preserving Greek heritage within the Spanish community. Through various
                         events and initiatives, we strive to strengthen the bonds between Greek and Spanish families and
                         foster a deeper understanding of Greek culture.</p>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 mb-4">
                     <h2 class="font-weight-bold mb-4">Misión de GREMA</h2>
                     <p class="lead">GREMA (Asociación de Familias Greco-Españolas de Madrid) se dedica a promover el
                         intercambio cultural y preservar el patrimonio griego dentro de la comunidad española. A través
@@ -71,6 +79,28 @@
                         griegas y españolas y fomentar una comprensión más profunda de la cultura griega.</p>
                 </div>
             </div>
+            <!-- New Counters Section -->
+            <div class="row text-center mt-5">
+                <div class="col-md-4 mb-4">
+                    <div class="counter">
+                        <span class="count" data-target="{{ user_count }}">{{ user_count }}</span>
+                        <p class="lead">User Registered</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="counter">
+                        <span class="count" data-target="{{ event_count }}">{{ event_count }}</span>
+                        <p class="lead">Events Organized</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="counter">
+                        <span class="count" data-target="{{ family_count }}">{{ family_count }}</span>
+                        <p class="lead">Members</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -136,14 +166,23 @@
 <style>
     /* Additional CSS for custom styling */
     .hero-banner {
-        height: 100vh;
-        /* Changed height to 100vh for a taller hero banner */
+        height: 70vh;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         color: white;
         text-shadow: 1px 1px 2px black;
+    }
+
+    .hero-banner video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
     }
 
     .hero-banner .container {
@@ -157,6 +196,16 @@
     .fade-in {
         opacity: 0;
         animation: fadeIn 2s forwards;
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 0;
     }
 
     .jumbotron {
@@ -187,25 +236,91 @@
             transform: translateY(0);
         }
     }
+
+    .container img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    section {
+        padding: 60px 0;
+    }
+
+    h2 {
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+    }
+
+    p {
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+
+    .btn-light {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    .btn-light:hover {
+        background-color: #e2e6ea;
+        color: #333;
+    }
+
+    .counter {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .counter .count {
+        font-size: 3rem;
+        font-weight: bold;
+    }
 </style>
 
 <script>
-    // Smooth scroll
-    document.querySelectorAll('.smooth-scroll').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
+    document.addEventListener('DOMContentLoaded', function () {
+            // Smooth scroll
+            document.querySelectorAll('.smooth-scroll').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
 
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
+            // Fade in effect
+            var fadeIns = document.querySelectorAll('.fade-in');
+            fadeIns.forEach(function (fadeIn) {
+                fadeIn.style.opacity = '1';
+            });
+
+            // Initialize counters
+            var counters = document.querySelectorAll('.count');
+            counters.forEach(function (counter) {
+                counter.innerText = '0';
+                var updateCounter = function () {
+                    var target = +counter.getAttribute('data-target');
+                    var count = +counter.innerText;
+                    var increment = target / 200;
+
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count + increment);
+                        setTimeout(updateCounter, 10);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCounter();
             });
         });
-    });
 
-    // Fade in effect
-    document.addEventListener('DOMContentLoaded', function () {
-        var fadeIns = document.querySelectorAll('.fade-in');
-        fadeIns.forEach(function (fadeIn) {
-            fadeIn.style.opacity = '1';
-        });
-    });
 </script>

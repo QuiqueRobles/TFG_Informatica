@@ -74,6 +74,30 @@ def home():
         return render_template("homeAdmin.html", user=current_user, active_event=eventos_activos, event_details=event_details)
     return render_template("home.html", user=current_user, active_event=eventos_activos, event_details=event_details)
 
+
+@login_required
+@views.route('/update-event/<int:event_id>', methods=['GET', 'POST'])
+def update_event(event_id):
+    event = Event.query.get_or_404(event_id)
+    if request.method == 'POST':
+        event.name = request.form['name']
+        date_str=request.form['date']
+        event.date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        event.max_guest_num = request.form['max_guest_num']
+        event.member_price = request.form['member_price']
+        event.member_child_price = request.form['member_child_price']
+        event.guest_price = request.form['guest_price']
+        event.description = request.form['description']
+        if 'img_url' in request.files:
+            img_file = request.files['img_url']
+            if img_file:
+                img_path = f'static/images/{img_file.filename}'
+                img_file.save(img_path)
+                event.img_url = img_path
+        db.session.commit()
+        return redirect(url_for('views.home')) # Redirect to the admin home or events page
+    return render_template('update_event.html', event=event, user=current_user)
+
 @views.route('/my_events', methods=['GET', 'POST'])
 @login_required
 def my_events():
@@ -82,9 +106,13 @@ def my_events():
     now = datetime.now()
     return render_template('my_events.html', user_attendances=user_attendances, events=events, user=current_user,now=now)
 
-@views.route('/about_us', methods=['GET', 'POST'])
+@views.route('/about_us', methods=['GET'])
 def about_us():
-    return render_template('about_us.html', user=current_user)
+    user_count = db.session.query(User).count()
+    event_count = db.session.query(Event).count()
+    family_count = db.session.query(Fee).count()
+    
+    return render_template('about_us.html', user=current_user, user_count=user_count, event_count=event_count, family_count=family_count)
 
 @views.route('/become_member', methods=['GET', 'POST'])
 @login_required
@@ -162,6 +190,8 @@ def update_profile():
                         birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
                     child.birthday=birthday
     flash("Profile data updated correctly")
+    return render_template('profile.html', user=current_user)
+
     return render_template('profile.html', user=current_user)
 
 @views.route('/success', methods=['GET', 'POST'])
@@ -280,28 +310,44 @@ def success_membership():
 def error():
     return render_template('error.html', message='An error was detected')
 
+
 @views.route('/manage_event_attendances', methods=['GET', 'POST'])
 @login_required
 def manage_event_attendances():
     events = Event.query.all()
     users = User.query.all()
     user_attendance = None
+    searched_user = None
+    searched_event = None
+    
     if request.method == 'POST':
-        event_id = request.form['event_id']
-        searched_event= Event.query.filter_by(id=event_id).first()
-        user_email = request.form['user_email']
-        searched_user = User.query.filter_by(email=user_email).first()
-        if searched_user:
+        event_id = request.form.get('event_id')
+        user_email = request.form.get('user_email')
+        user_nif = request.form.get('user_nif')
+        user_last_name = request.form.get('user_last_name')
+        
+        if event_id:
+            searched_event = Event.query.filter_by(id=event_id).first()
+
+        if user_email:
+            searched_user = User.query.filter_by(email=user_email).first()
+        elif user_nif:
+            searched_user = User.query.filter_by(nif=user_nif).first()
+        elif user_last_name:
+            searched_user = User.query.filter_by(surname=user_last_name).first()
+
+        if searched_user and searched_event:
             user_attendance = Event_Attendance.query.filter_by(event_id=event_id, user_id=searched_user.id).first()
             if user_attendance:
-                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users, user_attendance=user_attendance, searched_event=searched_event,searched_user=searched_user)  
+                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users, user_attendance=user_attendance, searched_event=searched_event, searched_user=searched_user)
             else:
                 flash('This user does not have tickets', category='error')
-                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users, user_attendance=user_attendance)
+                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users)
         else:
-            flash('There was an error', category='error')
-            return render_template('manage_event_attendances.html', user=current_user, events=events, users=users, user_attendance=user_attendance)
-    return render_template('manage_event_attendances.html', user=current_user, events=events, users=users, user_attendance=user_attendance)
+            flash('User not found', category='error')
+            return render_template('manage_event_attendances.html', user=current_user, events=events, users=users)
+
+    return render_template('manage_event_attendances.html', user=current_user, events=events, users=users)
 
 
 @views.route('/manage_memberships', methods=['GET', 'POST'])
@@ -530,6 +576,77 @@ def process_qr():
 @views.route('/qr_reader', methods=['GET','POST'])
 def reader_qr():
     return render_template('qr_reader.html', user=current_user)
+
+
+@views.route('/download_event_attendees', methods=['POST'])
+@login_required
+def download_event_attendees():
+    event_id = request.form.get('event_id')
+    event = Event.query.filter_by(id=event_id).first()
+    attendances = Event_Attendance.query.filter_by(event_id=event_id).all()
+
+    if not event or not attendances:
+        flash('No attendees found for this event', 'error')
+        return redirect(url_for('manage_event_attendances'))
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    title_style = styles['Title']
+    subtitle_style = styles['Heading3']
+    normal_style = styles['BodyText']
+    table_header_style = ParagraphStyle(
+        'TableHeader',
+        parent=normal_style,
+        fontSize=8,
+        textColor=colors.whitesmoke,
+        alignment=1,
+        fontName='Helvetica-Bold'
+    )
+
+    elements.append(Paragraph(f"Attendees of {event.name}", title_style))
+    elements.append(Paragraph(f"Event Date: {event.date}", subtitle_style))
+    elements.append(Spacer(1, 12))
+
+    table_data = [
+        ['User Name', 'User Email', 'Guest Tickets', 'Child Tickets', 'Member Tickets', 'Member Child Tickets', 'Guest Names']
+    ]
+
+    for attendance in attendances:
+        user = User.query.get(attendance.user_id)
+        guest_names = attendance.guests_names.split(', ')
+
+        table_data.append([
+            Paragraph(f"{user.first_name} {user.surname}", normal_style),
+            Paragraph(user.email, normal_style),
+            Paragraph(str(attendance.number_guest_tickets), normal_style),
+            Paragraph(str(attendance.number_child_tickets), normal_style),
+            Paragraph(str(attendance.number_member_tickets), normal_style),
+            Paragraph(str(attendance.number_memberchild_tickets), normal_style),
+            #Paragraph(', '.join(guest_names), normal_style)
+        ])
+
+    table = Table(table_data, colWidths=[70, 100, 50, 50, 50, 50, 120])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 4),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 4),
+    ]))
+
+    elements.append(table)
+    doc.build(elements)
+    buffer.seek(0)
+
+    return send_file(buffer, as_attachment=True, download_name=f"attendees_{event.name}.pdf", mimetype='application/pdf')
 
 #################################################
 #################################################

@@ -1,86 +1,171 @@
-{% extends "base.html" %} {% block title %}homeAdmin{% endblock %} {% block content %}
-<div class="container py-5">
-<br />
-<div align=center>You are the boss now. Create and destroy. ADMIN MODE ACTIVATED</div> 
-<br />
-<h1 align="center">Events</h1>
-<br/>
-<div class="row">
-    {% for event in active_event %}
-    <div class="col-md-4">
+{% extends "base.html" %}
+{% block title %}Admin Home{% endblock %}
+{% block content %}
+<!-- Hero Banner -->
+<section class="hero-banner bg-dark text-white text-center py-5 position-relative">
+    <video autoplay muted loop playsinline class="hero-video">
+        <source src="/static/images/banner_video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div
+        class="hero-content position-absolute w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+        <h1 class="display-4" style="color: #fff; font-size: 3.5rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">
+            Welcome
+            to GREMA Events Admin</h1>
+        <p class="lead" style="color: #fff; font-size: 1.25rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">Manage and
+            create events with ease</p>
+    </div>
+</section>
 
-        <div class="card mb-4 div-hover">
-            {% if event.img_url %}
-            <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
-            {% else %}
-            <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top"
-                alt="{{ event.name }}">
-            {% endif %}
-            <div class="card-body">
-
-                <h5 class="card-title">
-                    <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
-                </h5>
-                Event Date: {{event.date.strftime('%d-%m-%Y')}} <br />
-                Maximum capacity: {{event.max_guest_num}} people <br />
-                Member price: {{event.member_price}} € <br />
-                Member price (Child): {{event.member_child_price}} € <br />
-                Guest price: {{event.guest_price}} € <br />
-                Description: {{event.description}}
+<div class="container py-5" id="events">
+    <br />
+    <div align="center">You are the boss now. Create and destroy. ADMIN MODE ACTIVATED</div>
+    <br />
+    <h1 class="text-center mb-4">Events</h1>
+    <br />
+    <div class="text-center mb-4">
+        <button class="btn btn-success" id="create-event-btn">Create Event</button>
+    </div>
+    <div class="row">
+        {% for event in active_event %}
+        <div class="col-md-4 position-relative">
+            <div class="card mb-4 div-hover shadow-sm">
+                {% if event.img_url %}
+                <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
+                {% else %}
+                <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top"
+                    alt="{{ event.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
+                    </h5>
+                    <p><strong>Event Date:</strong> {{ event.date.strftime('%d-%m-%Y') }}</p>
+                    <p><strong>Maximum capacity:</strong> {{ event.max_guest_num }} people</p>
+                    <p><strong>Member price:</strong> {{ event.member_price }} €</p>
+                    <p><strong>Member price (Child):</strong> {{ event.member_child_price }} €</p>
+                    <p><strong>Guest price:</strong> {{ event.guest_price }} €</p>
+                    <p><strong>Description:</strong> {{ event.description }}</p>
+                    <p><strong>Available tickets:</strong>
+                        {% for detail in event_details %}
+                        {% if detail.event == event.id %}
+                        {% if detail.sold_out %}
+                        <span class="text-danger">{{ detail.tickets_remaining }}</span>
+                        {% else %}
+                        {% if detail.warning_few_tickets %}
+                        <span class="text-warning">{{ detail.tickets_remaining }}</span>
+                        {% else %}
+                        <span class="text-success">{{ detail.tickets_remaining }}/{{ event.max_guest_num }}</span>
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                    </p>
+                    <a href="/update-event/{{ event.id }}" class="btn btn-warning">Edit</a>
+                    <button type="button" class="btn btn-danger" onClick="deleteEvent({{ event.id }})">Delete</button>
+                </div>
+                {% for detail in event_details %}
+                {% if detail.event == event.id and detail.sold_out %}
+                <div
+                    class="sold-out-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                    <img src="{{ url_for('static', filename='images/sold_out.png') }}" alt="Sold Out"
+                        style="max-width: 80%; max-height: 80%;">
+                </div>
+                {% endif %}
+                {% endfor %}
             </div>
-            <button type="button" class="btn btn-danger" onClick="deleteEvent({{ event.id }})">
-                <span aria-hidden="true">&times;</span>
-            </button>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+
+    <div class="create-event-form mt-5" id="create-event-form" style="display: none;">
+        <form method="POST" enctype="multipart/form-data">
+            <h3 align="center">Create Event</h3>
+            <div class="form-group">
+                <label for="name">Name of the event</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter name of the event" />
+            </div>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" class="form-control" id="date" name="date" placeholder="Enter date of the event" />
+            </div>
+            <div class="form-group">
+                <label for="max_guest_num">Maximum number of guests</label>
+                <input type="number" class="form-control" id="max_guest_num" name="max_guest_num"
+                    placeholder="Enter the maximum guests number" />
+            </div>
+            <div class="form-group">
+                <label for="member_price">Member price</label>
+                <input type="number" class="form-control" id="member_price" name="member_price"
+                    placeholder="Enter member price" />
+            </div>
+            <div class="form-group">
+                <label for="member_child_price">Child member price</label>
+                <input type="number" class="form-control" id="member_child_price" name="member_child_price"
+                    placeholder="Enter child member price" />
+            </div>
+            <div class="form-group">
+                <label for="guest_price">Guest price</label>
+                <input type="number" class="form-control" id="guest_price" name="guest_price"
+                    placeholder="Enter guest price" />
+            </div>
+            <div class="form-group">
+                <label for="img_url">Event Image</label>
+                <input type="file" class="form-control" id="img_url" name="img_url" />
+            </div>
+            <br />
+            <label for="description">Insert a brief description of the event:</label>
+            <textarea name="description" id="description" class="form-control"></textarea>
+            <br />
+            <button type="submit" class="btn btn-primary">Create Event</button>
+        </form>
+    </div>
 </div>
 
-<br/>  
-<form method="POST" enctype="multipart/form-data">
-    <h3 align="center">Create Event</h3>
-    <div class="form-group">
-        <label for="name">Name of the event</label>
-        <input type="text" class="form-control" id="name" name="name" placeholder="Enter name of the event" />
-    </div>
-    <div class="form-group">
-        <label for="date">Date</label>
-        <input type="date" class="form-control" id="date" name="date" placeholder="Enter date of the event" />
-    </div>
-    <div class="form-group">
-        <label for="max_guest_num">Maximum number of guests</label>
-        <input type="text" class="form-control" id="max_guest_num" name="max_guest_num" placeholder="Enter the maximum guests number" />
-    </div>
-    <div class="form-group">
-        <label for="member_price">Member price</label>
-        <input type="number" class="form-control" id="member_price" name="member_price" placeholder="Enter member price" />
-    </div>
-    <div class="form-group">
-        <label for="member_child_price">Child member price</label>
-        <input type="number" class="form-control" id="member_child_price" name="member_child_price" placeholder="Enter date of child member price" />
-    </div>
-    <div class="form-group">
-        <label for="member_child_price">Child price</label>
-        <input type="number" class="form-control" id="child_price" name="child_price"
-            placeholder="Enter date of child price" />
-    </div>
-    <div class="form-group">
-        <label for="guest_price">Guest price</label>
-        <input type="number" class="form-control" id="guest_price" name="guest_price" placeholder="Enter date of guest price" />
-    </div>
-    <div class="form-group">
-        <label for="img_url">Event Image</label>
-        <input type="file" class="form-control" id="img_url" name="img_url" />
-    </div>
-    <br />
-    Insert a brief description of the event:
-    <br />
-    <br />
-    <textarea name="description" id="description" class="form-control"></textarea>
-    <br />
-    <button type="submit" class="btn btn-primary">Create Event</button>
-</form>
-<br />
-<br />
-</div>
+<style>
+    .hero-banner {
+        position: relative;
+        height: 60vh;
+        overflow: hidden;
+    }
+
+    .hero-video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+    }
+
+    .hero-content {
+        z-index: 2;
+        color: #ffffff;
+    }
+
+    .div-hover:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+    }
+
+    .sold-out-overlay {
+        background: rgba(255, 255, 255, 0.8);
+    }
+</style>
+
+<script>
+    document.querySelector('.btn-primary').addEventListener('click', function (event) {
+        event.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+
+    document.getElementById('create-event-btn').addEventListener('click', function () {
+        document.getElementById('create-event-form').style.display = 'block';
+        this.style.display = 'none';
+    });
+</script>
 {% endblock %}

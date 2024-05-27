@@ -2,10 +2,10 @@
 {% block title %}Ticket Event Searcher{% endblock %}
 {% block content %}
 <style>
-    
     .input-group {
         display: flex;
         align-items: center;
+        margin-bottom: 10px;
     }
 
     .input-group select,
@@ -14,7 +14,8 @@
         margin-right: 10px;
     }
 
-    .btn-primary {
+    .btn-primary,
+    .btn-secondary {
         margin-top: 10px;
     }
 
@@ -28,9 +29,11 @@
     .card-body {
         padding: 20px;
     }
+
     .bg-custom {
-    background-color: #114780; /* Cambia este color por el que desees */
-}
+        background-color: #114780;
+    }
+
     .card-title {
         font-size: 24px;
         margin-bottom: 20px;
@@ -55,9 +58,10 @@
         display: inline-block;
         font-weight: 600;
     }
+
     .custom-font-size {
-    font-size: 1.1rem; /* Tamaño de fuente equivalente a fs-6 en Bootstrap */
-}
+        font-size: 1.1rem;
+    }
 </style>
 <div class="container mt-5">
     <h1 class="text-center mb-4">Ticket Event Searcher</h1>
@@ -71,17 +75,22 @@
                         {% endfor %}
                     </select>
                     <input type="text" name="user_email" class="form-control" placeholder="Enter user email">
+                    <input type="text" name="user_nif" class="form-control" placeholder="Enter user NIF">
+                    <input type="text" name="user_last_name" class="form-control" placeholder="Enter user last name">
                     <button type="submit" class="btn btn-primary">Search</button>
                 </div>
             </form>
             {% if user_attendance %}
             <div class="card">
-                <h2 class="card-header bg-custom text-white custom-font-size">Tickets of {{ searched_user.first_name }} ({{
-                    searched_user.email }}) has been found</h2>
+                <h2 class="card-header bg-custom text-white custom-font-size">Tickets of {{ searched_user.first_name }}
+                    ({{ searched_user.email }}) have been found</h2>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item"><strong>Event Name:</strong> {{ searched_event.name }}</li>
                         <li class="list-group-item"><strong>Date:</strong> {{ searched_event.date }}</li>
+                        <li class="list-group-item"><strong>User Name:</strong> {{ searched_user.first_name }} {{
+                            searched_user.last_name }}</li>
+                        <li class="list-group-item"><strong>User Email:</strong> {{ searched_user.email }}</li>
                         <li class="list-group-item"><strong>Number of Guest Tickets:</strong> {{
                             user_attendance.number_guest_tickets }}</li>
                         <li class="list-group-item"><strong>Number of Child Tickets:</strong> {{
@@ -90,7 +99,8 @@
                             user_attendance.number_member_tickets }}</li>
                         <li class="list-group-item"><strong>Number of Member Child Tickets:</strong> {{
                             user_attendance.number_memberchild_tickets }}</li>
-                        <li class="list-group-item"><strong>Guests Names:</strong> {{ user_attendance.guests_names }}</li>
+                        <li class="list-group-item"><strong>Guests Names:</strong> {{ user_attendance.guests_names }}
+                        </li>
                         <li class="list-group-item"><strong>Cash Payment in Event:</strong> {{ "Yes" if
                             user_attendance.cash_payment_in_event else "No" }}</li>
                         <li class="list-group-item"><strong>Total Price:</strong> {{ user_attendance.total_price }}</li>
@@ -98,9 +108,17 @@
                 </div>
             </div>
             {% endif %}
+            <form action="/download_event_attendees" method="post">
+                <div class="input-group">
+                    <select name="event_id" class="form-select">
+                        {% for event in events %}
+                        <option value="{{ event.id }}">{{ event.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-secondary">Download Attendees PDF</button>
+                </div>
+            </form>
         </div>
     </div>
-
-
 </div>
 {% endblock %}
