@@ -4,7 +4,7 @@ import pyqrcode
 from flask import Blueprint, render_template, request, flash, jsonify, url_for,Flask, current_app, redirect, send_file, make_response
 from flask_login import login_required, current_user
 from .models import User,Admin,Event,Event_Attendance,Fee
-from . import db
+from . import db, mail
 from datetime import datetime
 from sqlalchemy.sql import func
 from werkzeug.utils import secure_filename
@@ -19,6 +19,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph
 from reportlab.lib.enums import TA_CENTER
 import base64
+from flask_mail import Mail, Message
 #from pyzbar.pyzbar import decode
 
 
@@ -228,6 +229,22 @@ def success():
             db.session.add(event_attendance)
             db.session.commit()
 
+            msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
+            msg.body = f"""
+            
+            Thank you for purchasing GREMA tickets!!! We are looking forward to seeing you in the event with your family!
+            
+            number_member_tickets={number_member_tickets},
+            number_memberchild_tickets={number_child_member_tickets},
+            number_guest_tickets={number_guest_tickets},
+            number_child_tickets={number_child_tickets},
+            guests_names={guests_names},
+            total_price={totalAmount},
+            
+            http://localhost:5000/my_events
+            """
+            mail.send(msg)
+
             
             return render_template('success.html')
         except Exception as e:
@@ -276,6 +293,25 @@ def success_cash():
             # Agregar la nueva instancia a la sesión y confirmar los cambios en la base de datos
             db.session.add(event_attendance)
             db.session.commit()
+
+            msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
+            msg.body = f"""
+            
+            Thank you for purchasing GREMA tickets!!! We are looking forward to seeing you in the event with your family!
+            
+            number_member_tickets={number_member_tickets},
+            number_memberchild_tickets={number_child_member_tickets},
+            number_guest_tickets={number_guest_tickets},
+            number_child_tickets={number_child_tickets},
+            guests_names={guests_names},
+            total_price={totalAmount},
+            
+            RECUERDA QUE DEBES PAGAR EN EFECTIVO ALLÍ!
+            
+            http://localhost:5000/my_events
+            """
+            mail.send(msg)
+
             return render_template('success.html', user=current_user)
         except Exception as e:
             # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
@@ -296,6 +332,9 @@ def success_membership():
             # Agregar la nueva instancia a la sesión y confirmar los cambios en la base de datos
             db.session.add(fee)
             db.session.commit()
+            msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
+            msg.body = f'Thank you for becoming part of the GREMA Association!!! We are looking forward to seeing you in events with your family!'
+            mail.send(msg)
             return render_template('success_membership.html')
         except Exception as e:
             # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
