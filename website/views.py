@@ -190,6 +190,7 @@ def update_profile():
                         birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
                     child.birthday=birthday
     flash("Profile data updated correctly")
+    db.session.commit()
     return render_template('profile.html', user=current_user)
 
 
@@ -593,7 +594,7 @@ def reader_qr():
 @login_required
 def download_event_attendees():
     event_id = request.form.get('event_id')
-    event = Event.query.filter_by(id=event_id).first()
+    event = Event.query.get(event_id)
     attendances = Event_Attendance.query.filter_by(event_id=event_id).all()
 
     if not event or not attendances:
@@ -603,51 +604,63 @@ def download_event_attendees():
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     styles = getSampleStyleSheet()
-    elements = []
 
+    elements = []
+    
+    # Estilos para el título y subtítulo
     title_style = styles['Title']
     subtitle_style = styles['Heading3']
-    normal_style = styles['BodyText']
+    
+    # Estilo para el texto normal en la tabla
+    normal_style = ParagraphStyle(
+        'Normal',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=colors.black,
+    )
+    
+    # Estilo para el encabezado de la tabla
     table_header_style = ParagraphStyle(
         'TableHeader',
         parent=normal_style,
-        fontSize=8,
-        textColor=colors.whitesmoke,
+        fontSize=10,
+        textColor=colors.white,
         alignment=1,
         fontName='Helvetica-Bold'
     )
 
+    # Título y subtítulo
     elements.append(Paragraph(f"Attendees of {event.name}", title_style))
     elements.append(Paragraph(f"Event Date: {event.date}", subtitle_style))
     elements.append(Spacer(1, 12))
 
+    # Datos de la tabla
     table_data = [
-        ['User Name', 'User Email', 'Guest Tickets', 'Child Tickets', 'Member Tickets', 'Member Child Tickets', 'Guest Names']
+        ['User Name', 'User Email', 'Guest Tickets', 'Child Tickets', 'Member Tickets', 'Member Child Tickets']
     ]
 
     for attendance in attendances:
         user = User.query.get(attendance.user_id)
-        print(user)
         guest_names = attendance.guests_names.split(', ')
 
         table_data.append([
-            Paragraph(f"{user.first_name} {user.surname}", normal_style),
-            Paragraph(user.email, normal_style),
-            Paragraph(str(attendance.number_guest_tickets), normal_style),
-            Paragraph(str(attendance.number_child_tickets), normal_style),
-            Paragraph(str(attendance.number_member_tickets), normal_style),
-            Paragraph(str(attendance.number_memberchild_tickets), normal_style),
-            #Paragraph(', '.join(guest_names), normal_style)
+            user.first_name + ' ' + user.surname,
+            user.email,
+            str(attendance.number_guest_tickets),
+            str(attendance.number_child_tickets),
+            str(attendance.number_member_tickets),
+            str(attendance.number_memberchild_tickets)
         ])
 
-    table = Table(table_data, colWidths=[70, 100, 50, 50, 50, 50, 120])
+    # Creación de la tabla
+    table = Table(table_data, repeatRows=1)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('LEFTPADDING', (0, 0), (-1, -1), 4),
@@ -747,7 +760,7 @@ def generate_event_pdf(event, user_attendance, current_user):
             "Member's Child": user_attendance.number_memberchild_tickets
         }],
         [Paragraph("Total Price:", style_normal), f"${user_attendance.total_price}"],
-        [Paragraph("Guest Names:", style_normal), ', '.join(user_attendance.guests_names)],
+        [Paragraph("Guest Names:", style_normal), user_attendance.guests_names],
         [Paragraph("Paid:", style_normal), "Yes" if not user_attendance.cash_payment_in_event else "No"]
     ]
 
