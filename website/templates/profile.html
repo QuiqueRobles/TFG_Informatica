@@ -187,24 +187,31 @@
                     {% for partner in user.partner %}
                     <h5 class="mt-4">Partner</h5>
                     <div class="form-group">
-                        <label for="partner_name">Partner Name:</label>
-                        <input type="text" id="partner_name" name="partner_name" class="form-control"
-                            value="{{ partner.name }}">
+                        <label for="partner_name_{{ loop.index }}">Partner Name:</label>
+                        <input type="text" id="partner_name_{{ loop.index }}" name="partner_name_{{ loop.index }}"
+                            class="form-control" value="{{ partner.name }}">
                     </div>
                     <div class="form-group">
-                        <label for="partner_nif">Partner NIF:</label>
-                        <input type="text" id="partner_nif" name="partner_nif" class="form-control"
-                            value="{{ partner.nif }}">
+                        <label for="partner_nif_{{ loop.index }}">Partner NIF:</label>
+                        <input type="text" id="partner_nif_{{ loop.index }}" name="partner_nif_{{ loop.index }}"
+                            class="form-control" value="{{ partner.nif }}">
                     </div>
                     <div class="form-group">
-                        <label for="partner_phone_number">Partner Phone Number:</label>
-                        <input type="text" id="partner_phone_number" name="partner_phone_number" class="form-control"
+                        <label for="partner_phone_number_{{ loop.index }}">Partner Phone Number:</label>
+                        <input type="text" id="partner_phone_number_{{ loop.index }}"
+                            name="partner_phone_number_{{ loop.index }}" class="form-control"
                             value="{{ partner.phone_number }}">
                     </div>
                     <div class="form-group">
-                        <label for="partner_birthday">Partner Birthday:</label>
-                        <input type="date" id="partner_birthday" name="partner_birthday" class="form-control"
+                        <label for="partner_birthday_{{ loop.index }}">Partner Birthday:</label>
+                        <input type="date" id="partner_birthday_{{ loop.index }}"
+                            name="partner_birthday_{{ loop.index }}" class="form-control"
                             value="{{ partner.birthday }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="partner_profile_image_{{ loop.index }}">Partner Profile Image:</label>
+                        <input type="file" id="partner_profile_image_{{ loop.index }}"
+                            name="partner_profile_image_{{ loop.index }}" class="form-control">
                     </div>
                     {% endfor %}
                     {% endif %}
@@ -213,23 +220,30 @@
                     <h5 class="mt-4">Children</h5>
                     {% for child in user.children %}
                     <div class="form-group">
-                        <label for="child_name">Child Name:</label>
-                        <input type="text" id="child_name" name="child_name" class="form-control"
-                            value="{{ child.name }}">
+                        <label for="child_name_{{ loop.index }}">Child Name:</label>
+                        <input type="text" id="child_name_{{ loop.index }}" name="child_name_{{ loop.index }}"
+                            class="form-control" value="{{ child.name }}">
                     </div>
                     <div class="form-group">
-                        <label for="child_nif">Child NIF:</label>
-                        <input type="text" id="child_nif" name="child_nif" class="form-control" value="{{ child.nif }}">
+                        <label for="child_nif_{{ loop.index }}">Child NIF:</label>
+                        <input type="text" id="child_nif_{{ loop.index }}" name="child_nif_{{ loop.index }}"
+                            class="form-control" value="{{ child.nif }}">
                     </div>
                     <div class="form-group">
-                        <label for="child_phone_number">Child Phone Number:</label>
-                        <input type="text" id="child_phone_number" name="child_phone_number" class="form-control"
+                        <label for="child_phone_number_{{ loop.index }}">Child Phone Number:</label>
+                        <input type="text" id="child_phone_number_{{ loop.index }}"
+                            name="child_phone_number_{{ loop.index }}" class="form-control"
                             value="{{ child.phone_number }}">
                     </div>
                     <div class="form-group">
-                        <label for="child_birthday">Child Birthday:</label>
-                        <input type="date" id="child_birthday" name="child_birthday" class="form-control"
-                            value="{{ child.birthday }}">
+                        <label for="child_birthday_{{ loop.index }}">Child Birthday:</label>
+                        <input type="date" id="child_birthday_{{ loop.index }}" name="child_birthday_{{ loop.index }}"
+                            class="form-control" value="{{ child.birthday }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="child_profile_image_{{ loop.index }}">Child Profile Image:</label>
+                        <input type="file" id="child_profile_image_{{ loop.index }}"
+                            name="child_profile_image_{{ loop.index }}" class="form-control">
                     </div>
                     {% endfor %}
                     {% endif %}

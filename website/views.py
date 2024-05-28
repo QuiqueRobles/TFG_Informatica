@@ -39,7 +39,6 @@ def home():
     todos_los_eventos = Event.query.all()
     eventos_activos = [evento for evento in todos_los_eventos if evento.date >= datetime.now()]
     event_details = calculate_event_details()
-    
     if current_user.is_admin == True:
         print("Renderizando homeAdmin")
         return render_template("homeAdmin.html", user=current_user, active_event=eventos_activos, event_details=event_details)
@@ -130,43 +129,67 @@ def update_profile():
             try:
                 birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
             except:
-                birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
-        
+                birthday = datetime.strptime('0001-01-01', '%Y-%m-%d').date()
 
-    current_user.first_name = first_name
-    current_user.surname = surname
-    current_user.nif = nif
-    current_user.phone_number = phone_number
-    current_user.address = address
-    if not current_user.is_admin:
-        current_user.birthday = birthday
-    if not current_user.is_admin:
-        if current_user.partner:
-                for partner in current_user.partner:
-                    partner.name = request.form['partner_name']
-                    partner.nif = request.form['partner_nif']
-                    partner.phone_number = request.form['partner_phone_number']
-                    birthday = request.form['partner_birthday']
-                    try:
-                        birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
-                    except:
-                        birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
-                    partner.birthday=birthday
+        current_user.first_name = first_name
+        current_user.surname = surname
+        current_user.nif = nif
+        current_user.phone_number = phone_number
+        current_user.address = address
+        if not current_user.is_admin:
+            current_user.birthday = birthday
 
-        if current_user.children:
-                for child in current_user.children:
-                    child.name = request.form['child_name']
-                    child.nif = request.form['child_nif']
-                    child.phone_number = request.form['child_phone_number']
-                    birthday = request.form['child_birthday']
-                    try:
-                        birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
-                    except:
-                        birthday=datetime.strptime('0001-01-01', '%Y-%m-%d').date()
-                    child.birthday=birthday
-    flash("Profile data updated correctly")
-    db.session.commit()
+        # Procesar las imágenes de perfil si se han subido
+        profile_image = request.files.get('profile_image')
+        if profile_image:
+            # Procesar y guardar la imagen de perfil del usuario
+            # Aquí deberías incluir tu lógica para guardar la imagen
+            pass
+
+        # Actualizar información de la pareja
+        if not current_user.is_admin and current_user.partner:
+            for idx, partner in enumerate(current_user.partner):
+                partner.name = request.form.get(f'partner_name_{idx+1}')
+                partner.nif = request.form.get(f'partner_nif_{idx+1}')
+                partner.phone_number = request.form.get(f'partner_phone_number_{idx+1}')
+                partner_birthday = request.form.get(f'partner_birthday_{idx+1}')
+                try:
+                    partner_birthday = datetime.strptime(partner_birthday, '%Y-%m-%d').date()
+                except:
+                    partner_birthday = datetime.strptime('0001-01-01', '%Y-%m-%d').date()
+                partner.birthday = partner_birthday
+
+                partner_profile_image = request.files.get(f'partner_profile_image_{idx+1}')
+                if partner_profile_image:
+                    # Procesar y guardar la imagen de perfil del partner
+                    # Aquí deberías incluir tu lógica para guardar la imagen
+                    pass
+
+        # Actualizar información de los hijos
+        if not current_user.is_admin and current_user.children:
+            for idx, child in enumerate(current_user.children):
+                child.name = request.form.get(f'child_name_{idx+1}')
+                child.nif = request.form.get(f'child_nif_{idx+1}')
+                child.phone_number = request.form.get(f'child_phone_number_{idx+1}')
+                child_birthday = request.form.get(f'child_birthday_{idx+1}')
+                try:
+                    child_birthday = datetime.strptime(child_birthday, '%Y-%m-%d').date()
+                except:
+                    child_birthday = datetime.strptime('0001-01-01', '%Y-%m-%d').date()
+                child.birthday = child_birthday
+
+                child_profile_image = request.files.get(f'child_profile_image_{idx+1}')
+                if child_profile_image:
+                    # Procesar y guardar la imagen de perfil del hijo
+                    # Aquí deberías incluir tu lógica para guardar la imagen
+                    pass
+
+        flash("Profile data updated correctly")
+        db.session.commit()
+        return render_template('profile.html', user=current_user)
+
     return render_template('profile.html', user=current_user)
+
 
 
 @views.route('/success', methods=['GET', 'POST'])
@@ -879,4 +902,4 @@ def calculate_event_details():
             'sold_out':sold_out
         })
 
-        return event_details
+    return event_details
