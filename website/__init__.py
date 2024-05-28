@@ -7,6 +7,8 @@ from flask_login import LoginManager
 import os
 from flask_mail import Mail
 from itsdangerous import URLSafeTimedSerializer
+from authlib.integrations.flask_client import OAuth
+
 
 db = SQLAlchemy()
 mail = Mail()
@@ -30,6 +32,26 @@ def create_app():
     app.config['MAIL_PASSWORD'] = 'cqjubziosxffbssb'
     app.config['MAIL_DEFAULT_SENDER'] = 'grematfginformatica@gmail.com'
     
+
+    # Configuración de OAuth
+    global oauth
+    oauth = OAuth()
+    oauth.init_app(app)
+
+    # Configuración de Google OAuth
+    app.config['GOOGLE_CLIENT_ID'] = '557189735141-bbebcuh44lq5ldekpr4mol7kuh4i9vuk.apps.googleusercontent.com'
+    app.config['GOOGLE_CLIENT_SECRET'] = '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'
+    app.config['GOOGLE_DISCOVERY_URL'] = "https://accounts.google.com/.well-known/openid-configuration"
+
+    google = oauth.register(
+        name='google',
+        client_id=app.config['GOOGLE_CLIENT_ID'],
+        client_secret=app.config['GOOGLE_CLIENT_SECRET'],
+        server_metadata_url=app.config['GOOGLE_DISCOVERY_URL'],
+        client_kwargs={
+            'scope': 'openid email profile'
+        }
+    )
     global s  # Hacemos que s sea global para que sea accesible desde auth.py
     s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 

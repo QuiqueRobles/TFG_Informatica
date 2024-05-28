@@ -38,38 +38,8 @@ def home():
         create_event()
     todos_los_eventos = Event.query.all()
     eventos_activos = [evento for evento in todos_los_eventos if evento.date >= datetime.now()]
-    event_details = []
-
-    for event in eventos_activos:
-        attendances = Event_Attendance.query.filter_by(event_id=event.id).all()
-        
-        total_tickets_sold = sum(
-            (attendance.number_guest_tickets or 0) + 
-            (attendance.number_child_tickets or 0) + 
-            (attendance.number_member_tickets or 0) + 
-            (attendance.number_memberchild_tickets or 0) 
-            for attendance in attendances
-        )
-        
-        tickets_remaining = event.max_guest_num - total_tickets_sold
-        
-        if (total_tickets_sold/event.max_guest_num > 0.6):
-            warning_few_tickets= True
-        else:
-            warning_few_tickets=False
-            
-        if (total_tickets_sold/event.max_guest_num==1):
-            sold_out=True
-        else:
-            sold_out=False
-            
-        event_details.append({
-            'event': event.id,
-            'tickets_remaining': tickets_remaining,
-            'warning_few_tickets': warning_few_tickets,
-            'sold_out':sold_out
-        })
-
+    event_details = calculate_event_details()
+    
     if current_user.is_admin == True:
         print("Renderizando homeAdmin")
         return render_template("homeAdmin.html", user=current_user, active_event=eventos_activos, event_details=event_details)
@@ -132,9 +102,13 @@ def delete_event(event_id):
 @views.route('/event-attendance/<int:event_id>', methods=['GET', 'POST'])
 @login_required
 def event_attendance(event_id):    
+    event_details = calculate_event_details()
     event = Event.query.get_or_404(event_id)
     user_fee = Fee.query.filter_by(user_fee=current_user.id).first()
-    return render_template('event.html', event=event, user=current_user, user_fee=user_fee)
+    return render_template('event.html', event=event, user=current_user, user_fee=user_fee, event_details=event_details)
+
+
+
 
 @views.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -380,8 +354,9 @@ def manage_event_attendances():
             if user_attendance:
                 return render_template('manage_event_attendances.html', user=current_user, events=events, users=users, user_attendance=user_attendance, searched_event=searched_event, searched_user=searched_user)
             else:
-                flash('This user does not have tickets', category='error')
-                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users)
+                msg_not_tickets="This user does not have tickets for this event"
+                print("YEAHJF IONO")
+                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users,msg_not_tickets=msg_not_tickets)
         else:
             flash('User not found', category='error')
             return render_template('manage_event_attendances.html', user=current_user, events=events, users=users)
@@ -868,3 +843,40 @@ def generate_event_pdf(event, user_attendance, current_user):
     # Devolver el contenido del PDF
     buffer.seek(0)
     return buffer.getvalue()
+
+def calculate_event_details():
+    todos_los_eventos = Event.query.all()
+    eventos_activos = [evento for evento in todos_los_eventos if evento.date >= datetime.now()]
+    event_details = []
+
+    for event in eventos_activos:
+        attendances = Event_Attendance.query.filter_by(event_id=event.id).all()
+        
+        total_tickets_sold = sum(
+            (attendance.number_guest_tickets or 0) + 
+            (attendance.number_child_tickets or 0) + 
+            (attendance.number_member_tickets or 0) + 
+            (attendance.number_memberchild_tickets or 0) 
+            for attendance in attendances
+        )
+        
+        tickets_remaining = event.max_guest_num - total_tickets_sold
+        
+        if (total_tickets_sold/event.max_guest_num > 0.6):
+            warning_few_tickets= True
+        else:
+            warning_few_tickets=False
+            
+        if (total_tickets_sold/event.max_guest_num==1):
+            sold_out=True
+        else:
+            sold_out=False
+            
+        event_details.append({
+            'event': event.id,
+            'tickets_remaining': tickets_remaining,
+            'warning_few_tickets': warning_few_tickets,
+            'sold_out':sold_out
+        })
+
+        return event_details

@@ -12,10 +12,10 @@
       to GREMA Events</h1>
     <p class="lead" style="color: #fff; font-size: 1.25rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">Join us for
       exciting events and experiences</p>
-    <a href="#events" style="background-color:#414197; color:#fff"class="btn btn-primary btn-lg mt-3">Explore Events</a>
+    <a href="#events" style="background-color:#414197; color:#fff" class="btn btn-primary btn-lg mt-3">Explore
+      Events</a>
   </div>
 </section>
-
 
 <div class="container py-5" id="events">
   <br />
@@ -24,7 +24,7 @@
   <div class="row">
     {% for event in active_event %}
     <div class="col-md-4 position-relative">
-      <div class="card mb-4 div-hover shadow-sm">
+      <div class="card mb-4 div-hover shadow-sm {% if event.is_family_friendly %}family-friendly{% endif %}">
         {% if event.img_url %}
         <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
         {% else %}
@@ -34,6 +34,13 @@
           <h5 class="card-title">
             <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
           </h5>
+          {% if event.is_family_friendly %}
+          <p class="family-friendly-label">
+            <img src="{{ url_for('static', filename='images/family_icon.jpg') }}" alt="Family Friendly Icon"
+              class="family-icon">
+            Family Friendly Event
+          </p>
+          {% endif %}
           <p><strong>Event Date:</strong> {{ event.date.strftime('%d-%m-%Y') }}</p>
           <p><strong>Maximum capacity:</strong> {{ event.max_guest_num }} people</p>
           <p><strong>Member price:</strong> {{ event.member_price }} €</p>
@@ -102,6 +109,31 @@
 
   .sold-out-overlay {
     background: rgba(255, 255, 255, 0.8);
+  }
+
+  .family-friendly {
+    border: 2px solid #32CD32;
+    /* Lime Green border */
+    background-color: #f0fff0;
+    /* Light green background */
+  }
+
+  .family-friendly .card-title a {
+    color: #228B22;
+    /* Forest Green text */
+  }
+
+  .family-friendly-label {
+    font-size: 1rem;
+    color: #228B22;
+    display: flex;
+    align-items: center;
+  }
+
+  .family-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
   }
 </style>
 

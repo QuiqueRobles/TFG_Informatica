@@ -1,17 +1,17 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from .models import User,Admin,Partner,Child
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db, mail, s   ##means from __init__.py import db
+from . import db, mail, s, oauth   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+from authlib.integrations.flask_client import OAuth
 
 
 auth = Blueprint('auth', __name__)
-
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -184,7 +184,38 @@ def sign_up():
 
     return render_template("sign_up.html", user=current_user)
 
+@auth.route('/google_login')
+def google_login():
+    redirect_uri = url_for('auth.google_callback', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
 
+
+@auth.route('/google_callback')
+def google_callback():
+    token = oauth.google.authorize_access_token()
+    user_info = oauth.google.parse_id_token(token)
+
+    if user_info:
+        email = user_info['email']
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            # Si el usuario no existe, crearlo
+            user = User(
+                email=email,
+                first_name=user_info.get('given_name'),
+                surname=user_info.get('family_name'),
+                password=generate_password_hash('defaultpassword', method='pbkdf2:sha256')  # Puedes generar una contraseña aleatoria o dejarla vacía.
+            )
+            db.session.add(user)
+            db.session.commit()
+
+        login_user(user)
+        flash('Logged in successfully!', category='success')
+        return redirect(url_for('views.home'))
+    
+    flash('Could not login with Google.', category='error')
+    return redirect(url_for('auth.login'))
 
 @auth.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():

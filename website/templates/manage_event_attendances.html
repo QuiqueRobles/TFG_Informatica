@@ -108,6 +108,10 @@
                 </div>
             </div>
             {% endif %}
+            {% if msg_not_tickets %}
+            <div id="error-message" class="alert alert-warning">{{msg_not_tickets}}
+            </div>
+            {% endif %}
             <form action="/download_event_attendees" method="post">
                 <div class="input-group">
                     <select name="event_id" class="form-select">

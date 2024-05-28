@@ -1,3 +1,4 @@
+<!-- login.html -->
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
@@ -36,6 +37,10 @@
       <button type="submit" class="btn btn-primary btn-block">Login</button>
       <div class="text-center mt-3">
         <a href="{{ url_for('auth.render_forgot_password') }}">Forgot Password?</a>
+      </div>
+      <div class="text-center mt-3">
+        <a href="{{ url_for('auth.google_login') }}" class="btn btn-danger"><i class="fa fa-google"></i> Login with
+          Google</a>
       </div>
     </form>
   </div>
@@ -78,5 +83,15 @@
   .btn-primary:hover {
     background-color: #0056b3;
     border-color: #004085;
+  }
+
+  .btn-danger {
+    background-color: #db4437;
+    border-color: #db4437;
+  }
+
+  .btn-danger:hover {
+    background-color: #c23321;
+    border-color: #c23321;
   }
 </style>
