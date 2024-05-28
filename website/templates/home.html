@@ -78,8 +78,57 @@
   </div>
 </div>
 
+<div class="container py-5" id="statistics">
+  <br />
+  <h1 class="text-center mb-4">User Satisfaction Statistics</h1>
+  <br />
+  <div class="row text-center">
+    <div class="col-md-3">
+      <div class="stat-card bg-light p-4 shadow-sm rounded">
+        <h2 class="stat-value display-4">95%</h2>
+        <p class="stat-label">Overall Satisfaction</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card bg-light p-4 shadow-sm rounded">
+        <h2 class="stat-value display-4">90%</h2>
+        <p class="stat-label">Event Organization</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card bg-light p-4 shadow-sm rounded">
+        <h2 class="stat-value display-4">85%</h2>
+        <p class="stat-label">Venue Quality</p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card bg-light p-4 shadow-sm rounded">
+        <h2 class="stat-value display-4">88%</h2>
+        <p class="stat-label">Activities Variety</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- Styles for the hero banner and additional custom styles -->
 <style>
+  .stat-card {
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: scale(1.05);
+  }
+
+  .stat-value {
+    color: #414197;
+  }
+
+  .stat-label {
+    font-size: 1.2rem;
+    color: #333;
+  }
   .hero-banner {
     position: relative;
     height: 60vh;
@@ -111,30 +160,30 @@
     background: rgba(255, 255, 255, 0.8);
   }
 
-  .family-friendly {
-    border: 2px solid #32CD32;
-    /* Lime Green border */
-    background-color: #f0fff0;
-    /* Light green background */
-  }
+    .family-friendly {
+      border: 2px solid #32CD32;
+      /* Lime Green border */
+      background-color: #f0fff0;
+      /* Light green background */
+    }
 
-  .family-friendly .card-title a {
-    color: #228B22;
-    /* Forest Green text */
-  }
+    .family-friendly .card-title a {
+      color: #228B22;
+      /* Forest Green text */
+    }
 
-  .family-friendly-label {
-    font-size: 1rem;
-    color: #228B22;
-    display: flex;
-    align-items: center;
-  }
+    .family-friendly-label {
+      font-size: 1rem;
+      color: #228B22;
+      display: flex;
+      align-items: center;
+    }
 
-  .family-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-  }
+    .family-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
 </style>
 
 <script>

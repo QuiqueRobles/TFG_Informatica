@@ -135,6 +135,28 @@ body {
     max-height: 30px;
 }
 
+ .family-friendly {
+     border: 2px solid #32CD32;
+     /* Lime Green border */
+     background-color: #f0fff0;
+     /* Light green background */
+ }
 
+ .family-friendly .card-title a {
+     color: #228B22;
+     /* Forest Green text */
+ }
 
+ .family-friendly-label {
+     font-size: 1rem;
+     color: #228B22;
+     display: flex;
+     align-items: center;
+ }
+
+ .family-icon {
+     width: 20px;
+     height: 20px;
+     margin-right: 5px;
+ }
 

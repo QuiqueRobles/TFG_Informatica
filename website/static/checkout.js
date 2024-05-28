@@ -28,6 +28,21 @@ async function initialize() {
 
     var payCashCheckbox = document.getElementById('pay_cash');
 
+
+    if (
+        formData.vip_admin_tickets === "0" &&
+        formData.number_member_tickets === "0" &&
+        formData.number_child_member_tickets === "0" &&
+        formData.number_guest_tickets === "0" &&
+        formData.number_child_tickets === "0"
+    ) {
+        console.error("Error: No puedes comprar 0 entradas en todos los tipos.");
+        alert("No puedes comprar 0 entradas en todos los tipos.");
+        window.location.href =  `/event-attendance/${formData.event_id}`;
+        return;
+    }
+
+
     // Comprobar disponibilidad de entradas
     const availabilityResponse = await fetch("/check-ticket-availability", {
         method: "POST",
@@ -36,6 +51,37 @@ async function initialize() {
     });
 
     if (availabilityResponse.ok) {
+
+        if (
+        formData.vip_admin_tickets !== "0" &&
+        formData.number_member_tickets === "0" &&
+        formData.number_child_member_tickets === "0" &&
+        formData.number_guest_tickets === "0" &&
+        formData.number_child_tickets === "0"
+        ) {
+            fetch('/success_vip', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Datos enviados correctamente a /success-vip.'); 
+                    window.location.href = '/success_cash_template';
+                    // Aquí puedes realizar otras acciones después de enviar los datos correctamente
+                } else {
+                    console.error('Error al enviar los datos a /success-cash.');
+                    // Aquí puedes manejar el error de envío de datos
+                }
+            })
+            .catch(error => {
+                console.error('Error al enviar los datos a /success-cash:', error);
+                // Aquí puedes manejar cualquier otro error
+            });
+        }
+
         if (payCashCheckbox.checked) {
             console.log("La casilla 'Pay with cash' está marcada.");
 

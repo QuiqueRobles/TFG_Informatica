@@ -180,9 +180,9 @@ def update_profile():
                     filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                     partner_profile_image.save(filepath)
                     img_url = url_for('static', filename=f'images/{filename}')
-                
+                    partner.partner_profile_image_url=img_url
 
-                partner.partner_profile_image_url=img_url
+                
                     
 
         # Actualizar información de los hijos
@@ -205,9 +205,8 @@ def update_profile():
                     filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                     child_profile_image.save(filepath)
                     img_url = url_for('static', filename=f'images/{filename}')
+                    child.child_profile_image_url=img_url
                 
-
-                child.child_profile_image_url=img_url
 
         flash("Profile data updated correctly")
         db.session.commit()
@@ -284,13 +283,65 @@ def success():
 def success_cash_template():
     return render_template('success.html')
 
+@views.route('/success_vip', methods=['GET', 'POST'])
+@login_required
+def success_vip():
+        try:
+            # Extraer los datos del formulario de la solicitud
+            data = request.json
+            # Aquí puedes acceder a los datos del formulario
+            number_member_tickets = data['number_member_tickets']
+            number_child_member_tickets = data['number_child_member_tickets']
+            number_guest_tickets = data['number_guest_tickets']
+            number_child_tickets = data['number_child_tickets']
+            vip_admin_tickets=data['vip_admin_tickets']
+            guests_names = data['guests_names']
+            totalAmount = data['totalAmount']
+            event_id = data['event_id']
+
+            
+            # Crear una nueva instancia de Event_Attendance con los datos del formulario
+            event_attendance = Event_Attendance(
+                number_member_tickets=number_member_tickets,
+                number_memberchild_tickets=number_child_member_tickets,
+                number_guest_tickets=number_guest_tickets,
+                number_child_tickets=number_child_tickets,
+                vip_admin_tickets=vip_admin_tickets,
+                guests_names=guests_names,
+                user_id=current_user.id,
+                event_id=event_id,
+                total_price=totalAmount,
+                cash_payment_in_event=False
+            )
+            
+            # Agregar la nueva instancia a la sesión y confirmar los cambios en la base de datos
+            db.session.add(event_attendance)
+            db.session.commit()
+
+            msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
+            msg.body = f"""
+            
+            Your VIP tickets have been booked. Enjoy
+
+            VIP tickets: {vip_admin_tickets}
+            
+            http://localhost:5000/my_events
+            """
+            mail.send(msg)
+
+            return render_template('success.html', user=current_user)
+        except Exception as e:
+            # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
+            print(e)
+            return render_template('error.html', message='Failed to create database entry')
+
+
 @views.route('/success_cash', methods=['GET', 'POST'])
 @login_required
 def success_cash():
         try:
             # Extraer los datos del formulario de la solicitud
             data = request.json
-            print("esto va bien")
             # Aquí puedes acceder a los datos del formulario
             number_member_tickets = data['number_member_tickets']
             number_child_member_tickets = data['number_child_member_tickets']

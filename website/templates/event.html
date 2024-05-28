@@ -11,8 +11,8 @@
 
 <div class="container py-5">
     <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow-lg mb-4">
+        <div class="col-md-6 ">
+            <div class="card shadow-lg mb-4 {% if event.is_family_friendly %}family-friendly{% endif %}">
                 {% if event.img_url %}
                 <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
                 {% else %}
@@ -24,12 +24,34 @@
                         <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
                     </h5>
                     <ul class="list-unstyled">
+                        {% if event.is_family_friendly %}
+                        <p class="family-friendly-label">
+                            <img src="{{ url_for('static', filename='images/family_icon.jpg') }}" alt="Family Friendly Icon"
+                                class="family-icon">
+                            Family Friendly Event
+                        </p>
+                        {%endif%}
                         <li><strong>Event Date:</strong> {{ event.date.strftime('%d-%m-%Y') }}</li>
                         <li><strong>Maximum Capacity:</strong> {{ event.max_guest_num }} people</li>
                         <li><strong>Member Price:</strong> {{ event.member_price }} €</li>
                         <li><strong>Member Price (Child):</strong> {{ event.member_child_price }} €</li>
                         <li><strong>Guest Price:</strong> {{ event.guest_price }} €</li>
                         <li><strong>Child Price:</strong> {{ event.child_price }} €</li>
+                        <p><strong>Available tickets:</strong>
+                            {% for detail in event_details %}
+                            {% if detail.event == event.id %}
+                            {% if detail.sold_out %}
+                            <span class="text-danger">{{ detail.tickets_remaining }}</span>
+                            {% else %}
+                            {% if detail.warning_few_tickets %}
+                            <span class="text-warning">{{ detail.tickets_remaining }}</span>
+                            {% else %}
+                            <span class="text-success">{{ detail.tickets_remaining }}/{{ event.max_guest_num }}</span>
+                            {% endif %}
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                        </p>
                     </ul>
                     <p class="card-text">{{ event.description }}</p>
                 </div>
@@ -44,7 +66,7 @@
                             <h3 class="text-center">Buy tickets</h3>
                             {% if user.is_admin %}
                             <div class="form-group">
-                                <label for="vip_admin_tickets"><span style="color:goldenrod">VIP ADMIN tickets</span></label>
+                                <label for="vip_admin_tickets" ><span style="color:goldenrod" >VIP ADMIN tickets</span></label>
                                 <input type="number" class="form-control" id="vip_admin_tickets" name="vip_admin_tickets"
                                     placeholder="VIP ADMIN Tickets" min="0" value="0" />
                             </div>
@@ -91,7 +113,7 @@
                             <div id="error-message" class="alert alert-danger hidden">You must fill in all the fields.
                             </div>
                             <br>
-                            <button id="continue-btn" class="btn btn-primary btn-block">Continue with Payment</button>
+                            <button id="continue-btn" class="btn btn-primary btn-block" >Continue with Payment</button>
                         </div>
                         <br /><br />
                         <div id="hidden-payment-form" class="hidden">
@@ -189,7 +211,7 @@
     .alert.hidden {
         display: block;
     }
-
+    
     #spinner {
         width: 20px;
         height: 20px;
@@ -220,4 +242,5 @@
     #error-message.hidden {
         display: block;
     }
+   
 </style>
