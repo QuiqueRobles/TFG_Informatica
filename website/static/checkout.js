@@ -16,6 +16,7 @@ async function initialize() {
     const totalAmount = $('#totalAmountDisplay').text().replace('Total Amount: €', '').trim();
 
     const formData = {
+        vip_admin_tickets: document.getElementById("vip_admin_tickets")?.value,
         number_member_tickets: document.getElementById("number_member_tickets")?.value,
         number_child_member_tickets: document.getElementById("number_child_member_tickets")?.value,
         number_guest_tickets: document.getElementById("number_guest_tickets").value,

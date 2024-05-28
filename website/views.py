@@ -229,6 +229,7 @@ def success():
             number_child_member_tickets = request.args.get('number_child_member_tickets')
             number_guest_tickets = request.args.get('number_guest_tickets')
             number_child_tickets = request.args.get('number_child_tickets')
+            vip_admin_tickets= request.args.get('vip_admin_tickets')
             guests_names = request.args.get('guests_names')
             event_id = request.args.get('event_id')
             totalAmount= request.args.get('totalAmount')
@@ -241,6 +242,7 @@ def success():
                 number_guest_tickets=number_guest_tickets,
                 number_child_tickets=number_child_tickets,
                 guests_names=guests_names,
+                vip_admin_tickets=vip_admin_tickets,
                 user_id=current_user.id,
                 event_id=event_id,
                 total_price=totalAmount,
@@ -294,6 +296,7 @@ def success_cash():
             number_child_member_tickets = data['number_child_member_tickets']
             number_guest_tickets = data['number_guest_tickets']
             number_child_tickets = data['number_child_tickets']
+            vip_admin_tickets=data['vip_admin_tickets']
             guests_names = data['guests_names']
             totalAmount = data['totalAmount']
             event_id = data['event_id']
@@ -305,6 +308,7 @@ def success_cash():
                 number_memberchild_tickets=number_child_member_tickets,
                 number_guest_tickets=number_guest_tickets,
                 number_child_tickets=number_child_tickets,
+                vip_admin_tickets=vip_admin_tickets,
                 guests_names=guests_names,
                 user_id=current_user.id,
                 event_id=event_id,
@@ -506,9 +510,11 @@ def check_ticket_availability():
         number_child_member_tickets = int(data.get('number_child_member_tickets', 0))
         number_guest_tickets = int(data.get('number_guest_tickets', 0))
         number_child_tickets = int(data.get('number_child_tickets', 0))
+        vip_admin_tickets=int(data.get('vip_admin_tickets',0))
         event_id = int(data.get('event_id'))
+
         
-        total_tickets = number_member_tickets + number_child_member_tickets + number_guest_tickets + number_child_tickets
+        total_tickets = number_member_tickets + number_child_member_tickets + number_guest_tickets + number_child_tickets + vip_admin_tickets
         
         # Verificar que no se superen las entradas disponibles
         event = Event.query.filter_by(id=event_id).first()
@@ -921,6 +927,7 @@ def calculate_event_details():
         attendances = Event_Attendance.query.filter_by(event_id=event.id).all()
         
         total_tickets_sold = sum(
+            (attendance.vip_admin_tickets or 0) +
             (attendance.number_guest_tickets or 0) + 
             (attendance.number_child_tickets or 0) + 
             (attendance.number_member_tickets or 0) + 

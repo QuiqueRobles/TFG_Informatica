@@ -61,6 +61,7 @@ class Event_Attendance(db.Model):
     number_child_tickets = db.Column(db.Integer)
     number_member_tickets = db.Column(db.Integer)
     number_memberchild_tickets = db.Column(db.Integer)
+    vip_admin_tickets= db.Column(db.Integer)
     guests_names = db.Column(db.String(300))
     cash_payment_in_event=db.Column(db.Boolean)
     total_price= db.Column(db.Float)

@@ -43,7 +43,12 @@
                         <div id="formulario_a_ocultar">
                             <h3 class="text-center">Buy tickets</h3>
                             {% if user.is_admin %}
-                            {%%}
+                            <div class="form-group">
+                                <label for="vip_admin_tickets"><span style="color:goldenrod">VIP ADMIN tickets</span></label>
+                                <input type="number" class="form-control" id="vip_admin_tickets" name="vip_admin_tickets"
+                                    placeholder="VIP ADMIN Tickets" min="0" value="0" />
+                            </div>
+                            {%endif%}
                             {% if user_fee %}
                             <div class="form-group">
                                 <label for="number_member_tickets">Member tickets</label>

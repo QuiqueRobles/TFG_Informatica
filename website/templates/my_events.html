@@ -22,6 +22,9 @@
                     <p class="card-text">Event Date: {{ events[i].date.strftime('%d-%m-%Y') }}</p>
                     <p class="card-text">Number of Tickets:</p>
                     <ul class="list-unstyled">
+                        {% if user.is_admin %}
+                        <li><span style="color:goldenrod">VIP</span>: {{ user_attendances[i].vip_admin_tickets }}</li>
+                        {%endif%}
                         <li>Member: {{ user_attendances[i].number_member_tickets }}</li>
                         <li>Guest: {{ user_attendances[i].number_guest_tickets }}</li>
                         <li>Child: {{ user_attendances[i].number_child_tickets }}</li>
