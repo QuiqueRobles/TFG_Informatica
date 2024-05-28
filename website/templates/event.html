@@ -42,6 +42,8 @@
                     <form id="payment-form" method="POST" class="border-0">
                         <div id="formulario_a_ocultar">
                             <h3 class="text-center">Buy tickets</h3>
+                            {% if user.is_admin %}
+                            {%%}
                             {% if user_fee %}
                             <div class="form-group">
                                 <label for="number_member_tickets">Member tickets</label>

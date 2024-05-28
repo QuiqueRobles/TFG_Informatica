@@ -58,13 +58,18 @@ def update_event(event_id):
         event.member_child_price = request.form['member_child_price']
         event.guest_price = request.form['guest_price']
         event.description = request.form['description']
+        
         if 'img_url' in request.files:
             img_file = request.files['img_url']
             if img_file:
-                img_path = f'static/images/{img_file.filename}'
-                img_file.save(img_path)
-                event.img_url = img_path
+                filename = secure_filename(img_file.filename)
+                filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                img_file.save(filepath)
+                img_url = url_for('static', filename=f'images/{filename}')
+                event.img_url=img_url
+
         db.session.commit()
+
         return redirect(url_for('views.home')) # Redirect to the admin home or events page
     return render_template('update_event.html', event=event, user=current_user)
 
@@ -147,12 +152,12 @@ def update_profile():
             filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             profile_image.save(filepath)
             img_url = url_for('static', filename=f'images/{filename}')
-        
+            if not current_user.is_admin:
+                current_user.user_profile_image_url=img_url
+            else:
+                current_user.admin_profile_image_url=img_url
 
-        if not current_user.is_admin:
-            current_user.user_profile_image_url=img_url
-        else:
-            current_user.admin_profile_image_url=img_url
+        
 
         # Actualizar información de la pareja
         if not current_user.is_admin and current_user.partner:
@@ -387,10 +392,13 @@ def manage_event_attendances():
 
         if user_email:
             searched_user = User.query.filter_by(email=user_email).first()
+            searched_user = Admin.query.filter_by(email=user_email).first()
         elif user_nif:
             searched_user = User.query.filter_by(nif=user_nif).first()
+            searched_user = Admin.query.filter_by(nif=user_nif).first()
         elif user_last_name:
             searched_user = User.query.filter_by(surname=user_last_name).first()
+            searched_user = Admin.query.filter_by(surname=user_last_name).first()
 
         if searched_user and searched_event:
             user_attendance = Event_Attendance.query.filter_by(event_id=event_id, user_id=searched_user.id).first()
@@ -697,17 +705,31 @@ def download_event_attendees():
     ]
 
     for attendance in attendances:
+        admin = Admin.query.get(attendance.user_id)
+        print(attendance.user_id)
         user = User.query.get(attendance.user_id)
-        guest_names = attendance.guests_names.split(', ')
+        if user:
+            guest_names = attendance.guests_names.split(', ')
 
-        table_data.append([
-            user.first_name + ' ' + user.surname,
-            user.email,
-            str(attendance.number_guest_tickets),
-            str(attendance.number_child_tickets),
-            str(attendance.number_member_tickets),
-            str(attendance.number_memberchild_tickets)
-        ])
+            table_data.append([
+                user.first_name + ' ' + user.surname,
+                user.email,
+                str(attendance.number_guest_tickets),
+                str(attendance.number_child_tickets),
+                str(attendance.number_member_tickets),
+                str(attendance.number_memberchild_tickets)
+            ])
+
+        if admin:
+            guest_names = attendance.guests_names.split(', ')
+            table_data.append([
+                admin.first_name + ' ' + admin.surname,
+                admin.email,
+                str(attendance.number_guest_tickets),
+                str(attendance.number_child_tickets),
+                str(attendance.number_member_tickets),
+                str(attendance.number_memberchild_tickets)
+            ])
 
     # Creación de la tabla
     table = Table(table_data, repeatRows=1)
@@ -750,6 +772,9 @@ def create_event():
     guest_price=float(request.form.get('guest_price'))
     description=request.form.get('description')
     event_image = request.files['img_url']
+    print(request.form.get('isFamilyFriendly'))
+    is_family_friendly = request.form.get('isFamilyFriendly') == 'on'
+    print(is_family_friendly)
     if event_image and allowed_file(event_image.filename):
         # Asegurar el nombre del archivo
         filename = secure_filename(event_image.filename)
@@ -764,7 +789,7 @@ def create_event():
         img_url=url_for('static',filename=f'images/gremaLogo.png')
         
     #AQUÍ HAY QUE CONTROLAR ALGUNOS ERRORES AL RELLENAR EL FORM
-    new_event = Event(name=name, date=date, max_guest_num=max_guest_num, member_price=member_price, member_child_price=member_child_price, guest_price=guest_price, child_price=child_price, img_url=img_url, description=description, admin_id=current_user.id)
+    new_event = Event(name=name, date=date, max_guest_num=max_guest_num, member_price=member_price, member_child_price=member_child_price, guest_price=guest_price, child_price=child_price, img_url=img_url, description=description, admin_id=current_user.id, is_family_friendly=is_family_friendly)
     db.session.add(new_event) #adding the note to the database 
     db.session.commit()
     flash('Event added correctly!', category='success')
