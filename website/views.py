@@ -141,10 +141,18 @@ def update_profile():
 
         # Procesar las imágenes de perfil si se han subido
         profile_image = request.files.get('profile_image')
-        if profile_image:
-            # Procesar y guardar la imagen de perfil del usuario
-            # Aquí deberías incluir tu lógica para guardar la imagen
-            pass
+        
+        if profile_image and allowed_file(profile_image.filename):
+            filename = secure_filename(profile_image.filename)
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            profile_image.save(filepath)
+            img_url = url_for('static', filename=f'images/{filename}')
+        
+
+        if not current_user.is_admin:
+            current_user.user_profile_image_url=img_url
+        else:
+            current_user.admin_profile_image_url=img_url
 
         # Actualizar información de la pareja
         if not current_user.is_admin and current_user.partner:
@@ -160,10 +168,17 @@ def update_profile():
                 partner.birthday = partner_birthday
 
                 partner_profile_image = request.files.get(f'partner_profile_image_{idx+1}')
-                if partner_profile_image:
-                    # Procesar y guardar la imagen de perfil del partner
-                    # Aquí deberías incluir tu lógica para guardar la imagen
-                    pass
+
+                if partner_profile_image and allowed_file(partner_profile_image.filename):
+                    
+                    filename = secure_filename(partner_profile_image.filename)
+                    filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                    partner_profile_image.save(filepath)
+                    img_url = url_for('static', filename=f'images/{filename}')
+                
+
+                partner.partner_profile_image_url=img_url
+                    
 
         # Actualizar información de los hijos
         if not current_user.is_admin and current_user.children:
@@ -179,10 +194,15 @@ def update_profile():
                 child.birthday = child_birthday
 
                 child_profile_image = request.files.get(f'child_profile_image_{idx+1}')
-                if child_profile_image:
-                    # Procesar y guardar la imagen de perfil del hijo
-                    # Aquí deberías incluir tu lógica para guardar la imagen
-                    pass
+                if child_profile_image and allowed_file(child_profile_image.filename):
+                    
+                    filename = secure_filename(child_profile_image.filename)
+                    filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                    child_profile_image.save(filepath)
+                    img_url = url_for('static', filename=f'images/{filename}')
+                
+
+                child.child_profile_image_url=img_url
 
         flash("Profile data updated correctly")
         db.session.commit()
