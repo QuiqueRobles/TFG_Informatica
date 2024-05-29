@@ -3,7 +3,7 @@ import json
 import pyqrcode
 from flask import Blueprint, render_template, request, flash, jsonify, url_for,Flask, current_app, redirect, send_file, make_response
 from flask_login import login_required, current_user
-from .models import User,Admin,Event,Event_Attendance,Fee
+from .models import User,Admin,Event,Event_Attendance,Fee,Partner,Child
 from . import db, mail
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -214,7 +214,85 @@ def update_profile():
 
     return render_template('profile.html', user=current_user)
 
+@views.route('/delete_partner/<int:partner_id>', methods=['POST'])
+def delete_partner(partner_id):
+    partner = Partner.query.get_or_404(partner_id)
+    user_id = partner.user_id  # Assuming there's a user_id foreign key in Partner
+    db.session.delete(partner)
+    db.session.commit()
+    flash('Partner has been deleted successfully.', 'success')
+    return redirect(url_for('views.profile'))
 
+@views.route('/delete_child/<int:child_id>', methods=['POST'])
+def delete_child(child_id):
+    child = Child.query.get_or_404(child_id)
+    user_id = child.user_id  # Assuming there's a user_id foreign key in Child
+    db.session.delete(child)
+    db.session.commit()
+    flash('Child has been deleted successfully.', 'success')
+    return redirect(url_for('views.profile'))
+
+@views.route('/add_partner/<int:user_id>', methods=['POST'])
+def add_partner(user_id):
+    user = User.query.get_or_404(user_id)
+    name = request.form['partner_name']
+    nif = request.form['partner_nif']
+    phone_number = request.form['partner_phone_number']
+    birthday = request.form['partner_birthday']
+
+    try:
+        birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+    except:
+        birthday = datetime.strptime('0001-01-01', '%Y-%m-%d').date()
+
+    profile_image = request.files['partner_profile_image']
+
+
+    if profile_image and allowed_file(profile_image.filename):
+        filename = secure_filename(profile_image.filename)
+        filepath=os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        profile_image.save(filepath)
+        img_url= url_for('static',filename=f'images/{filename}')
+    else:
+        img_url=url_for('static',filename=f'images/userLogo.png')
+
+    partner = Partner(name=name, nif=nif, phone_number=phone_number, birthday=birthday, user_id=user.id,partner_profile_image_url=img_url)
+    
+
+    db.session.add(partner)
+    db.session.commit()
+    flash('Partner has been added successfully.', 'success')
+    print(url_for('views.profile'))
+    return redirect(url_for('views.profile'))
+
+# Ruta para añadir un Child
+@views.route('/add_child/<int:user_id>', methods=['POST'])
+def add_child(user_id):
+    user = User.query.get_or_404(user_id)
+    name = request.form['child_name']
+    nif = request.form['child_nif']
+    phone_number = request.form['child_phone_number']
+    child_birthday = request.form['child_birthday']
+    try:
+        child_birthday = datetime.strptime(child_birthday, '%Y-%m-%d').date()
+    except:
+        child_birthday = datetime.strptime('0001-01-01', '%Y-%m-%d').date()
+    profile_image = request.files['child_profile_image']
+
+    if profile_image and allowed_file(profile_image.filename):
+        filename = secure_filename(profile_image.filename)
+        filepath=os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        profile_image.save(filepath)
+        img_url= url_for('static',filename=f'images/{filename}')
+    else:
+        img_url=url_for('static',filename=f'images/userLogo.png')
+
+    child = Child(name=name, nif=nif, phone_number=phone_number, birthday=child_birthday, user_id=user.id, child_profile_image_url=img_url)
+    
+    db.session.add(child)
+    db.session.commit()
+    flash('Child has been added successfully.', 'success')
+    return redirect(url_for('views.profile'))
 
 @views.route('/success', methods=['GET', 'POST'])
 @login_required
@@ -837,7 +915,6 @@ def create_event():
         filename = secure_filename(event_image.filename)
         # Guardar la imagen en la carpeta "static"
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        print(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
         event_image.save(filepath)
         print(url_for('static',filename=f'images/{filename}'))
         # Obtener la URL relativa de la imagen
