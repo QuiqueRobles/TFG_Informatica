@@ -151,15 +151,17 @@
     <div class="text-center mb-4">
         <button id="edit-profile-btn" class="btn btn-primary">Change Profile Data</button>
     </div>
+    {%if not user.is_admin%}
     <div class="text-center mb-4">
         <button id="add-partner-btn" class="btn btn-success">Add Partner</button>
     </div>
     <div class="text-center mb-4">
         <button id="add-child-btn" class="btn btn-success">Add Child</button>
     </div>
+    {%endif%}
     <div id="add-partner-form" style="display: none;">
         <form id="partner-add-form" method="POST" action="{{ url_for('views.add_partner', user_id=user.id) }}"
-            enctype="multipart/form-data">
+            enctype="multipart/form-data">  
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title text-center mb-4">Add Partner</h5>

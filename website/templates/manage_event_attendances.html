@@ -80,10 +80,12 @@
                     <button type="submit" class="btn btn-primary">Search</button>
                 </div>
             </form>
-            {% if user_attendance %}
+            {% if user_attendances %}
+            <h2 class="text-center mb-4 custom-font-size">Tickets of {{ searched_user.first_name }} ({{
+                searched_user.email }}) have been found</h2>
+            {% for attendance in user_attendances %}
             <div class="card">
-                <h2 class="card-header bg-custom text-white custom-font-size">Tickets of {{ searched_user.first_name }}
-                    ({{ searched_user.email }}) have been found</h2>
+                <h3 class="card-header bg-custom text-white custom-font-size">{{ searched_event.name }}</h3>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item"><strong>Event Name:</strong> {{ searched_event.name }}</li>
@@ -91,26 +93,28 @@
                         <li class="list-group-item"><strong>User Name:</strong> {{ searched_user.first_name }} {{
                             searched_user.last_name }}</li>
                         <li class="list-group-item"><strong>User Email:</strong> {{ searched_user.email }}</li>
+                        <li class="list-group-item"><strong>Number of VIP Tickets:</strong> {{
+                            attendance.vip_admin_tickets }}</li>
                         <li class="list-group-item"><strong>Number of Guest Tickets:</strong> {{
-                            user_attendance.number_guest_tickets }}</li>
+                            attendance.number_guest_tickets }}</li>
                         <li class="list-group-item"><strong>Number of Child Tickets:</strong> {{
-                            user_attendance.number_child_tickets }}</li>
+                            attendance.number_child_tickets }}</li>
                         <li class="list-group-item"><strong>Number of Member Tickets:</strong> {{
-                            user_attendance.number_member_tickets }}</li>
+                            attendance.number_member_tickets }}</li>
                         <li class="list-group-item"><strong>Number of Member Child Tickets:</strong> {{
-                            user_attendance.number_memberchild_tickets }}</li>
-                        <li class="list-group-item"><strong>Guests Names:</strong> {{ user_attendance.guests_names }}
-                        </li>
+                            attendance.number_memberchild_tickets }}</li>
+                        <li class="list-group-item"><strong>Guests Names:</strong> {{ attendance.guests_names }}</li>
                         <li class="list-group-item"><strong>Cash Payment in Event:</strong> {{ "Yes" if
-                            user_attendance.cash_payment_in_event else "No" }}</li>
-                        <li class="list-group-item"><strong>Total Price:</strong> {{ user_attendance.total_price }}</li>
+                            attendance.cash_payment_in_event else "No" }}</li>
+                        <li class="list-group-item"><strong>Total Price:</strong> {{ attendance.total_price }}</li>
                     </ul>
                 </div>
             </div>
+            <br><br>
+            {% endfor %}
             {% endif %}
             {% if msg_not_tickets %}
-            <div id="error-message" class="alert alert-warning">{{msg_not_tickets}}
-            </div>
+            <div id="error-message" class="alert alert-warning">{{ msg_not_tickets }}</div>
             {% endif %}
             <form action="/download_event_attendees" method="post">
                 <div class="input-group">

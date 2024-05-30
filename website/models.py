@@ -26,6 +26,7 @@ class User(db.Model, UserMixin):
 class Admin(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     is_admin = True
+    nif =db.Column(db.Integer)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     phone_number=db.Column(db.Integer)

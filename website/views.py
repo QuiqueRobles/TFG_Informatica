@@ -234,6 +234,11 @@ def delete_child(child_id):
 
 @views.route('/add_partner/<int:user_id>', methods=['POST'])
 def add_partner(user_id):
+    print(current_user.partner)
+    if current_user.partner:
+        print("wow")
+        flash("You cannot have more than one partner", category='error')
+        return render_template("profile.html",user=current_user)
     user = User.query.get_or_404(user_id)
     name = request.form['partner_name']
     nif = request.form['partner_nif']
@@ -262,7 +267,7 @@ def add_partner(user_id):
     db.session.add(partner)
     db.session.commit()
     flash('Partner has been added successfully.', 'success')
-    print(url_for('views.profile'))
+
     return redirect(url_for('views.profile'))
 
 # Ruta para añadir un Child
@@ -414,6 +419,66 @@ def success_vip():
             return render_template('error.html', message='Failed to create database entry')
 
 
+@views.route('/success_free', methods=['GET', 'POST'])
+@login_required
+def success_free():
+        try:
+            # Extraer los datos del formulario de la solicitud
+            data = request.json
+            # Aquí puedes acceder a los datos del formulario
+            number_member_tickets = data['number_member_tickets']
+            number_memberchild_tickets = data['number_child_member_tickets']
+            number_guest_tickets = data['number_guest_tickets']
+            number_child_tickets = data['number_child_tickets']
+            vip_admin_tickets=data['vip_admin_tickets']
+            guests_names = data['guests_names']
+            totalAmount = data['totalAmount']
+            event_id = data['event_id']
+
+            
+            # Crear una nueva instancia de Event_Attendance con los datos del formulario
+            event_attendance = Event_Attendance(
+                number_member_tickets=number_member_tickets,
+                number_memberchild_tickets=number_memberchild_tickets,
+                number_guest_tickets=number_guest_tickets,
+                number_child_tickets=number_child_tickets,
+                vip_admin_tickets=vip_admin_tickets,
+                guests_names=guests_names,
+                user_id=current_user.id,
+                event_id=event_id,
+                total_price=totalAmount,
+                cash_payment_in_event=False
+            )
+            
+            # Agregar la nueva instancia a la sesión y confirmar los cambios en la base de datos
+            db.session.add(event_attendance)
+            db.session.commit()
+
+            msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
+            msg.body = f"""
+            
+            Your free tickets have been booked. Enjoy
+
+            Ticket info: 
+            number_member_tickets={number_member_tickets},
+            number_member_child_tickets={number_memberchild_tickets},
+            number_guest_tickets={number_guest_tickets},
+            number_child_tickets={number_child_tickets},
+            vip_admin_tickets={vip_admin_tickets},
+            guests_names={guests_names},
+            total_price={totalAmount},
+            
+            http://localhost:5000/my_events
+            """
+            mail.send(msg)
+
+            return render_template('success.html', user=current_user)
+        except Exception as e:
+            # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
+            print(e)
+            return render_template('error.html', message='Failed to create database entry')
+
+
 @views.route('/success_cash', methods=['GET', 'POST'])
 @login_required
 def success_cash():
@@ -510,7 +575,7 @@ def error():
 def manage_event_attendances():
     events = Event.query.all()
     users = User.query.all()
-    user_attendance = None
+    user_attendances = None
     searched_user = None
     searched_event = None
     
@@ -525,27 +590,30 @@ def manage_event_attendances():
 
         if user_email:
             searched_user = User.query.filter_by(email=user_email).first()
-            searched_user = Admin.query.filter_by(email=user_email).first()
+            if not searched_user:
+                searched_user = Admin.query.filter_by(email=user_email).first()
         elif user_nif:
             searched_user = User.query.filter_by(nif=user_nif).first()
-            searched_user = Admin.query.filter_by(nif=user_nif).first()
+            if not searched_user:
+                searched_user = Admin.query.filter_by(nif=user_nif).first()
         elif user_last_name:
             searched_user = User.query.filter_by(surname=user_last_name).first()
-            searched_user = Admin.query.filter_by(surname=user_last_name).first()
+            if not searched_user:
+                searched_user = Admin.query.filter_by(surname=user_last_name).first()
 
         if searched_user and searched_event:
-            user_attendance = Event_Attendance.query.filter_by(event_id=event_id, user_id=searched_user.id).first()
-            if user_attendance:
-                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users, user_attendance=user_attendance, searched_event=searched_event, searched_user=searched_user)
+            user_attendances = Event_Attendance.query.filter_by(event_id=event_id, user_id=searched_user.id).all()
+            if user_attendances:
+                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users, user_attendances=user_attendances, searched_event=searched_event, searched_user=searched_user)
             else:
-                msg_not_tickets="This user does not have tickets for this event"
-                print("YEAHJF IONO")
-                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users,msg_not_tickets=msg_not_tickets)
+                msg_not_tickets = "This user does not have tickets for this event"
+                return render_template('manage_event_attendances.html', user=current_user, events=events, users=users, msg_not_tickets=msg_not_tickets)
         else:
             flash('User not found', category='error')
             return render_template('manage_event_attendances.html', user=current_user, events=events, users=users)
 
     return render_template('manage_event_attendances.html', user=current_user, events=events, users=users)
+
 
 
 @views.route('/manage_memberships', methods=['GET', 'POST'])
@@ -815,8 +883,9 @@ def download_event_attendees():
     normal_style = ParagraphStyle(
         'Normal',
         parent=styles['Normal'],
-        fontSize=10,
+        fontSize=10,  # Tamaño de letra reducido para que quepa mejor en la página
         textColor=colors.black,
+        alignment=1,
     )
     
     # Estilo para el encabezado de la tabla
@@ -836,38 +905,48 @@ def download_event_attendees():
 
     # Datos de la tabla
     table_data = [
-        ['User Name', 'User Email', 'Guest Tickets', 'Child Tickets', 'Member Tickets', 'Member Child Tickets']
+        [Paragraph('User Name', table_header_style),
+         Paragraph('User Email', table_header_style),
+         Paragraph('Vip Tickets', table_header_style),
+         Paragraph('Guest Tickets', table_header_style),
+         Paragraph('Child Tickets', table_header_style),
+         Paragraph('Member Tickets', table_header_style),
+         Paragraph('Member Child Tickets', table_header_style)]
     ]
 
     for attendance in attendances:
         admin = Admin.query.get(attendance.user_id)
-        print(attendance.user_id)
         user = User.query.get(attendance.user_id)
         if user:
             guest_names = attendance.guests_names.split(', ')
 
             table_data.append([
-                user.first_name + ' ' + user.surname,
-                user.email,
-                str(attendance.number_guest_tickets),
-                str(attendance.number_child_tickets),
-                str(attendance.number_member_tickets),
-                str(attendance.number_memberchild_tickets)
+                Paragraph(user.first_name + ' ' + user.surname, normal_style),
+                Paragraph(user.email, normal_style),
+                Paragraph(str(attendance.vip_admin_tickets), normal_style),
+                Paragraph(str(attendance.number_guest_tickets), normal_style),
+                Paragraph(str(attendance.number_child_tickets), normal_style),
+                Paragraph(str(attendance.number_member_tickets), normal_style),
+                Paragraph(str(attendance.number_memberchild_tickets), normal_style)
             ])
 
         if admin:
             guest_names = attendance.guests_names.split(', ')
             table_data.append([
-                admin.first_name + ' ' + admin.surname,
-                admin.email,
-                str(attendance.number_guest_tickets),
-                str(attendance.number_child_tickets),
-                str(attendance.number_member_tickets),
-                str(attendance.number_memberchild_tickets)
+                Paragraph(admin.first_name + ' ' + admin.surname, normal_style),
+                Paragraph(admin.email, normal_style),
+                Paragraph(str(attendance.vip_admin_tickets), normal_style),
+                Paragraph(str(attendance.number_guest_tickets), normal_style),
+                Paragraph(str(attendance.number_child_tickets), normal_style),
+                Paragraph(str(attendance.number_member_tickets), normal_style),
+                Paragraph(str(attendance.number_memberchild_tickets), normal_style)
             ])
 
+
+    # Especificar los anchos de las columnas
+    column_widths = [120, 120, 60, 60, 60, 60, 60]
     # Creación de la tabla
-    table = Table(table_data, repeatRows=1)
+    table = Table(table_data,colWidths=column_widths, repeatRows=1)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
@@ -886,6 +965,7 @@ def download_event_attendees():
     buffer.seek(0)
 
     return send_file(buffer, as_attachment=True, download_name=f"attendees_{event.name}.pdf", mimetype='application/pdf')
+
 
 #################################################
 #################################################
@@ -970,6 +1050,7 @@ def generate_event_pdf(event, user_attendance, current_user):
         [Paragraph("Event Date:", style_normal), event.date.strftime('%B %d, %Y')],
         [Paragraph("Description:", style_normal), event.description],
         [Paragraph("Tickets:", style_normal), {
+            "VIP": user_attendance.vip_admin_tickets,
             "Member": user_attendance.number_member_tickets,
             "Guest": user_attendance.number_guest_tickets,
             "Child": user_attendance.number_child_tickets,
@@ -1009,6 +1090,7 @@ def generate_event_pdf(event, user_attendance, current_user):
     Description: {event.description}
     User: {user_name}
     Email: {user_email}
+    Vip Tickets: {user_attendance.vip_admin_tickets}
     Member Tickets: {user_attendance.number_member_tickets}
     Guest Tickets: {user_attendance.number_guest_tickets}
     Child Tickets: {user_attendance.number_child_tickets}

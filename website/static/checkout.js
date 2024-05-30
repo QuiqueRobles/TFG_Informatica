@@ -80,7 +80,42 @@ async function initialize() {
                 console.error('Error al enviar los datos a /success-cash:', error);
                 // Aquí puedes manejar cualquier otro error
             });
+        }else{
+              if (
+        formData.vip_admin_tickets !== "0" ||
+        formData.number_member_tickets !== "0" ||
+        formData.number_child_member_tickets !== "0" ||
+        formData.number_guest_tickets !== "0" ||
+        formData.number_child_tickets !== "0" &&
+        formData.totalAmount === "0"
+        ) {
+            fetch('/success_free', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Datos enviados correctamente a /success-vip.'); 
+                    window.location.href = '/success_cash_template';
+                    // Aquí puedes realizar otras acciones después de enviar los datos correctamente
+                } else {
+                    console.error('Error al enviar los datos a /success-cash.');
+                    // Aquí puedes manejar el error de envío de datos
+                }
+            })
+            .catch(error => {
+                console.error('Error al enviar los datos a /success-cash:', error);
+                // Aquí puedes manejar cualquier otro error
+            });
         }
+        }
+        
+
+        
+
 
         if (payCashCheckbox.checked) {
             console.log("La casilla 'Pay with cash' está marcada.");
