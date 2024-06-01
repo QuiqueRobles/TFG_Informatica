@@ -8,6 +8,7 @@ import os
 from flask_mail import Mail
 from itsdangerous import URLSafeTimedSerializer
 from authlib.integrations.flask_client import OAuth
+from datetime import timedelta
 
 
 db = SQLAlchemy()
@@ -18,6 +19,8 @@ s = None  # Inicializamos s fuera de create_app
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
+    app.config['SESSION_PERMANENT'] = True
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     base_dir = os.path.dirname(os.path.abspath(__file__))
     upload_folder = os.path.join(base_dir, "static", "images")

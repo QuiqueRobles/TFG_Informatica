@@ -179,6 +179,16 @@ def sign_up():
                 
                 db.session.commit()
 
+            msg = Message('WELCOME TO GREMA', recipients=[current_user.email])
+            msg.body = f"""
+            
+            Welcome {first_name} {surname} to GREMA, the association promoting greek values and culture in Madrid!!. Thank you for choosing us!
+
+            You can buy your tickets now!! We will wait for you attendance!
+
+            http://localhost:5000/
+            """
+            mail.send(msg)
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))
 

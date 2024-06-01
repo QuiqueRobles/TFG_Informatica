@@ -352,19 +352,19 @@ def success():
             mail.send(msg)
 
             
-            return render_template('success.html')
+            return render_template('success.html', user=current_user)
         except Exception as e:
             # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
             print(e)
-            return render_template('error.html', message='Failed to create database entry')
+            return render_template('error.html', message='Failed to create database entry', user=current_user)
     else:
         # No se recibió el ID del intento de pago, manejar el error adecuadamente
-        return render_template('error.html', message='Payment intent ID not provided')
+        return render_template('error.html', message='Payment intent ID not provided', user=current_user)
     
 @views.route('/success_cash_template', methods=['GET', 'POST'])
 @login_required
 def success_cash_template():
-    return render_template('success.html')
+    return render_template('success.html', user=current_user)
 
 @views.route('/success_vip', methods=['GET', 'POST'])
 @login_required
@@ -416,7 +416,7 @@ def success_vip():
         except Exception as e:
             # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
             print(e)
-            return render_template('error.html', message='Failed to create database entry')
+            return render_template('error.html', message='Failed to create database entry', user=current_user)
 
 
 @views.route('/success_free', methods=['GET', 'POST'])
@@ -476,7 +476,7 @@ def success_free():
         except Exception as e:
             # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
             print(e)
-            return render_template('error.html', message='Failed to create database entry')
+            return render_template('error.html', message='Failed to create database entry', user=current_user)
 
 
 @views.route('/success_cash', methods=['GET', 'POST'])
@@ -536,7 +536,7 @@ def success_cash():
         except Exception as e:
             # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
             print(e)
-            return render_template('error.html', message='Failed to create database entry')
+            return render_template('error.html', message='Failed to create database entry', user=current_user)
     
 @views.route('/success_membership', methods=['GET', 'POST'])
 @login_required
@@ -555,14 +555,14 @@ def success_membership():
             msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
             msg.body = f'Thank you for becoming part of the GREMA Association!!! We are looking forward to seeing you in events with your family!'
             mail.send(msg)
-            return render_template('success_membership.html')
+            return render_template('success_membership.html', user=current_user)
         except Exception as e:
             # Manejar cualquier error que pueda ocurrir al crear la entrada en la base de datos
             print(e)
-            return render_template('error.html', message='Failed to create database entry')
+            return render_template('error.html', message='Failed to create database entry', user=current_user)
     else:
         # No se recibió el ID del intento de pago, manejar el error adecuadamente
-        return render_template('error.html', message='Payment intent ID not provided')
+        return render_template('error.html', message='Payment intent ID not provided', user=current_user)
 
 @views.route('/error', methods=['GET', 'POST'])
 @login_required
@@ -777,19 +777,14 @@ def create_payment():
     except Exception as e:
         return jsonify(error=str(e)), 403
     
-
+@login_required
 @views.route('/process_qr', methods=['POST'])
 def process_qr():
     try:
-        # Asegurarse de que se recibe el JSON correctamente
         data = request.json.get('data', '')
         print(f"Raw data received: {data}")
 
-        # Si data es un string JSON, cargarlo como diccionario
-        if isinstance(data, str):
-            data = json.loads(data)
-
-        # Extraer los datos del QR
+        # Procesar data como una cadena de texto con líneas separadas
         qr_info = {}
         for line in data.split('\n'):
             if ':' in line:
@@ -798,11 +793,15 @@ def process_qr():
 
         print(f"Extracted QR Info: {qr_info}")
 
-        # Verificar si la información del QR coincide con los registros en la base de datos
+        # Verificar si faltan campos obligatorios
+        required_fields = ['Event', 'Date', 'Email', 'Member Tickets', 'Guest Tickets', 'Child Tickets', "Member's Child Tickets", 'Total Price', 'Paid']
+        for field in required_fields:
+            if field not in qr_info:
+                return jsonify({"status": "error", "message": f"Missing required field: {field}"})
+
+        # Extraer detalles del QR
         event_name = qr_info.get('Event')
         date_str = qr_info.get('Date')
-        description = qr_info.get('Description')
-        user_name = qr_info.get('User')
         user_email = qr_info.get('Email')
         member_tickets = int(qr_info.get('Member Tickets', 0))
         guest_tickets = int(qr_info.get('Guest Tickets', 0))
@@ -811,41 +810,46 @@ def process_qr():
         total_price = float(qr_info.get('Total Price', '').replace('$', '').replace(',', ''))
         paid = qr_info.get('Paid', '').lower() == "yes"
 
-        # Buscar en la base de datos los registros que coincidan con la información del QR
+        # Buscar el evento en la base de datos
         event = Event.query.filter_by(name=event_name).first()
-        if event:
-            if event.date.strftime('%B %d, %Y') == date_str:
-                user = User.query.filter_by(email=user_email).first()
-                if user:
-                    user_attendance = Event_Attendance.query.filter_by(user_id=user.id, event_id=event.id).first()
-                    if user_attendance:
-                        # Comprobar si los detalles de la asistencia coinciden
-                        if (user_attendance.number_member_tickets == member_tickets and
-                                user_attendance.number_guest_tickets == guest_tickets and
-                                user_attendance.number_child_tickets == child_tickets and
-                                user_attendance.number_memberchild_tickets == member_child_tickets and
-                                user_attendance.total_price == total_price and
-                                paid):
-                            flash("Correct ticket!! Enjoy the event!!")
-                            return jsonify({"status": "success", "message": "QR data is correct.", "data": qr_info})
-                        elif (user_attendance.number_member_tickets == member_tickets and
-                                user_attendance.number_guest_tickets == guest_tickets and
-                                user_attendance.number_child_tickets == child_tickets and
-                                user_attendance.number_memberchild_tickets == member_child_tickets and
-                                user_attendance.total_price == total_price and not paid):
-                            flash("Correct ticket!! Enjoy the event!!")
-                            flash("El usuario debe pagar en efectivo", "orange")
-                            return jsonify({"status": "success", "message": "QR data is correct.", "data": qr_info})
-                        else:
-                            return jsonify({"status": "error", "message": "QR data does not match the records."})
-                    else:
-                        return jsonify({"status": "error", "message": "User attendance not found."})
-                else:
-                    return jsonify({"status": "error", "message": "User not found."})
-            else:
-                return jsonify({"status": "error", "message": "Event details do not match the records."})
-        else:
+        if not event:
             return jsonify({"status": "error", "message": "Event not found."})
+
+        if event.date.strftime('%B %d, %Y') != date_str:
+            return jsonify({"status": "error", "message": "Event details do not match the records."})
+
+        # Buscar al usuario en la base de datos
+        user = User.query.filter_by(email=user_email).first()
+        if not user:
+            return jsonify({"status": "error", "message": "User not found."})
+
+        # Buscar la asistencia del usuario al evento
+        user_attendance = Event_Attendance.query.filter_by(user_id=user.id, event_id=event.id).first()
+        if not user_attendance:
+            return jsonify({"status": "error", "message": "User attendance not found."})
+        
+        print((user_attendance.number_member_tickets == member_tickets and
+                user_attendance.number_guest_tickets == guest_tickets and
+                user_attendance.number_child_tickets == child_tickets and
+                user_attendance.number_memberchild_tickets == member_child_tickets and
+                user_attendance.total_price == total_price))
+        # Verificar los detalles de la asistencia
+        if (user_attendance.number_member_tickets == member_tickets and
+                user_attendance.number_guest_tickets == guest_tickets and
+                user_attendance.number_child_tickets == child_tickets and
+                user_attendance.number_memberchild_tickets == member_child_tickets and
+                user_attendance.total_price == total_price):
+            
+            flash("Correct ticket!! Enjoy the event!!")
+            
+            if paid:
+                return jsonify({"status": "success", "message": "QR data is correct.", "data": qr_info})
+            else:
+                flash("El usuario debe pagar en efectivo", "orange")
+                return jsonify({"status": "success", "message": "QR data is correct, but user needs to pay.", "data": qr_info})
+        else:
+            return jsonify({"status": "error", "message": "QR data does not match the records."})
+
     except Exception as e:
         print(f"Error processing QR: {e}")
         return jsonify({"status": "error", "message": "An error occurred while processing the QR code."})

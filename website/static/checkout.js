@@ -82,11 +82,11 @@ async function initialize() {
             });
         }else{
               if (
-        formData.vip_admin_tickets !== "0" ||
+        (formData.vip_admin_tickets !== "0" ||
         formData.number_member_tickets !== "0" ||
         formData.number_child_member_tickets !== "0" ||
         formData.number_guest_tickets !== "0" ||
-        formData.number_child_tickets !== "0" &&
+        formData.number_child_tickets !== "0") &&
         formData.totalAmount === "0"
         ) {
             fetch('/success_free', {

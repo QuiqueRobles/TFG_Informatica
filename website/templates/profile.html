@@ -51,114 +51,116 @@
         </div>
     </div>
 
-    {% if user.partner or user.children %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-center mb-4 custom-color">Family</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {% if user.partner %}
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-2 text-muted text-center text-warning">Partner</h6>
-                                    {% for partner in user.partner %}
-                                    <div class="row align-items-center mb-3">
-                                        <div class="col-md-9">
-                                            <ul class="list-group list-group-flush">
-                                                <li class="list-group-item"><strong class="custom-color">Name:</strong>
-                                                    {{ partner.name }}</li>
-                                                <li class="list-group-item"><strong class="custom-color">NIF:</strong>
-                                                    {{ partner.nif }}</li>
-                                                <li class="list-group-item"><strong class="custom-color">Phone
-                                                        Number:</strong> {{ partner.phone_number }}</li>
-                                                <li class="list-group-item"><strong
-                                                        class="custom-color">Birthday:</strong> {{ partner.birthday }}
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="partner-image-container">
-                                                {% if partner.partner_profile_image_url %}
-                                                <img src="{{ partner.partner_profile_image_url }}"
-                                                    class="rounded-circle" alt="Partner Image">
-                                                {% else %}
-                                                <img src="{{ url_for('static', filename='images/userLogo.png') }}"
-                                                    class="rounded-circle" alt="Default Partner Image">
-                                                {% endif %}
-                                            </div>
-                                        </div>
+{% if user.partner or user.children %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title text-center mb-4 custom-color">Family</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if user.partner %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted text-center text-warning">Partner</h6>
+                                {% for partner in user.partner %}
+                                <div class="row align-items-center mb-3">
+                                    <div class="col-md-9">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item"><strong class="custom-color">Name:</strong>
+                                                {{ partner.name }}</li>
+                                            <li class="list-group-item"><strong class="custom-color">NIF:</strong>
+                                                {{ partner.nif }}</li>
+                                            <li class="list-group-item"><strong class="custom-color">Phone
+                                                    Number:</strong> {{ partner.phone_number }}</li>
+                                            <li class="list-group-item"><strong class="custom-color">Birthday:</strong>
+                                                {{ partner.birthday }}
+                                            </li>
+                                        </ul>
                                     </div>
-                                    <form id="delete_partner_form" style="display: none;" action="{{ url_for('views.delete_partner', partner_id=partner.id) }}" method="POST" >
-                                        <button type="submit" class="btn btn-danger btn-sm mt-2">Delete</button>
-                                    </form>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            {% if user.children %}
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <h6 class="card-subtitle mb-2 text-muted text-center text-warning">Children</h6>
-                                    {% for child in user.children %}
-                                    <div class="row align-items-center mb-3">
-                                        <div class="col-md-9">
-                                            <ul class="list-group list-group-flush">
-                                                <li class="list-group-item"><strong class="custom-color">Name:</strong>
-                                                    {{ child.name }}</li>
-                                                <li class="list-group-item"><strong class="custom-color">NIF:</strong>
-                                                    {{ child.nif }}</li>
-                                                <li class="list-group-item"><strong class="custom-color">Phone
-                                                        Number:</strong> {{ child.phone_number }}</li>
-                                                <li class="list-group-item"><strong
-                                                        class="custom-color">Birthday:</strong> {{ child.birthday }}
-                                                </li>
-                                            </ul>
+                                    <div class="col-md-3 text-center">
+                                        <div class="partner-image-container mb-2">
+                                            {% if partner.partner_profile_image_url %}
+                                            <img src="{{ partner.partner_profile_image_url }}" class="rounded-circle"
+                                                alt="Partner Image">
+                                            {% else %}
+                                            <img src="{{ url_for('static', filename='images/userLogo.png') }}"
+                                                class="rounded-circle" alt="Default Partner Image">
+                                            {% endif %}
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="child-image-container">
-                                                {% if child.child_profile_image_url %}
-                                                <img src="{{ child.child_profile_image_url }}" class="rounded-circle"
-                                                    alt="Child Image">
-                                                {% else %}
-                                                <img src="{{ url_for('static', filename='images/userLogo.png') }}"
-                                                    class="rounded-circle" alt="Default Child Image">
-                                                {% endif %}
-                                                <form style="display: none;" class="delete-child-form" action="{{ url_for('views.delete_child', child_id=child.id) }}" method="POST" style="display:inline;">
-                                                    <button type="submit" class="btn btn-danger btn-sm mt-2">Delete</button>
-                                                </form>
-                                            </div>
-                                            
-                                        </div>
+                                        <form id="delete_partner_form" style="display: none;"
+                                            action="{{ url_for('views.delete_partner', partner_id=partner.id) }}"
+                                            method="POST">
+                                            <button type="submit" class="btn btn-danger btn-sm mt-2">Delete</button>
+                                        </form>
                                     </div>
-                                    
-                                    {% endfor %}
                                 </div>
+                                {% endfor %}
                             </div>
-                            {% endif %}
                         </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if user.children %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted text-center text-warning">Children</h6>
+                                {% for child in user.children %}
+                                <div class="row align-items-center mb-3">
+                                    <div class="col-md-9">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item"><strong class="custom-color">Name:</strong>
+                                                {{ child.name }}</li>
+                                            <li class="list-group-item"><strong class="custom-color">NIF:</strong>
+                                                {{ child.nif }}</li>
+                                            <li class="list-group-item"><strong class="custom-color">Phone
+                                                    Number:</strong> {{ child.phone_number }}</li>
+                                            <li class="list-group-item"><strong class="custom-color">Birthday:</strong>
+                                                {{ child.birthday }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-3 text-center">
+                                        <div class="child-image-container mb-2">
+                                            {% if child.child_profile_image_url %}
+                                            <img src="{{ child.child_profile_image_url }}" class="rounded-circle"
+                                                alt="Child Image">
+                                            {% else %}
+                                            <img src="{{ url_for('static', filename='images/userLogo.png') }}"
+                                                class="rounded-circle" alt="Default Child Image">
+                                            {% endif %}
+                                        </div>
+                                        <form class="delete-child-form" style="display: none;"
+                                            action="{{ url_for('views.delete_child', child_id=child.id) }}"
+                                            method="POST">
+                                            <button type="submit" class="btn btn-danger btn-sm mt-2">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    {% endif %}
+</div>
+{% endif %}
+
 
     <!-- Botón de edición y formulario -->
     <div class="text-center mb-4">
-        <button id="edit-profile-btn" class="btn btn-primary">Change Profile Data</button>
+        <div class="button-group">
+            <button id="edit-profile-btn" class="btn btn-primary">Change Profile Data</button>
+            {% if not user.is_admin %}
+            <button id="add-partner-btn" class="btn btn-success">Add Partner</button>
+            <button id="add-child-btn" class="btn btn-success">Add Child</button>
+            {% endif %}
+        </div>
     </div>
-    {%if not user.is_admin%}
-    <div class="text-center mb-4">
-        <button id="add-partner-btn" class="btn btn-success">Add Partner</button>
-    </div>
-    <div class="text-center mb-4">
-        <button id="add-child-btn" class="btn btn-success">Add Child</button>
-    </div>
-    {%endif%}
+
     <div id="add-partner-form" style="display: none;">
         <form id="partner-add-form" method="POST" action="{{ url_for('views.add_partner', user_id=user.id) }}"
             enctype="multipart/form-data">  
@@ -338,40 +340,52 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-                // Obtenemos el botón de edición y el formulario de edición
-                const editProfileBtn = document.getElementById('edit-profile-btn');
-                const editProfileForm = document.getElementById('edit-profile-form');
-                const deleteChildForms = document.querySelectorAll('.delete-child-form');
-                const deletePartnerForms = document.getElementById('delete_partner_form');
-                const addPartnerBtn = document.getElementById('add-partner-btn');
-                const addPartnerForm = document.getElementById('add-partner-form');
-                const addChildBtn = document.getElementById('add-child-btn');
-                const addChildForm = document.getElementById('add-child-form');
+            // Obtenemos el botón de edición y el formulario de edición
+            const editProfileBtn = document.getElementById('edit-profile-btn');
+            const editProfileForm = document.getElementById('edit-profile-form');
+            const deleteChildForms = document.querySelectorAll('.delete-child-form');
+            const deletePartnerForm = document.getElementById('delete_partner_form');
+            const addPartnerBtn = document.getElementById('add-partner-btn');
+            const addPartnerForm = document.getElementById('add-partner-form');
+            const addChildBtn = document.getElementById('add-child-btn');
+            const addChildForm = document.getElementById('add-child-form');
 
-                // Agregamos event listeners para los clics en los botones de añadir
-                addPartnerBtn.addEventListener('click', function () {
-                    addPartnerForm.style.display = addPartnerForm.style.display === 'none' ? 'block' : 'none';
-                });
-
-                addChildBtn.addEventListener('click', function () {
-                    addChildForm.style.display = addChildForm.style.display === 'none' ? 'block' : 'none';
-                });
-
+            if (editProfileBtn) {
                 // Agregamos un event listener para el clic en el botón de edición
                 editProfileBtn.addEventListener('click', function () {
                     // Alternamos la visibilidad del formulario de edición
                     editProfileForm.style.display = editProfileForm.style.display === 'none' ? 'block' : 'none';
-                    deletePartnerForms.style.display = deletePartnerForms.style.display === 'none' ? 'block' : 'none';
+
+                    // Alternamos la visibilidad del formulario de eliminación de partners
+                    if (deletePartnerForm) {
+                        deletePartnerForm.style.display = deletePartnerForm.style.display === 'none' ? 'block' : 'none';
+                    }
+
                     // Alternamos la visibilidad de todos los formularios de eliminación de children
                     deleteChildForms.forEach(function (form) {
                         form.style.display = form.style.display === 'none' ? 'block' : 'none';
                     });
-
-                    
                 });
-            });
+            }
 
+            if (addPartnerBtn) {
+                // Agregamos event listener para el clic en el botón de añadir partner
+                addPartnerBtn.addEventListener('click', function () {
+                    addPartnerForm.style.display = addPartnerForm.style.display === 'none' ? 'block' : 'none';
+                });
+            }
+
+            if (addChildBtn) {
+                // Agregamos event listener para el clic en el botón de añadir child
+                addChildBtn.addEventListener('click', function () {
+                    addChildForm.style.display = addChildForm.style.display === 'none' ? 'block' : 'none';
+                });
+            }
+        });
     </script>
+
+
+
 </div>
 
 <style>
@@ -401,6 +415,11 @@
     .custom-color {
         color: rgb(20, 73, 172);
     }
+    .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Ajusta el espacio entre los botones */
+}
 
     .partner-image-container img,
     .child-image-container img {
@@ -448,6 +467,33 @@
     .btn-primary:hover {
         background-color: #0056b3;
     }
+    .partner-image-container,
+    .child-image-container {
+        max-width: 80px;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    .delete-child-form,
+    #delete_partner_form {
+        text-align: center;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 0.75rem 0;
+        text-align: left;
+    }
+
+    .card-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .custom-color {
+        color: rgb(20, 73, 172);
+    }
+    
+
 </style>
 
 {% endblock %}
