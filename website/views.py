@@ -58,6 +58,8 @@ def update_event(event_id):
         event.member_child_price = request.form['member_child_price']
         event.guest_price = request.form['guest_price']
         event.description = request.form['description']
+        is_family_friendly = request.form.get('isFamilyFriendly') != None
+        event.is_family_friendly = is_family_friendly
         
         if 'img_url' in request.files:
             img_file = request.files['img_url']
@@ -991,16 +993,14 @@ def create_event():
     guest_price=float(request.form.get('guest_price'))
     description=request.form.get('description')
     event_image = request.files['img_url']
-    print(request.form.get('isFamilyFriendly'))
-    is_family_friendly = request.form.get('isFamilyFriendly') == 'on'
-    print(is_family_friendly)
+    is_family_friendly = request.form.get('isFamilyFriendly') != None
+
     if event_image and allowed_file(event_image.filename):
         # Asegurar el nombre del archivo
         filename = secure_filename(event_image.filename)
         # Guardar la imagen en la carpeta "static"
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
         event_image.save(filepath)
-        print(url_for('static',filename=f'images/{filename}'))
         # Obtener la URL relativa de la imagen
         img_url = url_for('static',filename=f'images/{filename}')
     else: 

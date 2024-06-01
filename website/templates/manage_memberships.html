@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Manage Fees{% endblock %}
 {% block content %}
+<script src="{{ url_for('static', filename='/membership.js') }}"></script>
 <div class="container py-5">
     <h1 class="text-center mb-4">Manage Memberships</h1>
     <p class="mb-4 justify-content-center">
@@ -79,6 +80,11 @@
             </div>
         </div>
     </div>
-
+    <form id="membership-form" class="mt-4">
+        <div class="input-group flex">
+            <input type="number" id="membership-fee" class="form-control" placeholder="Enter new membership fee">
+            <button type="button" class="btn btn-primary" onclick="updateMembershipFee()">Update Fee</button>
+        </div>
+    </form>
 </div>
-{% endblock %}C
+{% endblock %}

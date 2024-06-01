@@ -3,8 +3,6 @@ const stripe = Stripe("pk_test_51OfpDEDOahdbfVYL1Vc9nQ4TnnkZgWxaUghqWXNbMeuTIT7D
 
 let elements;
 
-
-
 checkStatus();
 
 document
@@ -36,6 +34,8 @@ async function initialize() {
   const paymentElement = elements.create("payment", paymentElementOptions);
   paymentElement.mount("#payment-element");
 }
+
+
 
 async function handleSubmit(e) {
   e.preventDefault();

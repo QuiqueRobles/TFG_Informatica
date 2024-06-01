@@ -25,6 +25,66 @@
     <div class="text-center mb-4">
         <button class="btn btn-success" id="create-event-btn">Create Event</button>
     </div>
+    <div class="create-event-form mt-5" id="create-event-form" style="display: none;">
+        <form method="POST" enctype="multipart/form-data" action="/">
+            <h3 align="center">Create Event</h3>
+            <div class="form-group">
+                <label for="name">Name of the event</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter name of the event"
+                    required />
+            </div>
+            <div class="form-group">
+                <label for="date"><span data-toggle="tooltip" data-placement="right"
+                        title="Insert a future date, otherwise the event will not be displayed ">Date</span><small> (Must be a future date in order to appear on next Events page)</small></label>
+                <input type="date" class="form-control" id="date" name="date" placeholder="Enter date of the event"
+                    required />
+            </div>
+            <div class="form-group">
+                <label for="max_guest_num">Maximum number of guests</label>
+                <input type="number" class="form-control" id="max_guest_num" name="max_guest_num"
+                    placeholder="Enter the maximum guests number" required />
+            </div>
+            <div class="form-group">
+                <label for="member_price">Member price</label>
+                <input type="number" class="form-control" id="member_price" name="member_price"
+                    placeholder="Enter member price" required />
+            </div>
+            <div class="form-group">
+                <label for="member_child_price">Child member price</label>
+                <input type="number" class="form-control" id="member_child_price" name="member_child_price"
+                    placeholder="Enter child member price" required />
+            </div>
+            <div class="form-group">
+                <label for="guest_price">Guest price</label>
+                <input type="number" class="form-control" id="guest_price" name="guest_price"
+                    placeholder="Enter guest price" required />
+            </div>
+            <div class="form-group">
+                <label for="child_price">Child price</label>
+                <input type="number" class="form-control" id="child_price" name="child_price"
+                    placeholder="Enter guest price" required />
+            </div>
+            <div class="form-group">
+                <label for="img_url">Event Image</label>
+                <input type="file" class="form-control" id="img_url" name="img_url" />
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="description">Insert a brief description of the event:</label>
+                <textarea name="description" id="description" class="form-control" required></textarea>
+            </div>
+            <br />
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="true" id="isFamilyFriendly" name="isFamilyFriendly">
+                <label class="form-check-label" for="isFamilyFriendly">
+                    Is this event family friendly?
+                </label>
+            </div>
+            <br />
+            <button type="submit" class="btn btn-primary">Create Event</button>
+            <br><br>
+        </form>
+    </div>
     <div class="row">
         {% for event in active_event %}
         <div class="col-md-4 position-relative">
@@ -67,6 +127,8 @@
                         {% endif %}
                         {% endfor %}
                     </p>
+                </div>
+                <div class="card-footer">
                     <a href="/update-event/{{ event.id }}" class="btn btn-warning">Edit</a>
                     <button type="button" class="btn btn-danger" onClick="deleteEvent({{ event.id }})">Delete</button>
                 </div>
@@ -84,64 +146,8 @@
         {% endfor %}
     </div>
 
-    <div class="create-event-form mt-5" id="create-event-form" style="display: none;">
-        <form method="POST" enctype="multipart/form-data" action="/">
-            <h3 align="center">Create Event</h3>
-            <div class="form-group">
-                <label for="name">Name of the event</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Enter name of the event"
-                    required />
-            </div>
-            <div class="form-group">
-                <label for="date"><span data-toggle="tooltip" data-placement="right" title="Insert a future date, otherwise the event will not be displayed ">Date</span></label>
-                <input type="date" class="form-control" id="date" name="date" placeholder="Enter date of the event"
-                    required />
-            </div>
-            <div class="form-group">
-                <label for="max_guest_num">Maximum number of guests</label>
-                <input type="number" class="form-control" id="max_guest_num" name="max_guest_num"
-                    placeholder="Enter the maximum guests number" required />
-            </div>
-            <div class="form-group">
-                <label for="member_price">Member price</label>
-                <input type="number" class="form-control" id="member_price" name="member_price"
-                    placeholder="Enter member price" required />
-            </div>
-            <div class="form-group">
-                <label for="member_child_price">Child member price</label>
-                <input type="number" class="form-control" id="member_child_price" name="member_child_price"
-                    placeholder="Enter child member price" required />
-            </div>
-            <div class="form-group">
-                <label for="guest_price">Guest price</label>
-                <input type="number" class="form-control" id="guest_price" name="guest_price"
-                    placeholder="Enter guest price" required />
-            </div>
-            <div class="form-group">
-                <label for="child_price">Child price</label>
-                <input type="number" class="form-control" id="child_price" name="child_price"
-                    placeholder="Enter guest price" required />
-            </div>
-            <div class="form-group">
-                <label for="img_url">Event Image</label>
-                <input type="file" class="form-control" id="img_url" name="img_url" />
-            </div>
-            <br />
-            <div class="form-group">
-                <label for="description">Insert a brief description of the event:</label>
-                <textarea name="description" id="description" class="form-control" required></textarea>
-            </div>
-            <br />
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="isFamilyFriendly" name="isFamilyFriendly">
-                <label class="form-check-label" for="isFamilyFriendly">
-                    Is this event family friendly?
-                </label>
-            </div>
-            <br />
-            <button type="submit" class="btn btn-primary">Create Event</button>
-        </form>
-    </div>
+
+    
 </div>
 
 <style>
@@ -172,10 +178,16 @@
         transition: transform 0.3s ease;
     }
 
+    
+    .card-footer {
+    position: relative;
+    z-index: 10; /* Higher than sold-out-overlay */
+}
+
     .sold-out-overlay {
         background: rgba(255, 255, 255, 0.8);
+        z-index: 5; /* Lower than card-footer */
     }
-
     .family-friendly {
         border: 2px solid #32CD32;
         /* Lime Green border */

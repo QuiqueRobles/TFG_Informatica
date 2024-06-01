@@ -64,16 +64,20 @@
           <div class="card-body">
             <div class="form-group">
               <label for="password1">Password* <small>(Must be at least 7 characters long)</small></label>
-              <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter password"
-                required>
+              <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter password" required>
             </div>
             <div class="form-group">
               <label for="password2">Password (Confirm)*</label>
               <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm password"
                 required>
             </div>
+            <div class="form-check mt-2">
+              <input type="checkbox" class="form-check-input" id="show-password" onclick="togglePasswordVisibility()">
+              <label class="form-check-label" for="show-password">Show Password</label>
+            </div>
           </div>
         </div>
+
 
         <!-- Family Information Section -->
         <div class="card mt-3">
@@ -168,7 +172,17 @@
       $('#partnerForm').collapse('hide');
     }
   });
-
+  function togglePasswordVisibility() {
+      var password1 = document.getElementById("password1");
+      var password2 = document.getElementById("password2");
+      if (password1.type === "password") {
+        password1.type = "text";
+        password2.type = "text";
+      } else {
+        password1.type = "password";
+        password2.type = "password";
+      }
+    }
   // Show/hide children form
   $('#childrenCheckbox').change(function () {
     if ($(this).is(':checked')) {
