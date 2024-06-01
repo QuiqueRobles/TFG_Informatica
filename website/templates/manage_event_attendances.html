@@ -8,10 +8,38 @@
         margin-bottom: 10px;
     }
 
-    .input-group select,
-    .input-group input {
-        flex: 1;
-        margin-right: 10px;
+    .search-container {
+        position: relative;
+    }
+
+    #event-search {
+        width: 100%;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    .suggestions {
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        border-top: none;
+        width: 100%;
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+        border-radius: 0 0 4px 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .suggestion-item {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
     }
 
     .btn-primary,
@@ -68,15 +96,19 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <form action="/manage_event_attendances" method="post" class="mb-4">
-                <div class="input-group">
-                    <select name="event_id" class="form-select">
+                <div class="search-container">
+                    <input type="text" id="event-search" class="form-control" placeholder="Search events by name">
+                    <div id="suggestions" class="suggestions"></div>
+                </div>
+                <div class="input-group mt-3">
+                    <select name="event_id" id="event-select" class="form-select" style="display:none;">
                         {% for event in events %}
                         <option value="{{ event.id }}">{{ event.name }}</option>
                         {% endfor %}
                     </select>
                     <input type="text" name="user_email" class="form-control" placeholder="Enter user email">
-                    <input type="text" name="user_nif" class="form-control" placeholder="Enter user NIF">
-                    <input type="text" name="user_last_name" class="form-control" placeholder="Enter user last name">
+                    <input type="text" name="user_nif" class="form-control" placeholder=" or/and Enter user NIF">
+                    <input type="text" name="user_last_name" class="form-control" placeholder="or/and Enter user last name">
                     <button type="submit" class="btn btn-primary">Search</button>
                 </div>
             </form>
@@ -129,4 +161,30 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('event-search').addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase();
+        const suggestionsContainer = document.getElementById('suggestions');
+        const eventSelect = document.getElementById('event-select');
+        const options = eventSelect.querySelectorAll('option');
+
+        suggestionsContainer.innerHTML = '';
+
+        options.forEach(option => {
+            const eventName = option.textContent.toLowerCase();
+            if (eventName.includes(searchTerm)) {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.classList.add('suggestion-item');
+                suggestionItem.textContent = option.textContent;
+                suggestionItem.addEventListener('click', function () {
+                    document.getElementById('event-search').value = option.textContent;
+                    suggestionsContainer.innerHTML = '';
+                    eventSelect.value = option.value;
+                });
+                suggestionsContainer.appendChild(suggestionItem);
+            }
+        });
+    });
+</script>
 {% endblock %}

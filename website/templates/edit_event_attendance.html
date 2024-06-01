@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Edit Event Attendance{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Edit Event Attendance</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form action="{{ url_for('edit_event_attendance', attendance_id=attendance.id) }}" method="post">
+                <div class="mb-3">
+                    <label for="vip_admin_tickets" class="form-label">Number of VIP Tickets</label>
+                    <input type="number" class="form-control" id="vip_admin_tickets" name="vip_admin_tickets"
+                        value="{{ attendance.vip_admin_tickets }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="number_guest_tickets" class="form-label">Number of Guest Tickets</label>
+                    <input type="number" class="form-control" id="number_guest_tickets" name="number_guest_tickets"
+                        value="{{ attendance.number_guest_tickets }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="number_child_tickets" class="form-label">Number of Child Tickets</label>
+                    <input type="number" class="form-control" id="number_child_tickets" name="number_child_tickets"
+                        value="{{ attendance.number_child_tickets }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="number_member_tickets" class="form-label">Number of Member Tickets</label>
+                    <input type="number" class="form-control" id="number_member_tickets" name="number_member_tickets"
+                        value="{{ attendance.number_member_tickets }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="number_memberchild_tickets" class="form-label">Number of Member Child Tickets</label>
+                    <input type="number" class="form-control" id="number_memberchild_tickets"
+                        name="number_memberchild_tickets" value="{{ attendance.number_memberchild_tickets }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="guests_names" class="form-label">Guests Names</label>
+                    <input type="text" class="form-control" id="guests_names" name="guests_names"
+                        value="{{ attendance.guests_names }}">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="cash_payment_in_event"
+                        name="cash_payment_in_event" {% if attendance.cash_payment_in_event %}checked{% endif %}>
+                    <label class="form-check-label" for="cash_payment_in_event">Cash Payment in Event</label>
+                </div>
+                <div class="mb-3">
+                    <label for="total_price" class="form-label">Total Price</label>
+                    <input type="number" class="form-control" id="total_price" name="total_price"
+                        value="{{ attendance.total_price }}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{{ url_for('manage_event_attendances') }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
