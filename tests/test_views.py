@@ -115,7 +115,12 @@ def test_delete_event(client):
 
 
 #################################################################
-#################################################################
+################################################################
+
+
+def login_as_user(client):
+    response= client.post('/login', data={'email': 'quiquemich@gmail.com', 'password': 'password'}, follow_redirects=True)
+    return
 
 def login_as_admin(client):
     response = client.post('/login', data={'email': 'qroblesuriel@gmail.com', 'password': 'quique'}, follow_redirects=True)

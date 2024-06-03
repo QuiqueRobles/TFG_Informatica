@@ -800,7 +800,7 @@ def process_qr():
         for field in required_fields:
             if field not in qr_info:
                 return jsonify({"status": "error", "message": f"Missing required field: {field}"})
-
+        
         # Extraer detalles del QR
         event_name = qr_info.get('Event')
         date_str = qr_info.get('Date')
@@ -819,22 +819,20 @@ def process_qr():
 
         if event.date.strftime('%B %d, %Y') != date_str:
             return jsonify({"status": "error", "message": "Event details do not match the records."})
-
+        
         # Buscar al usuario en la base de datos
         user = User.query.filter_by(email=user_email).first()
         if not user:
-            return jsonify({"status": "error", "message": "User not found."})
-
+            user =Admin.query.filter_by(email=user_email).first()
+            if not user:
+                return jsonify({"status": "error", "message": "User not found."})
+        
         # Buscar la asistencia del usuario al evento
         user_attendance = Event_Attendance.query.filter_by(user_id=user.id, event_id=event.id).first()
         if not user_attendance:
             return jsonify({"status": "error", "message": "User attendance not found."})
         
-        print((user_attendance.number_member_tickets == member_tickets and
-                user_attendance.number_guest_tickets == guest_tickets and
-                user_attendance.number_child_tickets == child_tickets and
-                user_attendance.number_memberchild_tickets == member_child_tickets and
-                user_attendance.total_price == total_price))
+        
         # Verificar los detalles de la asistencia
         if (user_attendance.number_member_tickets == member_tickets and
                 user_attendance.number_guest_tickets == guest_tickets and

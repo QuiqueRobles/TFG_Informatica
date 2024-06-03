@@ -47,12 +47,12 @@
                 .then(response => response.json())
                 .then(data => {
                     const resultsDiv = document.getElementById('qr-reader-results');
-                    if (data.valid) {
+                    if (data.status) {
                         resultsDiv.className = 'alert alert-success';
-                        resultsDiv.innerText = `Valid Entry: ${decodedText}`;
+                        resultsDiv.innerText = data.message + `: ${decodedText}`;
                     } else {
                         resultsDiv.className = 'alert alert-danger';
-                        resultsDiv.innerText = `Invalid Entry: ${decodedText}`;
+                        resultsDiv.innerText = data.message + `: ${decodedText}`;
                     }
                     resultsDiv.style.display = 'block';
                 })
