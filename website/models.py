@@ -97,3 +97,8 @@ class Partner(db.Model):
     partner_profile_image_url = db.Column(db.String(300))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = relationship("User", back_populates="partner")
+
+class Config(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fee_value=db.Column (db.Float)
+

@@ -12,8 +12,11 @@ document
 // Fetches a payment intent and captures the client secret
 async function initialize() {
 
+  const amountResponse = await fetch(`/get-total-amount`);
+  const { totalAmount } = await amountResponse.json();
+
   const formData = {
-    totalAmount: 30,
+    totalAmount: totalAmount,
   };
   const response = await fetch("/create-payment-intent", {
     method: "POST",

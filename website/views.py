@@ -3,7 +3,7 @@ import json
 import pyqrcode
 from flask import Blueprint, render_template, request, flash, jsonify, url_for,Flask, current_app, redirect, send_file, make_response
 from flask_login import login_required, current_user
-from .models import User,Admin,Event,Event_Attendance,Fee,Partner,Child
+from .models import User,Admin,Event,Event_Attendance,Fee,Partner,Child,Config
 from . import db, mail
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -38,11 +38,12 @@ def home():
         create_event()
     todos_los_eventos = Event.query.all()
     eventos_activos = [evento for evento in todos_los_eventos if evento.date >= datetime.now()]
+    eventos_pasados = [evento for evento in todos_los_eventos if evento.date < datetime.now()]
     event_details = calculate_event_details()
     if current_user.is_admin == True:
         print("Renderizando homeAdmin")
         return render_template("homeAdmin.html", user=current_user, active_event=eventos_activos, event_details=event_details)
-    return render_template("home.html", user=current_user, active_event=eventos_activos, event_details=event_details)
+    return render_template("home.html", user=current_user, active_event=eventos_activos, event_details=event_details, past_event=eventos_pasados)
 
 
 @login_required
@@ -94,7 +95,29 @@ def about_us():
 @views.route('/become_member', methods=['GET', 'POST'])
 @login_required
 def become_member():
-    return render_template('become_member.html', user=current_user)
+    config = Config.query.first()
+    fee_value= config.fee_value
+    return render_template('become_member.html', user=current_user, fee_value=fee_value)
+
+@views.route('/update-fee', methods=['POST'])
+def update_fee():
+    data = request.json
+    new_fee_value = data.get('fee_value')
+    
+    if new_fee_value is None:
+        return jsonify(success=False, error="No fee value provided"), 400
+
+    try:
+        config = Config.query.first()  # Assuming you have one config record
+        if config:
+            config.fee_value = new_fee_value
+            db.session.commit()
+            return jsonify(success=True)
+        else:
+            return jsonify(success=False, error="Config not found"), 404
+    except Exception as e:
+        return jsonify(success=False, error=str(e)), 500
+    
 
 @views.route('/delete-event/<int:event_id>', methods=['POST'])
 def delete_event(event_id): 
@@ -337,7 +360,7 @@ def success():
             db.session.add(event_attendance)
             db.session.commit()
 
-            msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
+            msg = Message('Thank You for Collaborating with GREMA!', recipients=[current_user.email])
             msg.body = f"""
             
             Thank you for purchasing GREMA tickets!!! We are looking forward to seeing you in the event with your family!
@@ -492,7 +515,10 @@ def success_cash():
             number_child_member_tickets = data['number_child_member_tickets']
             number_guest_tickets = data['number_guest_tickets']
             number_child_tickets = data['number_child_tickets']
-            vip_admin_tickets=data['vip_admin_tickets']
+            if current_user.is_admin:
+                vip_admin_tickets=data['vip_admin_tickets']
+            else: 
+                vip_admin_tickets=0
             guests_names = data['guests_names']
             totalAmount = data['totalAmount']
             event_id = data['event_id']
@@ -969,6 +995,15 @@ def download_event_attendees():
     buffer.seek(0)
 
     return send_file(buffer, as_attachment=True, download_name=f"attendees_{event.name}.pdf", mimetype='application/pdf')
+
+
+
+@views.route('/get-total-amount', methods=['GET'])
+def get_total_amount():
+    config = Config.query.first()  # Assuming you have one config record
+    if config:
+        return jsonify(totalAmount=config.fee_value)
+    return jsonify(error="Config not found"), 404
 
 
 #################################################

@@ -1,25 +1,40 @@
 {% extends "base.html" %}
 {% block title %}QR Reader{% endblock %}
 {% block content %}
-
 <section class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-5">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-body">
                     <h1 class="card-title text-center mb-4">QR Code Reader</h1>
                     <div class="form-group text-center mb-4">
                         <label for="camera-selection" class="form-label">Select Camera</label>
-                        <select id="camera-selection" class="form-select w-50 mx-auto"></select>
+                        <select id="camera-selection" class="form-select w-50 mx-auto"
+                            aria-label="Select Camera"></select>
                     </div>
-                    <div class="d-flex justify-content-center">
-                        <div id="qr-reader" style="position: relative; width: 300px; height: 300px;">
-                            <div
-                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid #007bff; border-radius: 10px;">
-                            </div>
-                        </div>
+                    <div class="text-center mb-4">
+                        <div id="qr-reader" class="border rounded"></div>
                     </div>
-                    <div id="qr-reader-results" class="alert mt-4 text-center" role="alert" style="display: none;">
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">Tips for Better QR Code Scanning</div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li><i class="bi bi-check-circle text-success"></i> Ensure good lighting</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Hold the camera steady</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Avoid reflections and glare</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Ensure the QR code is not damaged</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="qr-result-section" class="mt-4 d-none">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">QR Code Scan Result</div>
+                    <div class="card-body">
+                        <div id="qr-reader-results" class="alert" role="alert"></div>
                     </div>
                 </div>
             </div>
@@ -30,85 +45,83 @@
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        if (typeof Html5Qrcode === 'undefined') {
+        const qrReader = document.getElementById('qr-reader');
+        const qrReaderResults = document.getElementById('qr-reader-results');
+        const qrResultSection = document.getElementById('qr-result-section');
+        const cameraSelection = document.getElementById('camera-selection');
+
+        if (!Html5Qrcode) {
             console.error("Html5Qrcode library is not loaded!");
             return;
         }
 
-        function onScanSuccess(decodedText, decodedResult) {
+        let html5QrCode;
+
+        const scanSuccessCallback = (decodedText) => {
             console.log(`Scan result: ${decodedText}`);
             fetch('/process_qr', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: decodedText })
             })
                 .then(response => response.json())
                 .then(data => {
-                    const resultsDiv = document.getElementById('qr-reader-results');
-                    if (data.status) {
-                        resultsDiv.className = 'alert alert-success';
-                        resultsDiv.innerText = data.message + `: ${decodedText}`;
-                    } else {
-                        resultsDiv.className = 'alert alert-danger';
-                        resultsDiv.innerText = data.message + `: ${decodedText}`;
-                    }
-                    resultsDiv.style.display = 'block';
+                    const { status, message } = data;
+                    const className = status ? 'alert-success' : 'alert-danger';
+                    qrReaderResults.className = `alert ${className}`;
+                    qrReaderResults.textContent = `${message}: ${decodedText}`;
+                    qrResultSection.classList.remove('d-none');
                 })
-                .catch((error) => {
+                .catch(error => {
                     console.error('Error:', error);
                 });
-        }
+        };
 
-        function onScanFailure(error) {
+        const scanFailureCallback = (error) => {
             console.warn(`QR error = ${error}`);
-        }
+        };
 
-        let html5QrCode = new Html5Qrcode("qr-reader");
+        const startQrScanner = (cameraId) => {
+            html5QrCode = new Html5Qrcode("qr-reader");
 
-        function startQrScanner(cameraId) {
             html5QrCode.start(
-                { deviceId: { exact: cameraId } },
-                {
-                    fps: 10,
-                    qrbox: 250
-                },
-                onScanSuccess,
-                onScanFailure
+                cameraId,
+                { fps: 10, qrbox: 250 },
+                scanSuccessCallback,
+                scanFailureCallback
             ).catch(err => {
                 console.error("Unable to start scanning.", err);
             });
-        }
+        };
 
-        Html5Qrcode.getCameras().then(devices => {
-            if (devices && devices.length) {
-                const cameraSelection = document.getElementById('camera-selection');
-                devices.forEach(device => {
-                    const option = document.createElement('option');
-                    option.value = device.id;
-                    option.text = device.label;
-                    cameraSelection.appendChild(option);
-                });
+        Html5Qrcode.getCameras()
+            .then(devices => {
+                if (devices && devices.length) {
+                    devices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.id;
+                        option.text = device.label || `Camera ${device.id}`;
+                        cameraSelection.appendChild(option);
+                    });
 
-                let currentCameraId = devices[0].id; // Default to the first camera
-                startQrScanner(currentCameraId);  // Start with the first camera by default
+                    const defaultCameraId = devices[0].id;
+                    startQrScanner(defaultCameraId);
 
-                cameraSelection.addEventListener('change', (event) => {
-                    const selectedCameraId = event.target.value;
-                    if (selectedCameraId !== currentCameraId) {
-                        html5QrCode.stop().then(() => {
-                            currentCameraId = selectedCameraId;
-                            startQrScanner(currentCameraId);
-                        }).catch(err => {
-                            console.error("Unable to stop scanning.", err);
-                        });
-                    }
-                });
-            }
-        }).catch(err => {
-            console.error("Unable to get cameras.", err);
-        });
+                    cameraSelection.addEventListener('change', (event) => {
+                        const selectedCameraId = event.target.value;
+                        if (selectedCameraId !== html5QrCode._cameraId) {
+                            html5QrCode.stop().then(() => {
+                                startQrScanner(selectedCameraId);
+                            }).catch(err => {
+                                console.error("Unable to stop scanning.", err);
+                            });
+                        }
+                    });
+                }
+            })
+            .catch(err => {
+                console.error("Unable to get cameras.", err);
+            });
     });
 </script>
 

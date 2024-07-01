@@ -169,11 +169,11 @@
                     <h5 class="card-title text-center mb-4">Add Partner</h5>
                     <div class="form-group">
                         <label for="partner_name">Partner Name:</label>
-                        <input type="text" id="partner_name" name="partner_name" class="form-control">
+                        <input type="text" id="partner_name" name="partner_name" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="partner_nif">Partner NIF:</label>
-                        <input type="text" id="partner_nif" name="partner_nif" class="form-control">
+                        <input type="text" id="partner_nif" name="partner_nif" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="partner_phone_number">Partner Phone Number:</label>
@@ -203,11 +203,11 @@
                     <h5 class="card-title text-center mb-4">Add Child</h5>
                     <div class="form-group">
                         <label for="child_name">Child Name:</label>
-                        <input type="text" id="child_name" name="child_name" class="form-control">
+                        <input type="text" id="child_name" name="child_name" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="child_nif">Child NIF:</label>
-                        <input type="text" id="child_nif" name="child_nif" class="form-control">
+                        <input type="text" id="child_nif" name="child_nif" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="child_phone_number">Child Phone Number:</label>
@@ -272,12 +272,12 @@
                     <div class="form-group">
                         <label for="partner_name_{{ loop.index }}">Partner Name:</label>
                         <input type="text" id="partner_name_{{ loop.index }}" name="partner_name_{{ loop.index }}"
-                            class="form-control" value="{{ partner.name }}">
+                            class="form-control" value="{{ partner.name }}" required>
                     </div>
                     <div class="form-group">
                         <label for="partner_nif_{{ loop.index }}">Partner NIF:</label>
                         <input type="text" id="partner_nif_{{ loop.index }}" name="partner_nif_{{ loop.index }}"
-                            class="form-control" value="{{ partner.nif }}">
+                            class="form-control" value="{{ partner.nif }}" required>
                     </div>
                     <div class="form-group">
                         <label for="partner_phone_number_{{ loop.index }}">Partner Phone Number:</label>
@@ -305,12 +305,12 @@
                     <div class="form-group">
                         <label for="child_name_{{ loop.index }}">Child Name:</label>
                         <input type="text" id="child_name_{{ loop.index }}" name="child_name_{{ loop.index }}"
-                            class="form-control" value="{{ child.name }}">
+                            class="form-control" value="{{ child.name }}" required>
                     </div>
                     <div class="form-group">
                         <label for="child_nif_{{ loop.index }}">Child NIF:</label>
                         <input type="text" id="child_nif_{{ loop.index }}" name="child_nif_{{ loop.index }}"
-                            class="form-control" value="{{ child.nif }}">
+                            class="form-control" value="{{ child.nif }}" required>
                     </div>
                     <div class="form-group">
                         <label for="child_phone_number_{{ loop.index }}">Child Phone Number:</label>

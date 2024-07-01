@@ -87,4 +87,29 @@
         </div>
     </form>
 </div>
+
+<script>
+    async function updateMembershipFee() {
+        const feeValue = document.getElementById('membership-fee').value;
+
+        if (feeValue) {
+            const response = await fetch('/update-fee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ fee_value: feeValue }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert('Membership fee updated successfully');
+            } else {
+                alert('Error updating membership fee: ' + result.error);
+            }
+        } else {
+            alert('Please enter a membership fee.');
+        }
+    }
+</script>
 {% endblock %}
