@@ -852,7 +852,7 @@ def process_qr():
         # Buscar al usuario en la base de datos
         user = User.query.filter_by(email=user_email).first()
         if not user:
-            user =Admin.query.filter_by(email=user_email).first()
+            user = Admin.query.filter_by(email=user_email).first()
             if not user:
                 return jsonify({"status": "error", "message": "User not found."})
         
@@ -861,7 +861,6 @@ def process_qr():
         if not user_attendance:
             return jsonify({"status": "error", "message": "User attendance not found."})
         
-        
         # Verificar los detalles de la asistencia
         if (user_attendance.number_member_tickets == member_tickets and
                 user_attendance.number_guest_tickets == guest_tickets and
@@ -869,21 +868,19 @@ def process_qr():
                 user_attendance.number_memberchild_tickets == member_child_tickets and
                 user_attendance.total_price == total_price):
             
-            flash("Correct ticket!! Enjoy the event!!")
+            #flash("Correct ticket!! Enjoy the event!!")
             
             if paid:
-                return jsonify({"status": "success", "message": "QR data is correct.", "data": qr_info})
+                return jsonify({"status": "success", "message": "QR data is correct.", "name": f"{user.first_name} {user.surname}", "id": user.nif, "data": qr_info})
             else:
-                flash("El usuario debe pagar en efectivo", "orange")
-                return jsonify({"status": "success", "message": "QR data is correct, but user needs to pay.", "data": qr_info})
+                #flash("El usuario debe pagar en efectivo", "orange")
+                return jsonify({"status": "success", "message": "QR data is correct, but user needs to pay.", "name": f"{user.first_name} {user.surname}", "id": user.nif, "data": qr_info})
         else:
             return jsonify({"status": "error", "message": "QR data does not match the records."})
 
     except Exception as e:
         print(f"Error processing QR: {e}")
         return jsonify({"status": "error", "message": "An error occurred while processing the QR code."})
-
-
 
 
 @views.route('/qr_reader', methods=['GET','POST'])
@@ -1062,7 +1059,7 @@ def inject_membership():
 
 
 def generate_event_pdf(event, user_attendance, current_user):
-    # Crear un documento PDF
+     # Crear un documento PDF
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
 
@@ -1078,7 +1075,7 @@ def generate_event_pdf(event, user_attendance, current_user):
 
     # Información de asistencia del usuario
     if current_user.is_admin:
-        user_name =f"{current_user.first_name}"
+        user_name = f"{current_user.first_name}"
     else:
         user_name = f"{current_user.first_name} {current_user.surname}"
     
@@ -1120,17 +1117,16 @@ def generate_event_pdf(event, user_attendance, current_user):
     # Logo de la Asociación GREMA
     base_dir = os.path.dirname(os.path.abspath(__file__))
     logo_path = os.path.join(base_dir, "static", "images", "gremaLogo.png")
-    print(logo_path)
     logo = Image(logo_path, width=100, height=100)
 
-    # Crear el código QR
+    # Crear el código QR con la misma información que antes
     qr_data = f"""
     Event: {event.name}
     Date: {event.date.strftime('%B %d, %Y')}
     Description: {event.description}
     User: {user_name}
     Email: {user_email}
-    Vip Tickets: {user_attendance.vip_admin_tickets}
+    VIP Tickets: {user_attendance.vip_admin_tickets}
     Member Tickets: {user_attendance.number_member_tickets}
     Guest Tickets: {user_attendance.number_guest_tickets}
     Child Tickets: {user_attendance.number_child_tickets}
@@ -1138,13 +1134,14 @@ def generate_event_pdf(event, user_attendance, current_user):
     Total Price: ${user_attendance.total_price}
     Paid: {"Yes" if not user_attendance.cash_payment_in_event else "No"}
     """
-    qr = pyqrcode.create(qr_data)
+    qr = pyqrcode.create(qr_data, error='L')  # Use low error correction level
 
     # Guardar el código QR en un archivo temporal
     qr_temp_file = BytesIO()
-    qr.png(qr_temp_file, scale=5)
+    qr.png(qr_temp_file, scale=3)  # Adjust the scale to make it simpler
 
     # Leer el código QR desde el archivo temporal
+    qr_temp_file.seek(0)
     qr_img = Image(qr_temp_file)
     qr_img.drawHeight = 100
     qr_img.drawWidth = 100

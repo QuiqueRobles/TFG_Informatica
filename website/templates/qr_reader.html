@@ -66,14 +66,17 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    const { status, message } = data;
-                    const className = status ? 'alert-success' : 'alert-danger';
+                    const { status, message, name, id } = data;
+                    const className = status === "success" ? 'alert-success' : 'alert-danger';
                     qrReaderResults.className = `alert ${className}`;
-                    qrReaderResults.textContent = `${message}: ${decodedText}`;
+                    qrReaderResults.innerHTML = `<h4 class="alert-heading">${status === "success" ? "Success" : "Error"}</h4><p>${message}</p>${status === "success" ? `<p><strong>Name:</strong> ${name}</p> <p><strong>ID:</strong> ${id}</p>` : ''}`;
                     qrResultSection.classList.remove('d-none');
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    qrReaderResults.className = 'alert alert-danger';
+                    qrReaderResults.innerHTML = `<h4 class="alert-heading">Error</h4><p>An error occurred while processing the QR code.</p>`;
+                    qrResultSection.classList.remove('d-none');
                 });
         };
 
