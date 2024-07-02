@@ -38,8 +38,14 @@
     <!-- Upcoming Events -->
     <div class="tab-pane fade show active" id="upcoming-events" role="tabpanel" aria-labelledby="upcoming-events-tab">
       <div class="row mt-4">
+        <div class="col-12 mb-3">
+          <input type="text" id="upcoming-events-search" class="form-control search-bar"
+            placeholder="Search upcoming events...">
+        </div>
+      </div>
+      <div class="row mt-4" id="upcoming-events-list">
         {% for event in active_event %}
-        <div class="col-md-4 position-relative">
+        <div class="col-md-4 position-relative event-card">
           <div class="card mb-4 div-hover shadow-sm {% if event.is_family_friendly %}family-friendly{% endif %}">
             {% if event.img_url %}
             <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
@@ -98,8 +104,14 @@
     <!-- Past Events -->
     <div class="tab-pane fade" id="past-events" role="tabpanel" aria-labelledby="past-events-tab">
       <div class="row mt-4">
+        <div class="col-12 mb-3">
+          <input type="text" id="past-events-search" class="form-control search-bar"
+            placeholder="Search past events...">
+        </div>
+      </div>
+      <div class="row mt-4" id="past-events-list">
         {% for event in past_event %}
-        <div class="col-md-4 position-relative">
+        <div class="col-md-4 position-relative event-card">
           <div class="card mb-4 div-hover shadow-sm {% if event.is_family_friendly %}family-friendly{% endif %}">
             {% if event.img_url %}
             <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
@@ -160,6 +172,7 @@
       </div>
     </div>
   </div>
+</div>
 
 <!-- Styles for the hero banner and additional custom styles -->
 <style>
@@ -235,6 +248,17 @@
     height: 20px;
     margin-right: 5px;
   }
+
+  .search-bar {
+    font-size: 1.1rem;
+    padding: 10px;
+    border: 2px solid #414197;
+  }
+
+  .search-bar::placeholder {
+    color: #414197;
+    opacity: 0.6;
+  }
 </style>
 
 <script>
@@ -242,6 +266,32 @@
     event.preventDefault();
     document.querySelector(this.getAttribute('href')).scrollIntoView({
       behavior: 'smooth'
+    });
+  });
+
+  document.getElementById('upcoming-events-search').addEventListener('keyup', function () {
+    const query = this.value.toLowerCase();
+    const events = document.querySelectorAll('#upcoming-events-list .event-card');
+    events.forEach(event => {
+      const eventName = event.querySelector('.card-title a').textContent.toLowerCase();
+      if (eventName.includes(query)) {
+        event.style.display = 'block';
+      } else {
+        event.style.display = 'none';
+      }
+    });
+  });
+
+  document.getElementById('past-events-search').addEventListener('keyup', function () {
+    const query = this.value.toLowerCase();
+    const events = document.querySelectorAll('#past-events-list .event-card');
+    events.forEach(event => {
+      const eventName = event.querySelector('.card-title').textContent.toLowerCase();
+      if (eventName.includes(query)) {
+        event.style.display = 'block';
+      } else {
+        event.style.display = 'none';
+      }
     });
   });
 </script>

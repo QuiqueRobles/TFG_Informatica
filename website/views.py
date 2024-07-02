@@ -36,13 +36,16 @@ views = Blueprint('views', __name__)
 def home():
     if request.method == 'POST': 
         create_event()
+    
     todos_los_eventos = Event.query.all()
-    eventos_activos = [evento for evento in todos_los_eventos if evento.date >= datetime.now()]
-    eventos_pasados = [evento for evento in todos_los_eventos if evento.date < datetime.now()]
+    eventos_activos = sorted([evento for evento in todos_los_eventos if evento.date >= datetime.now()], key=lambda x: x.date)
+    eventos_pasados = sorted([evento for evento in todos_los_eventos if evento.date < datetime.now()], key=lambda x: x.date, reverse=True)
     event_details = calculate_event_details()
-    if current_user.is_admin == True:
+    
+    if current_user.is_admin:
         print("Renderizando homeAdmin")
-        return render_template("homeAdmin.html", user=current_user, active_event=eventos_activos, event_details=event_details)
+        return render_template("homeAdmin.html", user=current_user, active_event=eventos_activos, event_details=event_details, past_event=eventos_pasados)
+    
     return render_template("home.html", user=current_user, active_event=eventos_activos, event_details=event_details, past_event=eventos_pasados)
 
 

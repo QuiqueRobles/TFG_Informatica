@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Admin Home{% endblock %}
+{% block title %}Home{% endblock %}
 {% block content %}
 <!-- Hero Banner -->
 <section class="hero-banner bg-dark text-white text-center py-5 position-relative">
@@ -11,17 +11,150 @@
         class="hero-content position-absolute w-100 h-100 d-flex flex-column justify-content-center align-items-center">
         <h1 class="display-4" style="color: #fff; font-size: 3.5rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">
             Welcome to GREMA Events Admin</h1>
-        <p class="lead" style="color: #fff; font-size: 1.25rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">
-            Manage and create events with ease
-        </p>
+        <p class="lead" style="color: #fff; font-size: 1.25rem; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);">Join us
+            for
+            exciting events and experiences</p>
+        <a href="#events" style="background-color:#414197; color:#fff" class="btn btn-primary btn-lg mt-3">Explore
+            Events</a>
     </div>
 </section>
 
 <div class="container py-5" id="events">
     <br />
-    <br />
     <h1 class="text-center mb-4">Events</h1>
     <br />
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs" id="eventTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="upcoming-events-tab" data-bs-toggle="tab" href="#upcoming-events" role="tab"
+                aria-controls="upcoming-events" aria-selected="true">Upcoming Events</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="past-events-tab" data-bs-toggle="tab" href="#past-events" role="tab"
+                aria-controls="past-events" aria-selected="false">Past Events</a>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="eventTabsContent">
+        <!-- Upcoming Events -->
+        <div class="tab-pane fade show active" id="upcoming-events" role="tabpanel"
+            aria-labelledby="upcoming-events-tab">
+            <div class="row mt-4">
+                <div class="col-12 mb-3">
+                    <input type="text" id="upcoming-events-search" class="form-control search-bar"
+                        placeholder="Search upcoming events...">
+                </div>
+            </div>
+            <div class="row mt-4" id="upcoming-events-list">
+                {% for event in active_event %}
+                <div class="col-md-4 position-relative event-card">
+                    <div
+                        class="card mb-4 div-hover shadow-sm {% if event.is_family_friendly %}family-friendly{% endif %}">
+                        {% if event.img_url %}
+                        <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top"
+                            alt="{{ event.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
+                            </h5>
+                            {% if event.is_family_friendly %}
+                            <p class="family-friendly-label">
+                                <img src="{{ url_for('static', filename='images/family_icon.jpg') }}"
+                                    alt="Family Friendly Icon" class="family-icon">
+                                Family Friendly Event
+                            </p>
+                            {% endif %}
+                            <p><strong>Event Date:</strong> {{ event.date.strftime('%d-%m-%Y') }}</p>
+                            <p><strong>Maximum capacity:</strong> {{ event.max_guest_num }} people</p>
+                            <p><strong>Member price:</strong> {{ event.member_price }} €</p>
+                            <p><strong>Member price (Child):</strong> {{ event.member_child_price }} €</p>
+                            <p><strong>Guest price:</strong> {{ event.guest_price }} €</p>
+                            <p><strong>Description:</strong> {{ event.description }}</p>
+                            <p><strong>Available tickets:</strong>
+                                {% for detail in event_details %}
+                                {% if detail.event == event.id %}
+                                {% if detail.sold_out %}
+                                <span class="text-danger">{{ detail.tickets_remaining }}</span>
+                                {% else %}
+                                {% if detail.warning_few_tickets %}
+                                <span class="text-warning">{{ detail.tickets_remaining }}</span>
+                                {% else %}
+                                <span class="text-success">{{ detail.tickets_remaining }}/{{ event.max_guest_num
+                                    }}</span>
+                                {% endif %}
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+                            </p>
+                        </div>
+                        {% if current_user.is_admin %}
+                        <div class="card-footer">
+                            <a href="/update-event/{{ event.id }}" class="btn btn-warning">Edit</a>
+                            <button type="button" class="btn btn-danger"
+                                onClick="deleteEvent({{ event.id }})">Delete</button>
+                        </div>
+                        {% endif %}
+                        {% for detail in event_details %}
+                        {% if detail.event == event.id and detail.sold_out %}
+                        <div
+                            class="sold-out-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                            <img src="{{ url_for('static', filename='images/sold_out.png') }}" alt="Sold Out"
+                                style="max-width: 80%; max-height: 80%;">
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Past Events -->
+        <div class="tab-pane fade" id="past-events" role="tabpanel" aria-labelledby="past-events-tab">
+            <div class="row mt-4">
+                <div class="col-12 mb-3">
+                    <input type="text" id="past-events-search" class="form-control search-bar"
+                        placeholder="Search past events...">
+                </div>
+            </div>
+            <div class="row mt-4" id="past-events-list">
+                {% for event in past_event %}
+                <div class="col-md-4 position-relative event-card">
+                    <div
+                        class="card mb-4 div-hover shadow-sm {% if event.is_family_friendly %}family-friendly{% endif %}">
+                        {% if event.img_url %}
+                        <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top"
+                            alt="{{ event.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ event.name }}</h5>
+                            {% if event.is_family_friendly %}
+                            <p class="family-friendly-label">
+                                <img src="{{ url_for('static', filename='images/family_icon.jpg') }}"
+                                    alt="Family Friendly Icon" class="family-icon">
+                                Family Friendly Event
+                            </p>
+                            {% endif %}
+                            <p><strong>Event Date:</strong> {{ event.date.strftime('%d-%m-%Y') }}</p>
+                            <p><strong>Maximum capacity:</strong> {{ event.max_guest_num }} people</p>
+                            <p><strong>Member price:</strong> {{ event.member_price }} €</p>
+                            <p><strong>Member price (Child):</strong> {{ event.member_child_price }} €</p>
+                            <p><strong>Guest price:</strong> {{ event.guest_price }} €</p>
+                            <p><strong>Description:</strong> {{ event.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% if current_user.is_admin %}
     <div class="text-center mb-4">
         <button class="btn btn-success" id="create-event-btn">Create Event</button>
     </div>
@@ -35,7 +168,8 @@
             </div>
             <div class="form-group">
                 <label for="date"><span data-toggle="tooltip" data-placement="right"
-                        title="Insert a future date, otherwise the event will not be displayed ">Date</span><small> (Must be a future date in order to appear on next Events page)</small></label>
+                        title="Insert a future date, otherwise the event will not be displayed ">Date</span><small>
+                        (Must be a future date in order to appear on next Events page)</small></label>
                 <input type="date" class="form-control" id="date" name="date" placeholder="Enter date of the event"
                     required />
             </div>
@@ -75,7 +209,8 @@
             </div>
             <br />
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="true" id="isFamilyFriendly" name="isFamilyFriendly">
+                <input class="form-check-input" type="checkbox" value="true" id="isFamilyFriendly"
+                    name="isFamilyFriendly">
                 <label class="form-check-label" for="isFamilyFriendly">
                     Is this event family friendly?
                 </label>
@@ -85,72 +220,59 @@
             <br><br>
         </form>
     </div>
-    <div class="row">
-        {% for event in active_event %}
-        <div class="col-md-4 position-relative">
-            <div class="card mb-4 div-hover shadow-sm {% if event.is_family_friendly %}family-friendly{% endif %}">
-                {% if event.img_url %}
-                <img src="{{ event.img_url }}" class="card-img-top" alt="{{ event.name }}">
-                {% else %}
-                <img src="{{ url_for('static', filename='images/gremaLogo.png') }}" class="card-img-top"
-                    alt="{{ event.name }}">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a href="/event-attendance/{{ event.id }}">{{ event.name }}</a>
-                    </h5>
-                    {% if event.is_family_friendly %}
-                    <p class="family-friendly-label">
-                        <img src="{{ url_for('static', filename='images/family_icon.jpg') }}" alt="Family Friendly Icon"
-                            class="family-icon">
-                        Family Friendly Event
-                    </p>
-                    {% endif %}
-                    <p><strong>Event Date:</strong> {{ event.date.strftime('%d-%m-%Y') }}</p>
-                    <p><strong>Maximum capacity:</strong> {{ event.max_guest_num }} people</p>
-                    <p><strong>Member price:</strong> {{ event.member_price }} €</p>
-                    <p><strong>Member price (Child):</strong> {{ event.member_child_price }} €</p>
-                    <p><strong>Guest price:</strong> {{ event.guest_price }} €</p>
-                    <p><strong>Description:</strong> {{ event.description }}</p>
-                    <p><strong>Available tickets:</strong>
-                        {% for detail in event_details %}
-                        {% if detail.event == event.id %}
-                        {% if detail.sold_out %}
-                        <span class="text-danger">{{ detail.tickets_remaining }}</span>
-                        {% else %}
-                        {% if detail.warning_few_tickets %}
-                        <span class="text-warning">{{ detail.tickets_remaining }}</span>
-                        {% else %}
-                        <span class="text-success">{{ detail.tickets_remaining }}/{{ event.max_guest_num }}</span>
-                        {% endif %}
-                        {% endif %}
-                        {% endif %}
-                        {% endfor %}
-                    </p>
-                </div>
-                <div class="card-footer">
-                    <a href="/update-event/{{ event.id }}" class="btn btn-warning">Edit</a>
-                    <button type="button" class="btn btn-danger" onClick="deleteEvent({{ event.id }})">Delete</button>
-                </div>
-                {% for detail in event_details %}
-                {% if detail.event == event.id and detail.sold_out %}
-                <div
-                    class="sold-out-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
-                    <img src="{{ url_for('static', filename='images/sold_out.png') }}" alt="Sold Out"
-                        style="max-width: 80%; max-height: 80%;">
-                </div>
-                {% endif %}
-                {% endfor %}
+    {% endif %}
+</div>
+<div class="container py-5" id="statistics">
+    <br />
+    <h1 class="text-center mb-4">User Satisfaction Statistics</h1>
+    <br />
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="stat-card bg-light p-4 shadow-sm rounded">
+                <h2 class="stat-value display-4">95%</h2>
+                <p class="stat-label">Overall Satisfaction</p>
             </div>
         </div>
-        {% endfor %}
+        <div class="col-md-3">
+            <div class="stat-card bg-light p-4 shadow-sm rounded">
+                <h2 class="stat-value display-4">90%</h2>
+                <p class="stat-label">Event Organization</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-light p-4 shadow-sm rounded">
+                <h2 class="stat-value display-4">85%</h2>
+                <p class="stat-label">Venue Quality</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-light p-4 shadow-sm rounded">
+                <h2 class="stat-value display-4">88%</< /h2>
+                    <p class="stat-label">Activities Variety</p>
+            </div>
+        </div>
     </div>
-
-
-    
 </div>
 
+<!-- Styles for the hero banner and additional custom styles -->
 <style>
+    .stat-card {
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: scale(1.05);
+    }
+
+    .stat-value {
+        color: #414197;
+    }
+
+    .stat-label {
+        font-size: 1.2rem;
+        color: #333;
+    }
+
     .hero-banner {
         position: relative;
         height: 60vh;
@@ -178,16 +300,10 @@
         transition: transform 0.3s ease;
     }
 
-    
-    .card-footer {
-    position: relative;
-    z-index: 10; /* Higher than sold-out-overlay */
-}
-
     .sold-out-overlay {
         background: rgba(255, 255, 255, 0.8);
-        z-index: 5; /* Lower than card-footer */
     }
+
     .family-friendly {
         border: 2px solid #32CD32;
         /* Lime Green border */
@@ -212,12 +328,73 @@
         height: 20px;
         margin-right: 5px;
     }
+
+    .search-bar {
+        font-size: 1.1rem;
+        padding: 10px;
+        border: 2px solid #414197;
+    }
+
+    .search-bar::placeholder {
+        color: #414197;
+        opacity: 0.6;
+    }
 </style>
 
 <script>
+    document.querySelector('.btn-primary').addEventListener('click', function (event) {
+        event.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+
+    document.getElementById('upcoming-events-search').addEventListener('keyup', function () {
+        const query = this.value.toLowerCase();
+        const events = document.querySelectorAll('#upcoming-events-list .event-card');
+        events.forEach(event => {
+            const eventName = event.querySelector('.card-title a').textContent.toLowerCase();
+            if (eventName.includes(query)) {
+                event.style.display = 'block';
+            } else {
+                event.style.display = 'none';
+            }
+        });
+    });
+
+    document.getElementById('past-events-search').addEventListener('keyup', function () {
+        const query = this.value.toLowerCase();
+        const events = document.querySelectorAll('#past-events-list .event-card');
+        events.forEach(event => {
+            const eventName = event.querySelector('.card-title').textContent.toLowerCase();
+            if (eventName.includes(query)) {
+                event.style.display = 'block';
+            } else {
+                event.style.display = 'none';
+            }
+        });
+    });
+
+    {% if current_user.is_admin %}
     document.getElementById('create-event-btn').addEventListener('click', function () {
         document.getElementById('create-event-form').style.display = 'block';
         this.style.display = 'none';
     });
+
+    function deleteEvent(eventId) {
+        if (confirm('Are you sure you want to delete this event?')) {
+            fetch(`/delete-event/${eventId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Failed to delete event.');
+                    }
+                });
+        }
+    }
+    {% endif %}
 </script>
 {% endblock %}
