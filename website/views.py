@@ -365,18 +365,25 @@ def success():
 
             msg = Message('Thank You for Collaborating with GREMA!', recipients=[current_user.email])
             msg.body = f"""
-            
-            Thank you for purchasing GREMA tickets!!! We are looking forward to seeing you in the event with your family!
-            
-            number_member_tickets={number_member_tickets},
-            number_memberchild_tickets={number_child_member_tickets},
-            number_guest_tickets={number_guest_tickets},
-            number_child_tickets={number_child_tickets},
-            guests_names={guests_names},
-            total_price={totalAmount},
-            
-            http://localhost:5000/my_events
-            """
+                Thank you for purchasing GREMA tickets! We are excited to have you and your family join us at the event.
+
+                Here are the details of your purchase:
+                - Number of Member Tickets: {number_member_tickets}
+                - Number of Child Member Tickets: {number_child_member_tickets}
+                - Number of Guest Tickets: {number_guest_tickets}
+                - Number of Child Tickets: {number_child_tickets}
+                - Guests Names: {guests_names}
+
+                Total Price: €{totalAmount}
+
+                You can view your upcoming events and manage your tickets by visiting the following link:
+                http://localhost:5000/my_events
+
+                We look forward to seeing you there!
+
+                Best regards,
+                The GREMA Team
+                """
             mail.send(msg)
 
             
@@ -431,13 +438,20 @@ def success_vip():
 
             msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
             msg.body = f"""
-            
-            Your VIP tickets have been booked. Enjoy
+                Thank you for booking your VIP tickets with GREMA! We are excited to have you join us.
 
-            VIP tickets: {vip_admin_tickets}
-            
-            http://localhost:5000/my_events
-            """
+                Here are the details of your booking:
+                - VIP tickets: {vip_admin_tickets}
+
+                You can view your tickets and event details by visiting the following link:
+                http://localhost:5000/my_events
+
+                We look forward to seeing you at the event!
+
+                Best regards,
+                The GREMA Team
+                """
+
             mail.send(msg)
 
             return render_template('success.html', user=current_user)
@@ -484,20 +498,26 @@ def success_free():
 
             msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
             msg.body = f"""
-            
-            Your free tickets have been booked. Enjoy
+                Your free tickets have been successfully booked. Enjoy the event!
 
-            Ticket info: 
-            number_member_tickets={number_member_tickets},
-            number_member_child_tickets={number_memberchild_tickets},
-            number_guest_tickets={number_guest_tickets},
-            number_child_tickets={number_child_tickets},
-            vip_admin_tickets={vip_admin_tickets},
-            guests_names={guests_names},
-            total_price={totalAmount},
-            
-            http://localhost:5000/my_events
-            """
+                Ticket Information:
+                - Member tickets: {number_member_tickets}
+                - Member child tickets: {number_memberchild_tickets}
+                - Guest tickets: {number_guest_tickets}
+                - Child tickets: {number_child_tickets}
+                - VIP admin tickets: {vip_admin_tickets}
+                - Guests names: {guests_names}
+                - Total price: {totalAmount} €
+
+                You can view your tickets and event details by visiting the following link:
+                http://localhost:5000/my_events
+
+                We look forward to seeing you at the event!
+
+                Best regards,
+                The GREMA Team
+                """
+
             mail.send(msg)
 
             return render_template('success.html', user=current_user)
@@ -547,20 +567,25 @@ def success_cash():
 
             msg = Message('GREMA MEMBERSHIP', recipients=[current_user.email])
             msg.body = f"""
-            
-            Thank you for purchasing GREMA tickets!!! We are looking forward to seeing you in the event with your family!
-            
-            number_member_tickets={number_member_tickets},
-            number_memberchild_tickets={number_child_member_tickets},
-            number_guest_tickets={number_guest_tickets},
-            number_child_tickets={number_child_tickets},
-            guests_names={guests_names},
-            total_price={totalAmount},
-            
-            RECUERDA QUE DEBES PAGAR EN EFECTIVO ALLÍ!
-            
-            http://localhost:5000/my_events
-            """
+                Thank you for purchasing GREMA tickets! We are looking forward to seeing you at the event with your family!
+
+                Ticket Information:
+                - Member tickets: {number_member_tickets}
+                - Member child tickets: {number_child_member_tickets}
+                - Guest tickets: {number_guest_tickets}
+                - Child tickets: {number_child_tickets}
+                - Guests names: {guests_names}
+                - Total price: {totalAmount} €
+
+                PLEASE REMEMBER TO PAY IN CASH AT THE EVENT!
+
+                You can view your tickets and event details by visiting the following link:
+                http://localhost:5000/my_events
+
+                Best regards,
+                The GREMA Team
+                """
+
             mail.send(msg)
 
             return render_template('success.html', user=current_user)

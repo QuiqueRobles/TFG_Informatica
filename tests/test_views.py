@@ -276,7 +276,13 @@ def test_family_friendly_events(client):
     db.session.delete(event)
     db.session.commit()
 
+def test_home_page_performance(benchmark, client):
+    # Benchmark the request to the home page
+    result = benchmark(client.get, "/login")
 
+    # Check the response
+    assert result.status_code == 200
+    assert b"Welcome to GREMA Events Admin" in result.data
 
 
 #################################################################
