@@ -2,8 +2,10 @@
 
 from main import app
 import pytest
+import json
+from datetime import date
 from flask_login import current_user
-from website.models import Event,User,db
+from website.models import Event,User,db,Fee,Partner,Child
 
 # Fixture para configurar el cliente de prueba
 @pytest.fixture
@@ -273,6 +275,10 @@ def test_family_friendly_events(client):
     event = Event.query.filter_by(name='FamilyEventTest').first()
     db.session.delete(event)
     db.session.commit()
+
+
+
+
 #################################################################
 ################################################################
 
@@ -299,3 +305,15 @@ def create_test_event(client):
                                      'description': 'This is a test event'}, 
                                follow_redirects=True)
     return response
+
+def create_test_user(client):
+    with app.app_context():
+        user = User(email='testuser@example.com', first_name='Test', surname='User', password='password', nif="12345678A",
+                    phone_number="123456789", address="123 Test St", birthday=date(1980, 1, 1), is_admin=False)
+        db.session.add(user)
+        db.session.commit()
+    return user
+
+def login_as_user_payment(client, user):
+    with client.session_transaction() as sess:
+        sess['_user_id'] = user.id
