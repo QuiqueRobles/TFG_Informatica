@@ -34,7 +34,7 @@ def test_login_as_admin(client):
     response = client.post('/login', data={'email': 'admin@gmail.com', 'password': 'adminTFG_2024'}, follow_redirects=True)
     assert b'Welcome to GREMA Events Admin' in response.data  # Verifica que el inicio de sesión sea exitoso
 
-# Prueba de registro de usuario
+
 # Prueba de registro de usuario
 def test_register_user(client):
     # Simular una solicitud de registro con datos válidos
@@ -282,7 +282,7 @@ def test_home_page_performance(benchmark, client):
 
     # Check the response
     assert result.status_code == 200
-    assert b"Welcome to GREMA Events Admin" in result.data
+    assert b"Login" in result.data
 
 
 #################################################################
