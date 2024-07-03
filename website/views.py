@@ -530,12 +530,18 @@ def success_free():
 @views.route('/success_cash', methods=['GET', 'POST'])
 @login_required
 def success_cash():
+        print("aqui estoy")
         try:
             # Extraer los datos del formulario de la solicitud
             data = request.json
-            # Aquí puedes acceder a los datos del formulario
-            number_member_tickets = data['number_member_tickets']
-            number_child_member_tickets = data['number_child_member_tickets']
+            has_paid_fee = Fee.query.filter_by(user_fee=current_user.id, payed=True).first()
+
+            if has_paid_fee:
+                number_member_tickets = data['number_member_tickets']
+                number_child_member_tickets = data['number_child_member_tickets']
+            else:
+                number_member_tickets = 0
+                number_child_member_tickets = 0
             number_guest_tickets = data['number_guest_tickets']
             number_child_tickets = data['number_child_tickets']
             if current_user.is_admin:
@@ -560,6 +566,7 @@ def success_cash():
                 total_price=totalAmount,
                 cash_payment_in_event=True
             )
+            
             
             # Agregar la nueva instancia a la sesión y confirmar los cambios en la base de datos
             db.session.add(event_attendance)
